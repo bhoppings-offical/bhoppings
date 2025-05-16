@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta
+      name="google-site-verification"
+      content="gEZW0Romg5lx3iDIbOF3QGgLAP1RR7lG0Dmj7i2qHK0"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <title>Home - Bhop</title>
+    <link rel="stylesheet" href="home.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="preload" href="/images/gradient-o.svg" as="image" />
+    <link rel="preload" href="/images/gradient-settings.svg" as="image" />
+    <preload name="navbar" src="/config/home_navbar.json"></preload>
+    <preload name="carousel" src="/config/carousel.json"></preload>
+  </head>
+
+  <body>
+    <canvas id="waveCanvas" width="800" height="800"></canvas>
+    <img src="/images/gradient-settings.svg" style="display: none" />
+
+    <div id="navbar" class="navbar-preload"></div>
+    <div id="home-container">
+      <div id="center" class="title-preload">
+        <div class="gradient-text">
+          bh<span id="bhop-spacer">o</span>p
+          <div id="settings-icon" onclick="window.open('/settings', '_self');">
+            <div class="gradient-o"></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="text">
+          The high-quality website that always has just what you need.
+        </div>
+      </div>
+      <div id="carousel" class="carousel-preload"></div>
+    </div>
+  </body>
+  <script type="text/javascript" src="/cursor.js"></script>
+  <script type="text/javascript" src="home.js"></script>
+  <script type="text/javascript" src="home-waves.js"></script>
+  <script type="text/javascript" src="/home/carousel.js"></script>
+  <script type="text/javascript" src="/user-theme.js"></script>
+  <script type="text/javascript" src="/music-player.js"></script>
+  <script type="text/javascript" src="/context-menu.js"></script>
+</html>

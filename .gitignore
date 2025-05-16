@@ -1,0 +1,10 @@
+.env
+generated-icon.png
+readme.md
+README.MD
+.git
+dev
+package-lock.json
+.upm
+node_modules
+github.sh

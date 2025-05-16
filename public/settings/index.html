@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+    <title>Settings - Bhop</title>
+    <link rel="stylesheet" href="/home/home.css" />
+    <link rel="stylesheet" href="settings.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <preload name="navbar" src="/config/home_navbar.json"></preload>
+  </head>
+
+  <body>
+    <canvas id="waveCanvas" width="800" height="800"></canvas>
+
+    <div id="navbar" class="navbar-preload">
+      <div class="gradient-text">bhop</div>
+    </div>
+
+    <div id="sidebar">
+      <button id="cursor-sidebar-button" class="active-sidebar-button">
+        <div id="cursor-sidebar-img"></div>
+      </button>
+      <button>
+        <div id="sidebar-b"></div>
+      </button>
+      <button>
+        <img src="images/lightning.svg" />
+      </button>
+      <button>
+        <img src="images/science.svg" />
+      </button>
+      <button>
+        <img src="images/danger.svg" />
+      </button>
+    </div>
+    <div id="settings-container">
+      <div class="settings-container-row">
+        <!-- Generate options dynamically -->
+        <script>
+          function idToName(input) {
+            return (
+              input
+                // Replace the first letter and any letter after "_" with the uppercase equivalent
+                .replace(
+                  /(?:^|\_)([a-z])/g,
+                  (match, letter) => `_${letter.toUpperCase()}`,
+                )
+
+                // Replace underscores with spaces
+                .replace(/_/g, " ")
+
+                // Replace groups of digits with "#<digits>"
+                .replace(/\d+/g, (match) => ` #${match}`)
+            );
+          }
+          const cursorContainer = $(".settings-container-row").eq(0);
+
+          (async () => {
+            const data = await $.getJSON("/config/theme-colors.json");
+            const cursorSvgDoc = await $.get("/images/cursor.svg");
+            const cursorSvg = new XMLSerializer().serializeToString(
+              cursorSvgDoc,
+            );
+
+            // Loop through each cursor preset and dynamically replace the gradient ID and colors
+            for (let i = 0; i <= Object.keys(data.cursors).length - 1; i++) {
+              const key = Object.keys(data.cursors)[i];
+              const cursorData = data.cursors[key];
+
+              // Generate a unique gradient ID for each cursor
+              const gradientId = `gradientStroke-${key}`;
+
+              // Replace the gradient ID and colors in the SVG
+              const modifiedSvg = cursorSvg
+                .replace(/gradientStroke/g, `${gradientId}`) // Replace the ID to make it unique
+                .replace(
+                  /stop-color="#fff"/g,
+                  `stop-color="${cursorData.color1}"`,
+                ) // Replace color1
+                .replace(
+                  /stop-color="#000"/g,
+                  `stop-color="${cursorData.color2 || cursorData.color1}"`,
+                )
+                .replace("<svg", `<svg class="cursor-img"`); // Replace color2 (or fallback to color1)
+
+              console.log(cursorData);
+
+              // Append the modified SVG
+              cursorContainer.append(`
+                <div class="option">
+                  ${modifiedSvg}
+                  <button onclick="
+                    setUserStyle('cursor1', '${cursorData.color1}');
+                    setUserStyle('cursor2', '${cursorData.color2 || cursorData.color1}');
+                  ">${idToName(key)}</button>
+                </div>
+              `);
+            }
+
+            $("#settings-container, #sidebar").addClass("loaded");
+
+            for (let i = 0; i <= Object.keys(data.themes).length - 1; i++) {
+              const key = Object.keys(data.themes)[i];
+              $("#gradient-text-row").append(`
+                <div class="option">
+                  <div class="gradient-text" style="--color1: ${data.themes[key].color1}; --color2: ${data.themes[key].color2}">
+                    bhop
+                  </div>
+                  <button onclick="
+                    setUserStyle('color1', '${data.themes[key].color1}');
+                    setUserStyle('color2', '${data.themes[key].color2}');
+                    setUserStyle('bg1', '${data.themes[key].bg1}');
+                    setUserStyle('bg2', '${data.themes[key].bg2}');
+                  ">${idToName(key)}</button>
+                </div>
+              `);
+            }
+          })();
+        </script>
+      </div>
+
+      <div class="settings-container-row" id="gradient-text-row"></div>
+
+      <div class="settings-container-row">
+        <script>
+          function setEffect(effect) {
+            Account.setValue("effect", effectsSettings.indexOf(effect));
+            const effects = {
+              waves: WavePointsEffect,
+              particle_field: ParticleFieldEffect,
+              shooting_stars: ShootingStarsEffect,
+              starfield: StarFieldEffect,
+              neural: NeuralEffect,
+            };
+
+            const effectInstance = new effects[effect]();
+            console.log(effect);
+
+            // Use the framework to run the effect
+            animationFramework.setEffect(effectInstance);
+          }
+          const effectsSettings = [
+            "waves",
+            "particle_field",
+            "shooting_stars",
+            "starfield",
+            "neural",
+          ];
+          effectsSettings.forEach((effect) => {
+            document.write(
+              `<div class="option">
+                <img style="transform: translate(-50%, -50%) scale(1.5) " src="/images/effect_icons/${effect}.svg" />
+                <button onclick="
+                setEffect('${effect}');
+                ">${idToName(effect)}</button>
+              </div>`,
+            );
+          });
+        </script>
+      </div>
+
+      <div class="settings-container-row">
+        <table>
+          <!--
+          <tr>
+            <td>
+              Debug Mode<span class="small"
+                >Press Ctrl + . to access the debug menu.</span
+              >
+            </td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="debug-menu-checkbox" />
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>-->
+
+          <tr>
+            <td>
+              Disable Cursor<span class="small"
+                >Use the default cursor. Only enable this if you are having
+                problems.<br />*Requires a reload.</span
+              >
+            </td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="disable-cursor-checkbox" />
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Skip Bio<span class="small"
+                >Skip straight to the home page.<br />
+                (the bio can still be accessed through the navbar)</span
+              >
+            </td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" id="skip-bio-checkbox" />
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>
+        </table>
+        <script>
+          $("#disable-cursor-checkbox")
+            .prop("checked", Account.getValue("disableCursor") === true)
+            .change(function (e) {
+              if (e.target.checked) {
+                Account.setValue("disableCursor", true);
+              } else {
+                Account.setValue("disableCursor", false);
+              }
+            });
+          $("#skip-bio-checkbox")
+            .prop("checked", Account.getValue("skipBio") === true)
+            .change(function (e) {
+              if (e.target.checked) {
+                Account.setValue("skipBio", false);
+              } else {
+                Account.setValue("skipBio", true);
+              }
+            });
+        </script>
+      </div>
+
+      <div class="settings-container-row">
+        <h1>
+          <img src="/images/danger.svg" alt="⚠️" />
+        </h1>
+        <h1>
+          Danger Zone
+          <span class="small"
+            >Do not proceed if you are unsure, as options here can have severe
+            consequences.</span
+          >
+        </h1>
+        <table>
+          <tr>
+            <td>
+              Reset All Account Data<span class="small"
+                >This will delete all saved data, including settings, progress,
+                etc. This cannot be undone.<br />This will not affect data
+                stored by "Powered by Bhoppings" pages.
+              </span>
+            </td>
+            <td>
+              <button
+                style="float: right"
+                onclick="Account.resetData().mergeWithDefaults();"
+              >
+                <img src="/images/trash-red.svg" />
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Placeholder<span class="small"
+                >This will be filled with something eventually.</span
+              >
+            </td>
+            <td>
+              <button style="float: right" onclick="">
+                <img src="/images/placeholder.png" />
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Placeholder<span class="small"
+                >This will be filled with something eventually.</span
+              >
+            </td>
+            <td>
+              <button style="float: right" onclick="">
+                <img src="/images/placeholder4.png" />
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Placeholder<span class="small"
+                >This will be filled with something eventually.</span
+              >
+            </td>
+            <td>
+              <button style="float: right" onclick="">
+                <img src="/images/placeholder2.png" />
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Placeholder<span class="small"
+                >This will be filled with something eventually.</span
+              >
+            </td>
+            <td>
+              <button style="float: right" onclick="">
+                <img src="/images/placeholder3.png" />
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+
+  <script type="text/javascript" src="/cursor.js"></script>
+  <script type="text/javascript" src="/home/home.js"></script>
+  <script type="text/javascript" src="/home/home-waves.js"></script>
+  <script type="text/javascript" src="/user-theme.js"></script>
+  <script type="text/javascript" src="/settings/settings.js"></script>
+</html>

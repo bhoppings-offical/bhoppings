@@ -1,0 +1,22 @@
+[
+    {
+        "multiple": true,
+        "text": "bio",
+        "pages": [
+            { "text": "bhop", "url": "/" },
+            { "text": "bhop's observatory", "url": "/observe" },
+            { "text": "chezlinkz", "url": "/chezlinkz" }
+        ]
+    },
+    { "text": "tangini", "url": "/tangini" },
+    {
+        "multiple": true,
+        "text": "downloads",
+        "pages": [{ "text": "tango clicker", "url": "/downloads/tangoclicker" }]
+    },
+    { "text": "nexa", "url": "/nexa" },
+    { "text": "orik", "url": "/orik" },
+    { "text": "movies", "url": "/movies" },
+    { "text": "quill", "url": "/quill" },
+    { "text": "Apps", "url": "/app-library", "image": "lume-package-bold.svg" }
+]

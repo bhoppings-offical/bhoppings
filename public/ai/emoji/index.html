@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Pixelizer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            background-color: #f8fafc;
+        }
+
+        .upload-section label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4299e1;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .upload-section label:hover {
+            background-color: #3182ce;
+        }
+
+        .upload-section input[type="file"] {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #38a169;
+        }
+
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .preview-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .preview-container {
+            flex: 1;
+            min-width: 300px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: white;
+        }
+
+        .preview-heading {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        #originalPreview,
+        #downscaledPreview {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #emojiOutput {
+            white-space: pre;
+            font-family: monospace;
+            overflow-x: auto;
+            background-color: #26252A;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .copy-button {
+            display: block;
+            margin: 10px 0 0 auto;
+            padding: 6px 12px;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .preview-container {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Emoji Pixelizer</h1>
+
+    <div class="container">
+        <div class="upload-section">
+            <p>Upload an image to convert it to emoji art</p>
+            <label for="imageInput">Choose Image</label>
+            <input type="file" id="imageInput" accept="image/*">
+            <div id="dropArea">Or drag and drop an image here</div>
+        </div>
+
+        <div id="controls" class="controls hidden">
+            <div class="control-group">
+                <label for="widthInput">Width (pixels)</label>
+                <input type="number" id="widthInput" min="5" max="100" value="30">
+            </div>
+
+            <div class="control-group">
+                <label for="heightInput">Height (pixels)</label>
+                <input type="number" id="heightInput" min="5" max="100" value="20">
+            </div>
+
+            <div class="control-group">
+                <label for="emojiSet">Emoji Set</label>
+                <select id="emojiSet">
+                    <option value="squares">Colored Squares Only</option>
+                    <option value="basic">Basic (16 emojis)</option>
+                    <option value="extended" selected>Extended (32 emojis)</option>
+                    <option value="full">Full (64 emojis)</option>
+
+                    <option value="ios">IOS (thousands)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="maintainAspectRatio">Maintain Aspect Ratio</label>
+                <input type="checkbox" id="maintainAspectRatio" checked>
+            </div>
+
+            <button id="processButton">Generate Emoji Art</button>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            Processing image, please wait...
+        </div>
+
+        <div id="previewSection" class="preview-section hidden">
+            <div class="preview-container">
+                <div class="preview-heading">Original Image</div>
+                <img id="originalPreview" src="" alt="Original Image">
+            </div>
+
+            <div class="preview-container">
+                <div class="preview-heading">Downscaled Image</div>
+                <img id="downscaledPreview" src="" alt="Downscaled Image">
+            </div>
+
+            <div class="preview-container">
+                <div class="preview-heading">Emoji Art</div>
+                <div id="emojiOutput"></div>
+                <button id="copyButton" class="copy-button">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas" style="display: none;"></canvas>
+    <canvas id="emojiCanvas" style="display: none;"></canvas>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM elements
+            const imageInput = document.getElementById('imageInput');
+            const widthInput = document.getElementById('widthInput');
+            const heightInput = document.getElementById('heightInput');
+            const maintainAspectRatio = document.getElementById('maintainAspectRatio');
+            const emojiSetSelect = document.getElementById('emojiSet');
+            const processButton = document.getElementById('processButton');
+            const originalPreview = document.getElementById('originalPreview');
+            const downscaledPreview = document.getElementById('downscaledPreview');
+            const emojiOutput = document.getElementById('emojiOutput');
+            const copyButton = document.getElementById('copyButton');
+            const controls = document.getElementById('controls');
+            const previewSection = document.getElementById('previewSection');
+            const loading = document.getElementById('loading');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const emojiCanvas = document.getElementById('emojiCanvas');
+            const emojiCtx = emojiCanvas.getContext('2d');
+            const dropArea = document.getElementById('dropArea');
+
+            // Add subdivision option
+            const subdivisionToggle = document.createElement('div');
+            subdivisionToggle.className = 'mt-4';
+            subdivisionToggle.innerHTML = `
+                <label class="flex items-center">
+                    <input type="checkbox" id="useSubdivision" class="mr-2">
+                    <span>Use subdivision (1 emoji = 4 pixels)</span>
+                </label>
+            `;
+
+            // Insert after emoji set selection
+            emojiSetSelect.parentNode.parentNode.insertAdjacentElement('afterend', subdivisionToggle);
+            const useSubdivision = document.getElementById('useSubdivision');
+
+            // Add resolution percentage slider
+            const resolutionControl = document.createElement('div');
+            resolutionControl.className = 'mt-4';
+            resolutionControl.innerHTML = `
+                <label class="block mb-2">
+                    <span>Resolution (% of original)</span>
+                    <div class="flex items-center">
+                        <input type="range" id="resolutionSlider" class="w-full mr-2" min="1" max="100" value="20">
+                        <span id="resolutionValue">20%</span>
+                    </div>
+                </label>
+                <div class="text-sm text-gray-500">Max resolution: <span id="maxResolutionInfo">--</span></div>
+            `;
+
+            // Insert after subdivision toggle
+            subdivisionToggle.insertAdjacentElement('afterend', resolutionControl);
+            const resolutionSlider = document.getElementById('resolutionSlider');
+            const resolutionValue = document.getElementById('resolutionValue');
+            const maxResolutionInfo = document.getElementById('maxResolutionInfo');
+
+            // Background color for transparent areas (dark gray #26252A)
+            const bgColor = {
+                r: 38,  // 0x26
+                g: 37,  // 0x25
+                b: 42   // 0x2A
+            };
+
+            // Emoji sets
+            const emojiSets = {
+                squares: ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜', '🟫'],
+                basic: ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜', '🟫', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪'],
+                extended: ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜', '🟫', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪',
+                    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '🌑', '🌕', '🔶', '🔷', '♦️', '♣️', '♠️'],
+                full: ['🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛', '⬜', '🟫', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪',
+                    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '🌑', '🌕', '🔶', '🔷', '♦️', '♣️', '♠️',
+                    '🍎', '🍊', '🍋', '🍏', '🫐', '🍇', '🍫', '🥛', '🌰', '🍒', '🦞', '🌻', '🥝', '🐬', '🌂', '🤔',
+                    '🍅', '🦊', '🌼', '🥑', '🐳', '🍆', '🐈‍⬛', '👻', '🌲', '🍄', '🦀', '🌞', '🧩', '🌊', '👾', '🌸'],
+
+            };
+
+            fetch("https://raw.githubusercontent.com/chalda-pnuzig/emojis.json/refs/heads/master/src/array.with.modifiers.json")
+                .then(response => response.json())
+                .then(data => {
+                    const emojis = JSON.stringify(data.emojis).replace("\"");
+                    emojiSets.ios = data.emojis;
+                })
+
+            // Global variables
+            let originalImage = null;
+            let aspectRatio = 1;
+            let originalWidth = 0;
+            let originalHeight = 0;
+            const maxAllowedDimension = 500; // Maximum allowed dimension for performance
+
+            // Event listeners
+            imageInput.addEventListener('change', handleImageUpload);
+            widthInput.addEventListener('input', handleWidthChange);
+            heightInput.addEventListener('input', handleHeightChange);
+            processButton.addEventListener('click', processImage);
+            copyButton.addEventListener('click', copyToClipboard);
+
+            // Add subdivision change listener
+            useSubdivision.addEventListener('change', function () {
+                // When subdivision is enabled, dimensions should be even
+                if (this.checked) {
+                    ensureEvenDimensions();
+                }
+            });
+
+            // Add resolution slider listener
+            resolutionSlider.addEventListener('input', function () {
+                const percentage = this.value;
+                resolutionValue.textContent = `${percentage}%`;
+
+                if (originalImage) {
+                    // Calculate new dimensions based on percentage
+                    let newWidth = Math.round((originalWidth * percentage) / 100);
+                    let newHeight = Math.round((originalHeight * percentage) / 100);
+
+                    // Ensure we don't exceed max dimensions
+                    if (newWidth > maxAllowedDimension || newHeight > maxAllowedDimension) {
+                        const scaleFactor = Math.min(maxAllowedDimension / newWidth, maxAllowedDimension / newHeight);
+                        newWidth = Math.round(newWidth * scaleFactor);
+                        newHeight = Math.round(newHeight * scaleFactor);
+                    }
+
+                    // Update input fields
+                    widthInput.value = newWidth;
+                    heightInput.value = newHeight;
+
+                    // Ensure even dimensions if subdivision is enabled
+                    if (useSubdivision.checked) {
+                        ensureEvenDimensions();
+                    }
+                }
+            });
+
+            // Drag and drop handling
+            dropArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                dropArea.style.borderColor = '#4299e1';
+            });
+
+            dropArea.addEventListener('dragleave', function () {
+                dropArea.style.borderColor = '#cbd5e0';
+            });
+
+            dropArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                dropArea.style.borderColor = '#cbd5e0';
+
+                if (e.dataTransfer.files.length) {
+                    imageInput.files = e.dataTransfer.files;
+                    handleImageUpload();
+                }
+            });
+
+            // Ensure dimensions are even for subdivision
+            function ensureEvenDimensions() {
+                const width = parseInt(widthInput.value);
+                const height = parseInt(heightInput.value);
+
+                // Make dimensions even if they're not
+                if (width % 2 !== 0) {
+                    widthInput.value = width + 1;
+                }
+
+                if (height % 2 !== 0) {
+                    heightInput.value = height + 1;
+                }
+            }
+
+            // Image upload handler
+            function handleImageUpload() {
+                const file = imageInput.files[0];
+                if (!file || !file.type.startsWith('image/')) {
+                    alert('Please select a valid image file.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        originalImage = img;
+                        originalWidth = img.width;
+                        originalHeight = img.height;
+                        aspectRatio = originalWidth / originalHeight;
+
+                        // Update max resolution info
+                        let maxDimensionInfo = `${originalWidth}×${originalHeight}`;
+                        if (originalWidth > maxAllowedDimension || originalHeight > maxAllowedDimension) {
+                            const scaleFactor = Math.min(maxAllowedDimension / originalWidth, maxAllowedDimension / originalHeight);
+                            const maxWidth = Math.floor(originalWidth * scaleFactor);
+                            const maxHeight = Math.floor(originalHeight * scaleFactor);
+                            maxDimensionInfo += ` (limited to ${maxWidth}×${maxHeight})`;
+                        }
+                        maxResolutionInfo.textContent = maxDimensionInfo;
+
+                        // Calculate default percentage (around 20% of original)
+                        const defaultPercentage = Math.min(20, Math.max(1, Math.floor(100 * 30 / Math.max(originalWidth, originalHeight))));
+                        resolutionSlider.value = defaultPercentage;
+                        resolutionValue.textContent = `${defaultPercentage}%`;
+
+                        // Calculate dimensions based on percentage
+                        let defaultWidth = Math.round((originalWidth * defaultPercentage) / 100);
+                        let defaultHeight = Math.round((originalHeight * defaultPercentage) / 100);
+
+                        // Ensure we don't exceed max dimensions
+                        if (defaultWidth > maxAllowedDimension || defaultHeight > maxAllowedDimension) {
+                            const scaleFactor = Math.min(maxAllowedDimension / defaultWidth, maxAllowedDimension / defaultHeight);
+                            defaultWidth = Math.round(defaultWidth * scaleFactor);
+                            defaultHeight = Math.round(defaultHeight * scaleFactor);
+                        }
+
+                        // Update input fields
+                        widthInput.value = defaultWidth;
+                        heightInput.value = defaultHeight;
+
+                        // Ensure even dimensions if subdivision is enabled
+                        if (useSubdivision.checked) {
+                            ensureEvenDimensions();
+                        }
+
+                        // Show original preview
+                        originalPreview.src = e.target.result;
+
+                        // Show controls
+                        controls.classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Handle width change while maintaining aspect ratio
+            function handleWidthChange() {
+                const newWidth = parseInt(widthInput.value);
+
+                // Handle aspect ratio
+                if (maintainAspectRatio.checked && originalImage) {
+                    heightInput.value = Math.round(newWidth / aspectRatio);
+                }
+
+                // If subdivision is enabled, ensure width is even
+                if (useSubdivision.checked && newWidth % 2 !== 0) {
+                    widthInput.value = newWidth + (newWidth < originalWidth ? 1 : -1);
+                }
+
+                // Update resolution slider to reflect the new width
+                if (originalWidth > 0) {
+                    const percentage = Math.round((newWidth / originalWidth) * 100);
+                    resolutionSlider.value = percentage;
+                    resolutionValue.textContent = `${percentage}%`;
+                }
+            }
+
+            // Handle height change while maintaining aspect ratio
+            function handleHeightChange() {
+                const newHeight = parseInt(heightInput.value);
+
+                // Handle aspect ratio
+                if (maintainAspectRatio.checked && originalImage) {
+                    widthInput.value = Math.round(newHeight * aspectRatio);
+                }
+
+                // If subdivision is enabled, ensure height is even
+                if (useSubdivision.checked && newHeight % 2 !== 0) {
+                    heightInput.value = newHeight + (newHeight < originalHeight ? 1 : -1);
+                }
+
+                // Update resolution slider to reflect the new height
+                if (originalHeight > 0) {
+                    const percentage = Math.round((newHeight / originalHeight) * 100);
+                    resolutionSlider.value = percentage;
+                    resolutionValue.textContent = `${percentage}%`;
+                }
+            }
+
+            // Process image to generate emoji art
+            function processImage() {
+                if (!originalImage) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+
+                const width = parseInt(widthInput.value);
+                const height = parseInt(heightInput.value);
+                const subdivide = useSubdivision.checked;
+
+                // Validate dimensions
+                if (width < 5 || height < 5) {
+                    alert('Please use dimensions of at least 5 pixels.');
+                    return;
+                }
+
+                // Check for max dimensions
+                if (width > maxAllowedDimension || height > maxAllowedDimension) {
+                    alert(`Please keep dimensions under ${maxAllowedDimension} pixels for performance reasons.`);
+                    return;
+                }
+
+                // If subdivision is enabled, dimensions must be even
+                if (subdivide && (width % 2 !== 0 || height % 2 !== 0)) {
+                    alert('When using subdivision, width and height must be even numbers.');
+                    return;
+                }
+
+                // Show loading indicator
+                loading.classList.remove('hidden');
+                previewSection.classList.add('hidden');
+
+                // Allow UI to update before processing starts
+                setTimeout(() => {
+                    // Set canvas to dark background color
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.fillStyle = '#26252A';
+                    ctx.fillRect(0, 0, width, height);
+
+                    // Downscale image
+                    ctx.drawImage(originalImage, 0, 0, width, height);
+
+                    // Get pixel data
+                    const imageData = ctx.getImageData(0, 0, width, height);
+
+                    // Show downscaled preview
+                    downscaledPreview.src = canvas.toDataURL();
+
+                    // Get selected emoji set
+                    const selectedSet = emojiSets[emojiSetSelect.value];
+
+                    // Calculate emoji color mappings
+                    const emojiColorMap = calculateEmojiColors(selectedSet, subdivide);
+
+                    // Convert to emoji art
+                    const emojiArt = subdivide ?
+                        pixelsToEmojisWithSubdivision(imageData.data, width, height, emojiColorMap) :
+                        pixelsToEmojis(imageData.data, width, height, emojiColorMap);
+
+                    // Display result
+                    emojiOutput.textContent = emojiArt;
+
+                    // Show preview section
+                    loading.classList.add('hidden');
+                    previewSection.classList.remove('hidden');
+                }, 100);
+            }
+
+            // Calculate average color for each emoji
+            function calculateEmojiColors(emojiSet, subdivide) {
+                // Setup emoji canvas for rendering
+                emojiCanvas.width = 50;
+                emojiCanvas.height = 50;
+
+                if (subdivide) {
+                    return calculateEmojiColorsWithSubdivision(emojiSet);
+                } else {
+                    return calculateEmojiColorsSimple(emojiSet);
+                }
+            }
+
+            // Calculate simple emoji colors (whole emoji average)
+            function calculateEmojiColorsSimple(emojiSet) {
+                const colorMap = [];
+
+                for (const emoji of emojiSet) {
+                    // Fill canvas with the background color
+                    emojiCtx.fillStyle = '#26252A';
+                    emojiCtx.fillRect(0, 0, 50, 50);
+
+                    // Draw emoji
+                    emojiCtx.font = '40px Arial';
+                    emojiCtx.textAlign = 'center';
+                    emojiCtx.textBaseline = 'middle';
+                    emojiCtx.fillText(emoji, 25, 25);
+
+                    // Get color data
+                    const emojiData = emojiCtx.getImageData(0, 0, 50, 50).data;
+
+                    // Calculate average color
+                    let r = 0, g = 0, b = 0, count = 0;
+
+                    for (let i = 0; i < emojiData.length; i += 4) {
+                        // Skip exact background color pixels
+                        if (emojiData[i] === bgColor.r &&
+                            emojiData[i + 1] === bgColor.g &&
+                            emojiData[i + 2] === bgColor.b) {
+                            continue;
+                        }
+
+                        r += emojiData[i];
+                        g += emojiData[i + 1];
+                        b += emojiData[i + 2];
+                        count++;
+                    }
+
+                    if (count > 0) {
+                        r = Math.round(r / count);
+                        g = Math.round(g / count);
+                        b = Math.round(b / count);
+                    } else {
+                        // If no non-background pixels, use background color
+                        r = bgColor.r;
+                        g = bgColor.g;
+                        b = bgColor.b;
+                    }
+
+                    colorMap.push({
+                        emoji: emoji,
+                        color: {r, g, b}
+                    });
+                }
+
+                return colorMap;
+            }
+
+            // Calculate subdivision emoji colors (4 quadrants)
+            function calculateEmojiColorsWithSubdivision(emojiSet) {
+                const colorMap = [];
+
+                for (const emoji of emojiSet) {
+                    // Fill canvas with the background color
+                    emojiCtx.fillStyle = '#26252A';
+                    emojiCtx.fillRect(0, 0, 50, 50);
+
+                    // Draw emoji
+                    emojiCtx.font = '40px Arial';
+                    emojiCtx.textAlign = 'center';
+                    emojiCtx.textBaseline = 'middle';
+                    emojiCtx.fillText(emoji, 25, 25);
+
+                    // Get color data
+                    const emojiData = emojiCtx.getImageData(0, 0, 50, 50).data;
+
+                    // Divide into quadrants (top-left, top-right, bottom-left, bottom-right)
+                    const quadrants = [
+                        {r: 0, g: 0, b: 0, count: 0}, // top-left
+                        {r: 0, g: 0, b: 0, count: 0}, // top-right
+                        {r: 0, g: 0, b: 0, count: 0}, // bottom-left
+                        {r: 0, g: 0, b: 0, count: 0}  // bottom-right
+                    ];
+
+                    const halfWidth = 25;
+                    const halfHeight = 25;
+
+                    for (let y = 0; y < 50; y++) {
+                        for (let x = 0; x < 50; x++) {
+                            const index = (y * 50 + x) * 4;
+
+                            // Skip exact background color pixels
+                            if (emojiData[index] === bgColor.r &&
+                                emojiData[index + 1] === bgColor.g &&
+                                emojiData[index + 2] === bgColor.b) {
+                                continue;
+                            }
+
+                            // Determine quadrant
+                            const quadIndex = (x < halfWidth ? 0 : 1) + (y < halfHeight ? 0 : 2);
+                            const quad = quadrants[quadIndex];
+
+                            quad.r += emojiData[index];
+                            quad.g += emojiData[index + 1];
+                            quad.b += emojiData[index + 2];
+                            quad.count++;
+                        }
+                    }
+
+                    // Calculate average color for each quadrant
+                    const quadColors = quadrants.map(quad => {
+                        if (quad.count > 0) {
+                            return {
+                                r: Math.round(quad.r / quad.count),
+                                g: Math.round(quad.g / quad.count),
+                                b: Math.round(quad.b / quad.count)
+                            };
+                        } else {
+                            // If no non-background pixels, use background color
+                            return {r: bgColor.r, g: bgColor.g, b: bgColor.b};
+                        }
+                    });
+
+                    colorMap.push({
+                        emoji: emoji,
+                        quadColors: quadColors
+                    });
+                }
+
+                return colorMap;
+            }
+
+            // Convert pixel data to emoji art
+            function pixelsToEmojis(pixelData, width, height, emojiColorMap) {
+                let result = '';
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const index = (y * width + x) * 4;
+                        const r = pixelData[index];
+                        const g = pixelData[index + 1];
+                        const b = pixelData[index + 2];
+
+                        // Find closest emoji match
+                        const emoji = findClosestEmoji(r, g, b, emojiColorMap);
+                        result += emoji;
+                    }
+                    result += '\n';
+                }
+
+                return result;
+            }
+
+            // Convert pixel data to emoji art using subdivision
+            function pixelsToEmojisWithSubdivision(pixelData, width, height, emojiColorMap) {
+                let result = '';
+
+                // Process 2x2 pixel groups
+                for (let y = 0; y < height; y += 2) {
+                    for (let x = 0; x < width; x += 2) {
+                        // Get colors for the 2x2 grid
+                        const quadColors = [];
+
+                        // Top-left pixel
+                        const idx1 = (y * width + x) * 4;
+                        quadColors.push({
+                            r: pixelData[idx1],
+                            g: pixelData[idx1 + 1],
+                            b: pixelData[idx1 + 2]
+                        });
+
+                        // Top-right pixel
+                        const idx2 = (y * width + (x + 1)) * 4;
+                        quadColors.push({
+                            r: pixelData[idx2],
+                            g: pixelData[idx2 + 1],
+                            b: pixelData[idx2 + 2]
+                        });
+
+                        // Bottom-left pixel
+                        const idx3 = ((y + 1) * width + x) * 4;
+                        quadColors.push({
+                            r: pixelData[idx3],
+                            g: pixelData[idx3 + 1],
+                            b: pixelData[idx3 + 2]
+                        });
+
+                        // Bottom-right pixel
+                        const idx4 = ((y + 1) * width + (x + 1)) * 4;
+                        quadColors.push({
+                            r: pixelData[idx4],
+                            g: pixelData[idx4 + 1],
+                            b: pixelData[idx4 + 2]
+                        });
+
+                        // Find closest emoji match based on subdivision
+                        const emoji = findClosestEmojiSubdivided(quadColors, emojiColorMap);
+                        result += emoji;
+                    }
+                    result += '\n';
+                }
+
+                return result;
+            }
+
+            // Find closest emoji to a given color
+            function findClosestEmoji(r, g, b, emojiColorMap) {
+                let closestDistance = Infinity;
+                let closestEmoji = '⬜';
+
+                for (const mapping of emojiColorMap) {
+                    const emojiColor = mapping.color;
+                    const distance = colorDistance(r, g, b, emojiColor.r, emojiColor.g, emojiColor.b);
+
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestEmoji = mapping.emoji;
+                    }
+                }
+
+                return closestEmoji;
+            }
+
+            // Find closest emoji based on 4 quadrant colors
+            function findClosestEmojiSubdivided(quadColors, emojiColorMap) {
+                let closestDistance = Infinity;
+                let closestEmoji = '⬜';
+
+                for (const mapping of emojiColorMap) {
+                    let totalDistance = 0;
+
+                    // Calculate distance for each quadrant
+                    for (let i = 0; i < 4; i++) {
+                        const pixelColor = quadColors[i];
+                        const emojiQuadColor = mapping.quadColors[i];
+
+                        const distance = colorDistance(
+                            pixelColor.r, pixelColor.g, pixelColor.b,
+                            emojiQuadColor.r, emojiQuadColor.g, emojiQuadColor.b
+                        );
+
+                        totalDistance += distance;
+                    }
+
+                    // Use average distance across all quadrants
+                    const avgDistance = totalDistance / 4;
+
+                    if (avgDistance < closestDistance) {
+                        closestDistance = avgDistance;
+                        closestEmoji = mapping.emoji;
+                    }
+                }
+
+                return closestEmoji;
+            }
+
+            // Calculate color distance using weighted Euclidean distance
+            function colorDistance(r1, g1, b1, r2, g2, b2) {
+                // Human eye is more sensitive to green, less to blue
+                const rMean = (r1 + r2) / 2;
+                const rDiff = r1 - r2;
+                const gDiff = g1 - g2;
+                const bDiff = b1 - b2;
+
+                return Math.sqrt(
+                    (2 + rMean / 256) * rDiff * rDiff +
+                    4 * gDiff * gDiff +
+                    (2 + (255 - rMean) / 256) * bDiff * bDiff
+                );
+            }
+
+            // Copy emoji art to clipboard
+            function copyToClipboard() {
+                const text = emojiOutput.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = copyButton.textContent;
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = originalText;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

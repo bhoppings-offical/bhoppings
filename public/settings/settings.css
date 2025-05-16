@@ -1,0 +1,387 @@
+@media (orientation: portrait) {
+  ::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  body {
+    overflow-y: hidden;
+    overflow-x: hidden;
+  }
+
+  #sidebar {
+    display: none;
+  }
+
+  #settings-container {
+    width: 100vw !important;
+    right: -36px;
+    top: 0px;
+    height: 100vh !important;
+  }
+
+  #settings-container> :first-child {
+    margin-top: 96px;
+  }
+
+  .option {
+    flex: 0 0 40vw !important;
+    height: auto !important;
+    border-radius: 4vw !important;
+  }
+
+  .option button {
+    border-radius: 4vw !important;
+    font-size: 0.7em !important;
+  }
+}
+
+
+#sidebar {
+  position: absolute;
+  left: -5vw;
+  top: 50vh;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.25);
+  width: 5vw;
+  height: fit-content;
+  border: solid 1px rgba(0, 0, 0, 0.6);
+  border-radius: 1.25vw;
+  transition: left 0.5s ease-in-out;
+}
+
+#sidebar.loaded {
+  left: 15vw !important;
+}
+
+#sidebar button {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  border: transparent;
+  outline: transparent;
+}
+
+#sidebar button img {
+  height: 42%;
+  aspect-ratio: 1 / 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#sidebar button#cursor-sidebar-button img {
+  height: 100%;
+  width: 100%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-30%, -30%);
+}
+
+#cursor-sidebar-img {
+  transform: translate(+20%, +20%);
+  width: 75%;
+}
+
+#sidebar button::before {
+  content: "";
+  height: 0px;
+  width: 5%;
+  background-color: #fff;
+  position: absolute;
+  left: 12%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+#sidebar button:hover::before,
+#sidebar .active-sidebar-button::before {
+  height: 25%;
+  opacity: 1;
+}
+
+#settings-container {
+  height: calc(100vh - 96px);
+  width: 70vw;
+  position: absolute;
+  right: -36px;
+  bottom: 0px;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  flex-wrap: wrap;
+  transform: translateY(+100%);
+  transition: transform 0.5s ease-in-out;
+}
+
+#settings-container.loaded {
+  transform: translateY(0px) !important;
+}
+
+#settings-container::-webkit-scrollbar {
+  background-color: transparent;
+  width: 6px;
+  margin-bottom: 6px;
+}
+
+#settings-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 6px;
+  border-right: solid 6px transparent;
+  width: 7px;
+  border-radius: 9999px;
+}
+
+.option {
+  aspect-ratio: 1;
+  height: 15.5vw;
+  margin: 1vw;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  position: relative;
+  border-radius: 2vw;
+  overflow: hidden;
+  border: solid 1px rgba(255, 255, 255, 0.2);
+  flex: 0 0 14.5vw;
+}
+
+.option img {
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.option .cursor-img {
+  position: absolute;
+  left: 50%;
+  transform: translate(-33%, -43%);
+  top: 50%;
+  height: 80%;
+  aspect-ratio: 1;
+}
+
+.option button {
+  width: calc(100% - 1vw);
+  height: 20%;
+  position: absolute;
+  left: 50%;
+  bottom: 0.5vw;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: solid 1px rgba(255, 255, 255, 0.2);
+  outline: none;
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  font-size: 1vw;
+}
+
+.option button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.option .gradient-text {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 60px;
+  background-clip: text;
+  font-weight: 800;
+}
+
+
+
+.settings-container-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  height: fit-content;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+  position: relative;
+}
+
+#sidebar #sidebar-b {
+  mask: url("/images/bhoppings-b.svg") no-repeat center / contain;
+  background: linear-gradient(to right, var(--color1), var(--color2));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 76%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  content: "";
+}
+
+.option.active-option::after {
+  height: 3vh;
+  width: 3vh;
+  position: absolute;
+  right: 3vh;
+  top: 3vh;
+  content: "";
+  background-image: url("/images/check.svg");
+  background-size: cover;
+}
+
+.bucket {
+  height: 14vh;
+  -webkit-mask-image: url("/images/bucket.svg");
+  mask-image: url("/images/bucket.svg");
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  width: 15vh;
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(to right, var(--bg1), var(--bg2));
+}
+
+.bucket::after {
+  content: "";
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))
+}
+
+body #sidebar .bucket {
+  height: 50%;
+  width: 51%;
+  top: 50%;
+}
+
+.option>img {
+  width: 50%;
+  top: 40%;
+}
+
+table {
+  width: calc(100% - 3vw);
+  box-sizing: border-box;
+  margin-bottom: 1vh;
+  border: solid 1.5px rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 2rem;
+}
+
+td {
+  padding: 1.5rem;
+  width: 50%;
+  box-sizing: border-box;
+  font-size: 1.5rem;
+}
+
+span.small {
+  display: block;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7em;
+  font-weight: 400;
+}
+
+/* The switch container with color variables */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+
+  /* Color variables with black/white contrast */
+  --switch-off-background: black;
+  --switch-on-background: white;
+  --switch-off-knob-color: white;
+  --switch-on-knob-color: black;
+  --switch-focus-color: rgba(128, 128, 128, 0.5);
+}
+
+/* Hide the default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--switch-off-background);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+/* The circle/knob */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--switch-off-knob-color);
+  transition: .4s;
+  border-radius: 50%;
+}
+
+/* When checked - change both background and knob colors */
+input:checked+.slider {
+  background-color: var(--switch-on-background);
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px var(--switch-focus-color);
+}
+
+input:checked+.slider:before {
+  transform: translateX(26px);
+  background-color: var(--switch-on-knob-color);
+}
+
+h1 img {
+  height: 2em;
+  margin-right: 1em;
+}
+
+td button {
+  filter: invert(0) saturate(100%);
+  height: 5em;
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  background-color: #000;
+  border: none;
+  outline: none;
+  transition: filter 0.4s ease-in-out;
+  padding: 1em;
+}
+
+td button:hover {
+  filter: invert(1) saturate(0%);
+}
+
+td button img {
+  height: 100%;
+  filter: brightness(100%);
+  transition: filter 0.4s ease-in-out;
+}
+
+td button:hover img {
+  filter: brightness(1000%);
+}

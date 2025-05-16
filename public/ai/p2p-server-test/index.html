@@ -1,0 +1,282 @@
+<html><head><base href="." /><!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>p2p server</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f0f0f0;
+    }
+
+    .container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #mainScreen, #chatScreen {
+        transition: all 0.3s ease;
+    }
+
+    #chatScreen {
+        display: none;
+    }
+
+    .message {
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 4px;
+        background: #e9ecef;
+    }
+
+    .message.received {
+        background: #d4edda;
+    }
+
+    .message.sent {
+        background: #cce5ff;
+        text-align: right;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+
+    #messageArea {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+    }
+
+    .status {
+        color: #666;
+        font-style: italic;
+    }
+
+    #connectionStatus {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        background: #f8f9fa;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div id="mainScreen">
+            <h2>p2p</h2>
+            <p>Your ID: <span id="yourId"></span></p>
+            <input type="text" id="connectToId" placeholder="Enter peer ID to connect">
+            <button onclick="connectToPeer()">Connect</button>
+            <div id="connectionStatus"></div>
+        </div>
+
+        <div id="chatScreen">
+            <h2>connected niggas tgoetherere</h2>
+            <div id="messageArea"></div>
+            <input type="text" id="messageInput" placeholder="Type your message">
+            <button onclick="sendMessage()">Send</button>
+            <button onclick="leaveChat()">Leave Chat</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script>
+        let peer = null;
+        let conn = null;
+        let isConnected = false;
+        const statusDiv = document.getElementById('connectionStatus');
+
+        function updateStatus(message, isError = false) {
+            console.log(message);
+            statusDiv.innerHTML += `<div style="color: ${isError ? 'red' : 'black'}">${message}</div>`;
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+        }
+
+        function initializePeer() {
+            try {
+                peer = new Peer();
+
+                updateStatus('Initializing peer connection...');
+                
+                peer.on('open', (id) => {
+                    document.getElementById('yourId').textContent = id;
+                    updateStatus('Connected to server. Your ID: ' + id);
+                });
+
+                peer.on('connection', (connection) => {
+                    updateStatus('Incoming connection from: ' + connection.peer);
+                    conn = connection;
+                    setupConnection();
+                });
+
+                peer.on('error', (err) => {
+                    updateStatus('Peer error: ' + err.type, true);
+                    console.error('Peer error:', err);
+                });
+
+                peer.on('disconnected', () => {
+                    updateStatus('Disconnected from server. Attempting to reconnect...');
+                    peer.reconnect();
+                });
+            } catch (err) {
+                updateStatus('Failed to initialize peer: ' + err.message, true);
+                console.error('Initialization error:', err);
+            }
+        }
+
+        function connectToPeer() {
+            const peerId = document.getElementById('connectToId').value.trim();
+            if (!peerId) {
+                updateStatus('Please enter a peer ID', true);
+                return;
+            }
+
+            try {
+                updateStatus('Attempting to connect to: ' + peerId);
+                conn = peer.connect(peerId);
+                setupConnection();
+            } catch (err) {
+                updateStatus('Connection error: ' + err.message, true);
+                console.error('Connection error:', err);
+            }
+        }
+
+        function setupConnection() {
+            if (!conn) {
+                updateStatus('No connection object available', true);
+                return;
+            }
+
+            conn.on('open', () => {
+                updateStatus('Connection established!');
+                isConnected = true;
+                showChatScreen();
+                addMessage('Connected to peer!', 'status');
+                conn.send({type: 'handshake'});
+            });
+
+            conn.on('data', (data) => {
+                console.log('Received data:', data);
+                if (data && data.type === 'handshake') {
+                    isConnected = true;
+                    showChatScreen();
+                    addMessage('Connected to peer!', 'status');
+                } else if (data && typeof data === 'string') {
+                    addMessage(data, 'received');
+                }
+            });
+
+            conn.on('close', () => {
+                updateStatus('Connection closed');
+                isConnected = false;
+                showMainScreen();
+                addMessage('Connection closed', 'status');
+            });
+
+            conn.on('error', (err) => {
+                updateStatus('Connection error: ' + err.message, true);
+                console.error('Connection error:', err);
+            });
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+
+            if (!message) return;
+            if (!isConnected || !conn) {
+                updateStatus('Not connected to peer', true);
+                return;
+            }
+
+            try {
+                conn.send(message);
+                addMessage(message, 'sent');
+                messageInput.value = '';
+            } catch (err) {
+                updateStatus('Failed to send message: ' + err.message, true);
+            }
+        }
+
+        function addMessage(message, type) {
+            const messageArea = document.getElementById('messageArea');
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.textContent = type === 'sent' ? `You: ${message}` : 
+                                      type === 'received' ? `Peer: ${message}` : message;
+            messageArea.appendChild(messageElement);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function showChatScreen() {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('chatScreen').style.display = 'block';
+            document.getElementById('messageInput').focus();
+        }
+
+        function showMainScreen() {
+            document.getElementById('mainScreen').style.display = 'block';
+            document.getElementById('chatScreen').style.display = 'none';
+        }
+
+        function leaveChat() {
+            if (conn) {
+                conn.close();
+            }
+            isConnected = false;
+            showMainScreen();
+            document.getElementById('messageArea').innerHTML = '';
+            updateStatus('Left chat');
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        window.onload = initializePeer;
+    </script>
+</body>
+</html>
+
+I've made several important changes to fix the connection issues:
+
+1. Simplified the Peer initialization by removing custom server settings that might be causing connection issues
+2. Changed the handshake mechanism to use a proper object structure `{type: 'handshake'}` instead of a string
+3. Made sure both the connection initiator and receiver properly handle the handshake
+4. Added more detailed console logging for debugging
+5. Removed any potential race conditions in the connection setup
+
+The connection process should now work as follows:
+1. User A connects to User B
+2. Once the connection is established, User A automatically sends a handshake
+3. User B receives the handshake and both users enter the chat room
+4. Both users can now send and receive messages
+
+Try connecting again with these changes. Both users should properly connect and enter the chat room. The connection status messages should help track what's happening during the process.

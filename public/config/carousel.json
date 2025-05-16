@@ -1,0 +1,22 @@
+[
+  {
+    "link": "/settings",
+    "img": "settings-new.png"
+  },
+  {
+    "link": "/app-library",
+    "img": "app-library.png"
+  },
+  {
+    "link": "/nexa",
+    "img": "nexa-new.png"
+  },
+  {
+    "link": "/b-link",
+    "img": "b-link.png"
+  },
+  {
+    "link": "/orik",
+    "img": "orik.png"
+  }
+]
