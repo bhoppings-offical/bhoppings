@@ -1,0 +1,25 @@
+/* Figma Styles of your File */
+:root {
+  /* Colors */
+  --gradient-1: linear-gradient(
+    90deg,
+    rgba(109, 228, 255, 1) 0%,
+    rgba(235, 85, 255, 1) 100%
+  );
+  --but: linear-gradient(
+    141deg,
+    rgba(0, 224, 255, 1) 0%,
+    rgba(49, 0, 153, 1) 100%
+  );
+  --sunset: linear-gradient(
+    180deg,
+    rgba(255, 215, 0, 1) 0%,
+    rgba(238, 105, 7, 1) 50%,
+    rgba(214, 16, 57, 1) 75%,
+    rgba(207, 18, 97, 1) 87.5%
+  );
+
+  /* Fonts */
+  /* Effects */
+  --purple: #651FFF;
+}

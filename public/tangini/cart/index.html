@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/tangini/cart/vars.css" />
+  <link rel="stylesheet" href="/tangini/cart/style.css" />
+
+  <style>
+    a,
+    button,
+    input,
+    select,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: none;
+      text-decoration: none;
+      background: none;
+
+      -webkit-font-smoothing: antialiased;
+    }
+
+    menu,
+    ol,
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <title>Cart - Tangini</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <div class="tangini">
+    <img class="background" src="/images/tangini/background.svg" />
+    <div class="cart-side">
+      <div class="back-button">
+        <img class="back-arrow" src="/images/tangini/back-arrow.svg" />
+        <div class="back">Back</div>
+      </div>
+      <div class="separator"></div>
+      <div class="item-count-container">
+        <div class="shopping-cart-text">Shopping Cart</div>
+        <div class="item-count-text"></div>
+      </div>
+      <div class="cart">
+        <!-- Will be populated by JS -->
+      </div>
+    </div>
+    <div class="checkout">
+      <div class="checkout-top">
+        <div class="checkout-top-text">
+          <div class="card-details-title">Card Details</div>
+          <div class="card-type-text">Card type</div>
+        </div>
+        <img class="card-person-img" src="/images/tangini/card-person-img.png" />
+      </div>
+      <img class="card-type-select" src="/images/tangini/card-type-select.svg" />
+      <div id="card">
+        <input type="text" id="card-number" placeholder="Card number..." autocomplete="off" />
+        <input type="text" id="name" placeholder="Enter name here..." autocomplete="off" autocapitalize="" />
+        <input type="text" id="cvc" placeholder="123" autocomplete="off" />
+        <div id="expiration-container">
+          <input type="text" id="expiration-month" placeholder="MM" autocomplete="off" class="expiration" />
+          <span id="expiration-separator">/</span>
+          <input type="text" id="expiration-year" placeholder="YY" autocomplete="off" class="expiration" />
+        </div>
+      </div>
+      <div class="checkout-spacer"></div>
+      <div class="checkout-button">
+        <div class="checkout-button-price">$0.00</div>
+        <div class="checkout-button-right">
+          <div class="checkout-button-text">Checkout</div>
+          <img class="checkout-button-arrow" src="/images/tangini/checkout-button-arrow.svg" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/user-data.js"></script>
+  <script src="/tangini/cart/cart.js"></script>
+</body>
+
+</html>

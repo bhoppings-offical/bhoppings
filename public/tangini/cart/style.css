@@ -1,0 +1,823 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Nunito:wght@500&family=Poppins:wght@500;600&family=Raleway:wght@600&display=swap');
+
+.tangini,
+.tangini * {
+  box-sizing: border-box;
+}
+
+html,
+body,
+tangini {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Montserrat", sans-serif;
+}
+
+.tangini {
+  background: #ffffff;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.background {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 2160px;
+  height: auto;
+  position: absolute;
+  left: -3.5%;
+  top: -24%;
+  overflow: visible;
+  filter: blur(5vh);
+}
+
+/* Cart Side */
+.cart-side {
+  padding: 2rem;
+  padding-bottom: 0px;
+  padding-right: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  width: 70%;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.back-button {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  /* overflow: hidden; */
+  cursor: pointer;
+  user-select: none;
+}
+
+.back-button::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transform-origin: center;
+  height: 100%;
+  width: 100%;
+  content: '';
+  background: var(--purple);
+  transition: transform 0.3s ease;
+  border-radius: 0.9rem;
+}
+
+.back-button:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.back-arrow {
+  border-radius: 0px;
+  width: clamp(24px, 2vw, 40px);
+  height: clamp(24px, 2vw, 40px);
+  position: relative;
+  overflow: visible;
+  -webkit-user-drag: none;
+}
+
+.back {
+  color: #1e1e1e;
+  text-align: left;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(18px, 1.5vw, 28px);
+  font-weight: 600;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.separator {
+  background: #d9d9d9;
+  border-radius: 9999px;
+  align-self: stretch;
+  height: 2px;
+  position: relative;
+  width: 100%;
+}
+
+.item-count-container {
+  font-family: "Poppins", sans-serif;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+  width: 100%;
+}
+
+.shopping-cart-text {
+  color: #1e1e1e;
+  text-align: left;
+  font-size: clamp(16px, 1vw, 20px);
+  font-weight: 500;
+  position: relative;
+}
+
+.item-count-text {
+  color: #1e1e1e;
+  text-align: left;
+  font-size: clamp(12px, 0.75vw, 16px);
+  font-weight: 500;
+  position: relative;
+}
+
+.cart {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  position: relative;
+  width: 100%;
+  padding-right: 1rem;
+  /* Fixed properties for proper scrolling */
+  overflow-y: auto;
+  /* max-height: 70vh; */
+  padding-bottom: 0px;
+}
+
+.cart-item {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  position: relative;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  width: calc(100% - 5px);
+  /* Fixed height properties */
+  height: 25%;
+  min-height: 150px;
+  flex-shrink: 0;
+  margin-left: 5px;
+}
+
+.cart-item:first-of-type {
+  margin-top: 5px;
+}
+
+.cart-item-img {
+  background: linear-gradient(to left, #d9d9d9, #d9d9d9);
+  border-radius: 8px;
+  height: 100%;
+  aspect-ratio: 1/1;
+  position: relative;
+  object-fit: cover;
+}
+
+.cart-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-name {
+  color: #1e1e1e;
+  text-align: left;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(16px, 1.5vw, 28px);
+  font-weight: 500;
+  position: relative;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-item-description {
+  color: #1e1e1e;
+  text-align: left;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(14px, 1vw, 20px);
+  font-weight: 500;
+  position: relative;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-item-counter {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  height: 40%;
+}
+
+.cart-item-counter-text {
+  color: #393939;
+  text-align: left;
+  font-size: clamp(16px, 1.25vw, 24px);
+  line-height: 100%;
+  height: 100%;
+  font-weight: 600;
+  display: flex;
+  position: relative;
+  width: auto;
+  min-width: 20px;
+  align-content: center;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: "Poppins", sans-serif;
+}
+
+.cart-item-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: clamp(18px, 1.5vw, 30px);
+  height: auto;
+  position: relative;
+  overflow: visible;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.cart-item-right {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: stretch;
+  position: relative;
+  overflow: hidden;
+  min-width: fit-content;
+}
+
+.cart-item-price {
+  color: #393939;
+  text-align: right;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(16px, 1.25vw, 24px);
+  font-weight: 500;
+  position: relative;
+  white-space: nowrap;
+  width: 8em;
+}
+
+.cart-item-delete {
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  height: 50%;
+  aspect-ratio: 1/1;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.cart-item-delete::after {
+  height: 100%;
+  aspect-ratio: 1/1;
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: url('/images/tangini/cart-item-delete.svg') no-repeat;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.3s ease;
+}
+
+.cart-item-delete::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transform-origin: center;
+  height: 105%;
+  aspect-ratio: 1/1;
+  content: '';
+  background: url("/images/tangini/cart-item-delete-background.svg");
+  transition: transform 0.3s ease;
+  border-radius: 9999px;
+}
+
+.cart-item-delete:hover::after {
+  filter: brightness(0) invert(1);
+}
+
+.cart-item-delete:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkout Section */
+.checkout {
+  width: 30%;
+  height: 100%;
+  padding: 2rem;
+  padding-left: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.checkout-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  position: relative;
+  width: 100%;
+}
+
+.checkout-top-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1;
+  position: relative;
+}
+
+.card-details-title {
+  color: #000000;
+  text-align: left;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(18px, 1.75vw, 32px);
+  font-weight: 600;
+  position: relative;
+  width: 100%;
+}
+
+.card-type-text {
+  color: #000000;
+  text-align: left;
+  font-family: "Nunito", sans-serif;
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-weight: 500;
+  position: relative;
+  width: 100%;
+}
+
+.card-person-img {
+  background: linear-gradient(to left, #d9d9d9, #d9d9d9);
+  border-radius: 8px;
+  width: clamp(48px, 4vw, 80px);
+  position: relative;
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+
+.card-type-select {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  position: relative;
+  overflow: visible;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  height: auto;
+  position: relative;
+  overflow: visible;
+  width: 100%;
+}
+
+#card {
+  width: 100%;
+  aspect-ratio: 663 / 421;
+  background: url("/images/tangini/card.svg") no-repeat;
+  background-size: cover;
+  background-position: center;
+  margin: 1rem 0;
+  border-radius: 2vw;
+  user-select: none;
+  position: relative;
+}
+
+.checkout-spacer {
+  align-self: stretch;
+  flex: 1;
+  position: relative;
+}
+
+.checkout-button {
+  border-radius: 12px;
+  padding: 0 1.5rem 0 2rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: clamp(54px, 4vw, 80px);
+  position: relative;
+  overflow: hidden;
+  background: url("/images/tangini/checkout-button-background.png");
+  background-position-x: 100%;
+  transition: background-position-x 0.3s ease-in-out, background-size 0.3s ease-in-out, transform 0.3s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+  transform: translateY(0%);
+  transform-origin: center;
+}
+
+.checkout-button:hover {
+  transform: translateY(-10%);
+
+}
+
+.checkout-button-price {
+  color: #fefcfc;
+  text-align: left;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(16px, 1.5vw, 28px);
+  font-weight: 500;
+  position: relative;
+  flex: 1;
+}
+
+.checkout-button-right {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.checkout-button-text {
+  color: #fefcfc;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(16px, 1.5vw, 28px);
+  font-weight: 500;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.checkout-button-arrow {
+  width: clamp(18px, 1.5vw, 28px);
+  transform: translateX(+0px);
+  height: auto;
+  position: relative;
+  overflow: visible;
+  aspect-ratio: 32/31;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1200px) {
+  .tangini {
+    flex-direction: column;
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .cart-side,
+  .checkout {
+    width: 100%;
+    overflow-y: visible;
+  }
+
+  .background {
+    top: -10%;
+    position: fixed;
+    z-index: -1;
+  }
+
+  .cart {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  /* Ensure cart items don't shrink in mobile view */
+  .cart-item {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+
+  html,
+  body,
+  tangini {
+    overflow-y: auto;
+  }
+
+  .cart-side,
+  .checkout {
+    padding: 1.5rem;
+  }
+
+  .cart-item {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 1rem;
+    min-height: auto;
+    /* Allow it to adapt to content on smaller screens */
+  }
+
+  .cart-item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+
+  .cart-item-text {
+    width: calc(100% - 170px);
+  }
+
+  .cart-item-right {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .checkout-top {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .card-person-img {
+    align-self: center;
+  }
+
+  .checkout-button {
+    margin-bottom: 1rem;
+    /* Add space at bottom for mobile */
+  }
+}
+
+@media (max-width: 576px) {
+
+  .cart-side,
+  .checkout {
+    padding: 1rem;
+  }
+
+  .cart {
+    gap: 1rem;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: auto;
+  }
+
+  .cart-item-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+
+  .cart-item-text {
+    width: 100%;
+    margin: 0.75rem 0;
+  }
+
+  .cart-item-right {
+    width: 100%;
+    padding: 0;
+  }
+
+  .back-button {
+    padding: 0.5rem 0;
+    position: relative;
+  }
+
+  .item-count-container {
+    padding: 1rem 0;
+  }
+
+  .checkout-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .card-person-img {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .checkout-button {
+    height: 50px;
+    padding: 0 1rem 0 1.5rem;
+  }
+}
+
+/* Make cart scrollable on very small screens */
+@media (max-height: 700px) and (max-width: 1200px) {
+  .cart {
+    max-height: 50vh;
+  }
+}
+
+/* Fix for devices with notches or unusual aspect ratios */
+@supports (padding: max(0px)) {
+
+  .cart-side,
+  .checkout {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .checkout-button {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
+
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--purple);
+}
+
+*::-webkit-scrollbar {
+  width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--purple) !important;
+  border-radius: 10px;
+  border: 3px solid #ffffff;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--purple) !important;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+.cart-item:last-of-type {
+  margin-bottom: 1vw;
+}
+
+.back-button * {
+  filter: brightness(1) invert(0);
+  transition: all 0.3s ease;
+}
+
+.back-button:hover * {
+  filter: brightness(0) invert(1);
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  33% {
+    transform: rotate(-15deg);
+  }
+
+  66% {
+    transform: rotate(15deg);
+  }
+
+  100% {
+    transform: rotate(0deg)
+  }
+}
+
+
+.back-button:hover img {
+  animation: wiggle 0.3s ease-in-out;
+}
+
+#card input {
+  outline: none !important;
+  border: none !important;
+  color: #fff;
+  /* height: 10%; */
+  font-size: 150%;
+  font-family: 'Montserrat';
+  position: absolute;
+}
+
+#card input#name {
+  left: 7%;
+  top: 75%;
+  width: 70%;
+}
+
+#card input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+#card input#card-number {
+  left: 7%;
+  top: 48%;
+  width: 60%;
+}
+
+#card input#cvc {
+  top: 49%;
+  font-size: 136%;
+  left: 73.8%;
+  width: 20%;
+  letter-spacing: 0.1em;
+}
+
+input.expiration {
+  top: 76.5%;
+  letter-spacing: 0.1em;
+  width: 2em;
+  position: static !important;
+  font-size: 120% !important;
+}
+
+input#expiration-year {
+  left: 80.6%;
+}
+
+input#expiration-month {
+  left: 69.5%;
+}
+
+span#expiration-separator {
+  color: white;
+  font-size: 120%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+  transform: translateY(+10%);
+}
+
+div#expiration-container {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  position: absolute;
+  left: 72.5%;
+  top: 76%;
+}

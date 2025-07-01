@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./vars.css" />
+    <link rel="stylesheet" href="./style.css" />
+
+    <style>
+      a,
+      button,
+      input,
+      select,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: none;
+        text-decoration: none;
+        background: none;
+
+        -webkit-font-smoothing: antialiased;
+      }
+
+      menu,
+      ol,
+      ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <title>Explore - Tangini</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="tangini">
+      <img class="background" src="/images/tangini/background.svg" />
+      <div class="top">
+        <div class="title">Tangini</div>
+        <div class="top-row">
+          <div class="search-bar">
+            <img class="search-icon" src="/images/tangini/search.svg" />
+            <input
+              id="search-input"
+              autocomplete="off"
+              placeholder="Search for tangos..."
+            />
+          </div>
+
+          <div class="top-row-right">
+            <div class="sort-by-container">
+              <select class="sort-by">
+                <option value="featured" selected>Featured</option>
+                <option value="alphabetical">A-Z</option>
+                <option value="price">Price</option>
+                <!--<option value="date-added">Date Added</option>-->
+              </select>
+              <div id="sort-by-arrow"></div>
+            </div>
+            <div class="view-toggle">
+              <div class="view-option view-option-grid active"></div>
+              <div class="view-option view-option-list"></div>
+            </div>
+            <div id="cart-button">
+              <img src="/images/tangini/cart.svg" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="items"></div>
+    </div>
+    <script src="/user-data.js"></script>
+    <script src="./store.js"></script>
+  </body>
+</html>
