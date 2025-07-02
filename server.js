@@ -1,8 +1,85 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const fetch = require("node-fetch");
 
 const app = express();
+
+// JSONBin configuration
+const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6864aacb8a456b7966b9d611";
+const JSONBIN_SECRET_KEY = "$2a$10$PdE8DlpdPuENmEfETNioOOROSZ8bMS7wVMiNa7YN415QGW907Fwwm";
+
+// View counter middleware for root path
+app.get("/", async (req, res, next) => {
+  try {
+    // First, get the current data from JSONBin
+    const response = await fetch(JSONBIN_URL, {
+      headers: {
+        "X-Master-Key": JSONBIN_SECRET_KEY,
+        "X-Bin-Meta": false
+      }
+    });
+    
+    if (!response.ok) {
+      console.error("Failed to fetch JSONBin data:", await response.text());
+      return next(); // Continue to serve the page even if counter fails
+    }
+    
+    const data = await response.json();
+    
+    // Increment the view count
+    const updatedData = {
+      ...data,
+      viewCount: (data.viewCount || 0) + 1
+    };
+    
+    // Update the JSONBin with the new count
+    const updateResponse = await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_SECRET_KEY
+      },
+      body: JSON.stringify(updatedData)
+    });
+    
+    if (!updateResponse.ok) {
+      console.error("Failed to update JSONBin data:", await updateResponse.text());
+    } else {
+      console.log("View count updated successfully. New count:", updatedData.viewCount);
+    }
+    
+    // Continue to serve the root page
+    next();
+  } catch (error) {
+    console.error("Error updating view count:", error);
+    next(); // Continue to serve the page even if counter fails
+  }
+});
+
+app.get("/view-count", async (req, res) => {
+  try {
+    // Get the current data from JSONBin
+    const response = await fetch(JSONBIN_URL, {
+      headers: {
+        "X-Master-Key": JSONBIN_SECRET_KEY,
+        "X-Bin-Meta": false
+      }
+    });
+    
+    if (!response.ok) {
+      return res.status(500).json({ error: "Failed to fetch view count data" });
+    }
+    
+    const data = await response.json();
+    
+    // Return the view count as JSON
+    res.json({ viewCount: data.viewCount || 0 });
+  } catch (error) {
+    console.error("Error fetching view count:", error);
+    res.status(500).json({ error: "Failed to fetch view count" });
+  }
+});
 
 app.use('/favicon.ico', express.static(path.join(__dirname, 'public', '/images/favicon.ico')));
 

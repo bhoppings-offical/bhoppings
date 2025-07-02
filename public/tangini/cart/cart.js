@@ -177,7 +177,7 @@ function totalCartPrice() {
 $(document).ready(function() {
   displayCartItems();
   $(".back-button").on("click", function() {
-    window.location.href = "../";
+    window.location.href = "/tangini/";
   });
   $(".cart").on("click", ".cart-item-delete", function() {
     const id = $(this).closest(".cart-item").data("id");

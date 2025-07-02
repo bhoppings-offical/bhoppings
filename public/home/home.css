@@ -170,6 +170,7 @@ body.bg-fadein {
     min-width: 120px;
     z-index: 2;
     transform-origin: top;
+    gap: 0.4rem;
     /* Apply blur to content behind the element */
 }
 

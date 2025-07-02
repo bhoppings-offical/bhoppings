@@ -192,6 +192,7 @@ img {
   display: none;
 }
 
+
 .view-toggle {
   background: #ffffff;
   border-radius: 0.6rem;
@@ -209,6 +210,7 @@ img {
   overflow: hidden;
   cursor: pointer;
 }
+
 
 .view-option,
 .view-option2 {

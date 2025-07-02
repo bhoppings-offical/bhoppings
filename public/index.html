@@ -90,6 +90,20 @@
         console.error("Error playing audio:", error); // Log any playback errors
       });
     };
+    // Fetch view count from the endpoint and update the view-count element
+    fetch('/view-count')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('view-count').textContent = data.viewCount;
+      })
+      .catch(error => {
+        console.error('Error fetching view count:', error);
+      });
   </script>
 
   <!-- script src's below -->
