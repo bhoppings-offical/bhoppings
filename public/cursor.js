@@ -41,7 +41,7 @@ async function cursorMain() {
         width: 48px;
         height: 48px;
         pointer-events: none;
-        z-index: 100000;
+        z-index: 10000000;
         display: block;
         top: -100%;
         left: -100%;

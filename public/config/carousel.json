@@ -1,22 +1,14 @@
 [
   {
-    "link": "/settings",
-    "img": "settings-new.png"
+    "link": "/home",
+    "img": "return.svg"
   },
   {
-    "link": "/app-library",
-    "img": "app-library.png"
+    "link": "/quill",
+    "img": "quill.svg"
   },
   {
-    "link": "/nexa",
-    "img": "nexa-new.png"
-  },
-  {
-    "link": "/b-link",
-    "img": "b-link.png"
-  },
-  {
-    "link": "/orik",
-    "img": "orik.png"
+    "link": "/tangini",
+    "img": "tangini.svg"
   }
 ]
