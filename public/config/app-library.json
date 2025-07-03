@@ -1,13 +1,46 @@
 [
+    
+    {
+        "name": "Quill",
+        "url": "/quill",
+        "image": "quill.png",
+        "fromRoot": true,
+        "new": true
+    },
+    {
+        "name": "Nexa",
+        "url": "/nexa",
+        "image": "nexa.png",
+        "fromRoot": true,
+        "new": true,
+        "tags": ["ai"]
+    },
+    {
+        "name": "Orik",
+        "url": "/orik",
+        "image": "orik.png",
+        "fromRoot": true,
+        "new": true,
+        "tags": ["multiplayer", "ai"]
+    },
+    {
+        "name": "Poop Shooter 3D",
+        "url": "/poopshooter3d",
+        "image": "poopshooter3d.png"
+    },
+    { "name": "Damyan Run", "url": "/damyan-run", "image": "damyan-run.png" },
+    { "name": "Drug Tycoon", "url": "/drugtycoon", "image": "drugtycoon.png" },
     {
         "name": "Annoy the AI",
         "url": "/annoy-the-ai",
-        "image": "annoy-the-ai.png"
+        "image": "annoy-the-ai.png",
+        "tags": ["ai"]
     },
     {
         "name": "Draw Something",
         "url": "/draw-something",
-        "image": "draw-something.png"
+        "image": "draw-something.png",
+        "tags": ["ai"]
     },
     {
         "name": "End of the World",
@@ -17,13 +50,15 @@
     {
         "name": "Evil Google",
         "url": "/evil-google",
-        "image": "evil-google.png"
+        "image": "evil-google.png",
+        "tags": ["ai"]
     },
     { "name": "Fogmorph", "url": "/fogmorph", "image": "fogmorph.png" },
     {
         "name": "Go Literally Anywhere",
         "url": "/go-literally-anywhere",
-        "image": "go-literally-anywhere.png"
+        "image": "go-literally-anywhere.png",
+        "tags": ["ai"]
     },
     { "name": "Hoyd", "url": "/hoyd", "image": "hoyd.png" },
     {
@@ -34,12 +69,14 @@
     {
         "name": "Minecraft Mixing Table",
         "url": "/minecraft-mixing-table",
-        "image": "minecraft-mixing-table.png"
+        "image": "minecraft-mixing-table.png",
+        "tags": ["ai"]
     },
     {
         "name": "Minecraft Log Analyzer",
         "url": "/minecraftloganalyzer",
-        "image": "minecraftloganalyzer.png"
+        "image": "minecraftloganalyzer.png",
+        "tags": ["ai"]
     },
     {
         "name": "Rocket Runner",
@@ -66,29 +103,6 @@
         "url": "/recursive-maze-escape",
         "image": "recursive-maze-escape.png"
     },
-    {
-        "name": "Nexa",
-        "url": "/nexa",
-        "image": "nexa.png",
-        "fromRoot": true,
-        "new": true,
-        "tags": ["ai"]
-    },
-    {
-        "name": "Orik",
-        "url": "/orik",
-        "image": "orik.png",
-        "fromRoot": true,
-        "new": true,
-        "tags": ["multiplayer", "ai"]
-    },
-    {
-        "name": "Poop Shooter 3D",
-        "url": "/poopshooter3d",
-        "image": "poopshooter3d.png"
-    },
-    { "name": "Damyan Run", "url": "/damyan-run", "image": "damyan-run.png" },
-    { "name": "Drug Tycoon", "url": "/drugtycoon", "image": "drugtycoon.png" },
     { "name": "❓Enhance", "url": "/enhance", "image": "enhance.png" },
     {
         "name": "2D Survival Game",
