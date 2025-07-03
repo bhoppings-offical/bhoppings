@@ -4,19 +4,32 @@
         "text": "bio",
         "pages": [
             { "text": "bhop", "url": "/" },
-            { "text": "bhop's observatory", "url": "/observe" },
-            { "text": "chezlinkz", "url": "/chezlinkz" }
+            { "text": "bhop's observatory", "url": "/observe" }
         ]
     },
-    { "text": "tangini", "url": "/tangini" },
     {
         "multiple": true,
         "text": "downloads",
         "pages": [{ "text": "tango clicker", "url": "/downloads/tangoclicker" }]
     },
-    { "text": "nexa", "url": "/nexa" },
-    { "text": "orik", "url": "/orik" },
-    { "text": "movies", "url": "/movies" },
+    {
+        "multiple": true,
+        "text": "ai",
+        "pages": [
+            { "text": "nexa", "url": "/nexa" },
+            { "text": "orik", "url": "/orik" }
+        ]
+    },
+    {
+        "multiple": true,
+        "text": "assets",
+        "pages": [
+            { "text": "lume icons", "url": "/lume" },
+            { "text": "orik images", "url": "/orik" }
+        ]
+    },
+    { "text": "tangini", "url": "/tangini" },
     { "text": "quill", "url": "/quill" },
+    { "text": "b-link", "url": "/b-link" },
     { "text": "Apps", "url": "/app-library", "image": "lume-package-bold.svg" }
 ]

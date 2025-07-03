@@ -12,7 +12,6 @@
         "url": "/nexa",
         "image": "nexa.png",
         "fromRoot": true,
-        "new": true,
         "tags": ["ai"]
     },
     {
@@ -20,7 +19,6 @@
         "url": "/orik",
         "image": "orik.png",
         "fromRoot": true,
-        "new": true,
         "tags": ["multiplayer", "ai"]
     },
     {
