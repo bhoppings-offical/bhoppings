@@ -46,7 +46,7 @@ app.get("/", async (req, res, next) => {
     if (!updateResponse.ok) {
       console.error("Failed to update JSONBin data:", await updateResponse.text());
     } else {
-      console.log("View count updated successfully. New count:", updatedData.viewCount);
+      //console.log("View count updated successfully. New count:", updatedData.viewCount);
     }
     
     // Continue to serve the root page
