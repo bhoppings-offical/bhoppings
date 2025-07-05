@@ -82,7 +82,7 @@
 }
 
 #container .item:hover img {
-  filter: blur(0.5vh);
+  filter: blur(0.5vh) brightness(0.4);
 }
 
 #container .item .item-open {
@@ -91,20 +91,16 @@
   left: 50%;
   font-size: 1.1vw;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.3);
-  border: solid 0.6vh rgba(0, 0, 0, 0.3);
   outline: none;
-  width: 66%;
+  width: 40%;
   padding: 2vh 0vh;
   border-radius: 9999px;
   opacity: 0;
   transition: all 0.3s ease-in-out;
-  backdrop-filter: blur(1vh);
+  background: transparent;
+  border: none;
 }
 
-#container .item .item-open:hover {
-  transform: translate(-50%, -70%) scale(1.05) !important;
-}
 
 #container .item:hover .item-open {
   opacity: 1;

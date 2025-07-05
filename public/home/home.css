@@ -748,7 +748,7 @@ body.bg-fadein {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -40%);
+    transform: translate(-50%, -40%) scale(1);
     opacity: 0;
     transition: opacity 0.5s ease, transform 0.5s ease-in-out;
     width: 33%;
@@ -770,7 +770,7 @@ body.bg-fadein {
 }
 
 #carousel-button:hover {
-    transform: translate(-50%, -50%) scale(1.03);
+    transform: translate(-50%, -60%) scale(1.03) !important;
 }
 
 #carousel-button span {

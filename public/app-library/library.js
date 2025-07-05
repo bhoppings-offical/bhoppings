@@ -87,6 +87,10 @@ $("#container").on("click", ".item-open", function () {
   window.open($(this).data("url-to"));
 });
 
+$("#container").on("click", ".item", function () {
+  window.open($(this).find(".item-open").data("url-to"));
+});
+
 function levenshteinDistance(str1, str2) {
   // Create a matrix of dimensions (str1.length + 1) x (str2.length + 1)
   const matrix = Array(str1.length + 1)
