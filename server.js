@@ -125,8 +125,6 @@ const getFile = (baseDir, url, name) => {
     const normalizedUrl = url.startsWith("/") ? url.slice(1) : url;
     const filePath = path.join(process.cwd(), "public", baseDir, normalizedUrl);
 
-    console.log("Attempting to read file:", filePath);
-
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const data = fs.readFileSync(filePath, "utf8");
       return `<preload name='${name}'>${data}</preload>`;
