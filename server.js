@@ -7,7 +7,7 @@ const app = express();
 
 // JSONBin configuration
 const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6864aacb8a456b7966b9d611";
-const JSONBIN_SECRET_KEY = "$2a$10$PdE8DlpdPuENmEfETNioOOROSZ8bMS7wVMiNa7YN415QGW907Fwwm";
+const JSONBIN_SECRET_KEY = "$2a$10$B.SDLui2MiVV648M3WaNQ.72.HVEzNrixWggMyXAjLG8Xo8dHGohm";
 
 // View counter middleware for root path
 app.get("/", async (req, res, next) => {
