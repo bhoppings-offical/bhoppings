@@ -1,9 +1,5 @@
 [
   {
-    "link": "/home",
-    "img": "return.svg"
-  },
-  {
     "link": "/quill",
     "img": "quill.svg"
   },
