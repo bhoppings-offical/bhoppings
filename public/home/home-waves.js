@@ -125,10 +125,10 @@ class WavePointsEffect {
         // Default options
         this.options = Object.assign(
             {
-                numWaves: 20,
+                numWaves: 60,
                 rows: 80,
-                gravityStrength: 10,
-                waveSpeed: 0.000001,
+                gravityStrength: 15,
+                waveSpeed: 0.0000015,
             },
             options,
         );

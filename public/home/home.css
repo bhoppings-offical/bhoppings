@@ -299,6 +299,13 @@ body.bg-fadein {
     animation: shine 7s ease-in-out 1s infinite;
     /* Shorthand with delay */
     z-index: 1;
+    transition: opacity 1s ease-in-out;
+    pointer-events: none;
+    opacity: 1;
+}
+
+#center .gradient-text:has(#settings-icon:hover)::before {
+    opacity: 0;
 }
 
 
