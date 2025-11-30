@@ -1,0 +1,26 @@
+{
+  "name": "bhoppings",
+  "version": "1.0.0",
+  "description": "Bhoppings.de Remastered",
+  "homepage": "https://github.com/SnezLinkZ/bhoppings#readme",
+  "bugs": {
+    "url": "https://github.com/SnezLinkZ/bhoppings/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SnezLinkZ/bhoppings.git"
+  },
+  "license": "MIT",
+  "author": "SnezLinkZ",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  }
+}
