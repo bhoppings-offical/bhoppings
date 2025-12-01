@@ -1,0 +1,48 @@
+html, body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
+}
+
+:root {
+  --background: linear-gradient(to left, #669)
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  background: linear-gradient(
+    to bottom,
+    hsl(0, 0%, 0%) 0%,
+    hsla(0, 0%, 0%, 0.995) 8.4%,
+    hsla(0, 0%, 0%, 0.984) 17.2%,
+    hsla(0, 0%, 0%, 0.967) 26.1%,
+    hsla(0, 0%, 0%, 0.946) 35.2%,
+    hsla(0, 0%, 0%, 0.921) 44.1%,
+    hsla(0, 0%, 0%, 0.894) 52.9%,
+    hsla(0, 0%, 0%, 0.864) 61.3%,
+    hsla(0, 0%, 0%, 0.835) 69.3%,
+    hsla(0, 0%, 0%, 0.805) 76.6%,
+    hsla(0, 0%, 0%, 0.777) 83.2%,
+    hsla(0, 0%, 0%, 0.751) 88.9%,
+    hsla(0, 0%, 0%, 0.729) 93.5%,
+    hsla(0, 0%, 0%, 0.71) 97%,
+    hsla(0, 0%, 0%, 0.697) 99.2%,
+    hsla(0, 0%, 0%, 0.69) 100%
+  );
+}
+
+#grain {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  background: url("/assets/images/backgrounds/grain.jpg");
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+  inset: 0;
+}
+
