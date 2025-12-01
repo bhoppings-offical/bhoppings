@@ -1,0 +1,88 @@
+body {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#home-left, #home-right {
+    flex: 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(+0px);
+    height: 100%;
+    min-width: 600px;
+    justify-content: center;
+    gap: 12px;
+}
+
+#home-left {
+    padding-left: 96px;
+    animation: slideInLeft 0.6s ease-in-out;
+}
+
+#home-right {
+    animation: slideInRight 0.6s ease-in-out;
+}
+
+@keyframes slideInLeft {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(+0px);
+    }
+}
+
+@keyframes slideInRight {
+    0% {
+        transform: translateX(+100%);
+    }
+    100% {
+        transform: translateX(+0px);
+    }
+}
+
+#bhop-big {
+    font-size: 4em;
+    width: fit-content;
+    font-weight: 500;
+    font-family: "Instrument Sans", sans-serif;
+    display: flex;
+    align-content: center;
+    flex-direction: row;
+    line-height: 1em;
+    background: var(--theme-color);
+    background-clip: text;
+    color: transparent;
+    font-weight: 600;
+    background-size: cover;
+    cursor: pointer;
+}
+
+#subtitle {
+    font-size: 1.5em;
+}
+
+#carousel {
+    aspect-ratio: 8 / 5;
+    background-color: #000;
+    width: calc(100% - 96px);
+    border-radius: var(--card-spacing);
+    border: var(--card-border);
+    overflow: hidden;
+    position: relative;
+}
+
+#carousel .carousel-img {
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    border-radius: 0px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    transform: translateX(+0px);
+    transition: transform 0.2s ease-in-out;
+}

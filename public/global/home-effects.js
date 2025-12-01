@@ -126,8 +126,8 @@ class WavePointsEffect {
         this.options = Object.assign(
             {
                 numWaves: 60,
-                rows: 80,
-                gravityStrength: 15,
+                rows: 60,
+                gravityStrength: 10,
                 waveSpeed: 0.0000015,
             },
             options,
@@ -263,7 +263,7 @@ class WavePointsEffect {
 
     draw(ctx) {
         // Draw points
-        ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         this.points.forEach((point) => {
             ctx.beginPath();
             ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
@@ -845,7 +845,7 @@ class NeuralEffect {
         // Store reference to the canvas and 2D context
         this.canvas = canvas || ctx.canvas;
         this.ctx2d = ctx;
-        ctx.globalAlpha = 0.2;
+        ctx.globalAlpha = 1;
 
         try {
             // Create an offscreen canvas for WebGL
