@@ -7,7 +7,25 @@
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="/global/home.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    
+<meta name="apple-mobile-web-app-title" content="Bhoppings">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#000000">
+
+<meta name="format-detection" content="telephone=no">
+<meta name="format-detection" content="email=no">
+<meta name="format-detection" content="address=no">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/assets/images/icons/apple-touch.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/assets/images/icons/apple-touch.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/assets/images/icons/apple-touch.png">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-startup-image" href="/assets/images/icons/apple-touch.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+
   </head>
   <body>
       <div id="grain"></div>
@@ -18,8 +36,12 @@
       </div>
       <div id="home-right">
         <div id="carousel">
-          <img class="carousel-img" src="/assets/images/banners/reborn.svg" data-href="/about"/>
-          <img class="carousel-img" src="/assets/images/banners/lume.svg" data-href="/lume"/>
+          <div id="carousel-images">
+            <img class="carousel-img" src="/assets/images/banners/reborn.svg" data-href="/about"/>
+            <img class="carousel-img" src="/assets/images/banners/lume.png" data-href="/lume"/>
+            <img class="carousel-img" src="/assets/images/banners/library.svg" data-href="/apps"/>
+          </div>
+          <div id="carousel-cover"><button onclick="carouselOpen()">Open</button></div>
         </div>
       </div>
   </body>

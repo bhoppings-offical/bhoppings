@@ -13,7 +13,7 @@ const navbarItems = [
     { text: "orik", href: "/orik" }
   ]},
   { text: "nexa", href: "/nexa" },
-  { text: "apps", href: "/apps", icon: "/assets/images/icons/package.svg"}
+  { text: "Apps", href: "/apps", icon: "/assets/images/icons/package.svg"}
 ];
 
 function navbarItem(item) {

@@ -7,6 +7,10 @@ const port = 3000;
 
 const publicPath = (p = "") => path.join(__dirname, "public", p);
 
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(publicPath("assets/images/icons/favicon.ico"));
+})
+
 app.use(express.static(publicPath()));
 
 app.get("/", (req, res) => {
@@ -14,7 +18,7 @@ app.get("/", (req, res) => {
 })
 
 app.use((req, res) => {
-  res.status(404).sendFile(publicPath("404", "index.html"));
+  res.status(404).sendFile(publicPath("404/index.html"));
 })
 
 app.listen(port, () => {

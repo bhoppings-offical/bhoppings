@@ -71,6 +71,7 @@ body {
   background-color: #fff;
   transition: transform 0.2s ease-in-out;
   cursor: pointer;
+  max-height: 290px;
 }
 
 #pfp:hover {
