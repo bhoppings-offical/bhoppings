@@ -47,6 +47,9 @@ function navbar() {
   logo.setAttribute("id", "navbar-logo");
   logo.innerText = "bhop";
   nav.appendChild(logo);
+  logo.addEventListener("click", (e) => {
+    window.open("/home", "_self");
+  });
   for (const i of navbarItems) {
     const e = navbarItem(i);
     nav.appendChild(e);
@@ -59,3 +62,16 @@ function injectNavbar() {
   document.body.appendChild(element);
   return element;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const navbarElement = injectNavbar();
+    navbarElement.addEventListener("click", (e) => {
+        if (
+            e.target.matches("#navbar .navbar-item") &&
+            !e.target.querySelector(".navbar-dropdown")
+        ) {
+            const href = e.target.getAttribute("data-href");
+            window.open(href, "_blank");
+        };
+    })
+});

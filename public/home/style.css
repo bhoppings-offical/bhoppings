@@ -185,3 +185,113 @@ body {
     background: #fff;
     color: #000;
 }
+
+#music-player {
+    padding: var(--card-spacing);
+    background: var(--card-background);
+    border: var(--card-border);
+    border-radius: var(--card-spacing);
+    display: grid;
+    position: fixed;
+    left: var(--card-spacing);
+    bottom: var(--card-spacing);
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--card-spacing);
+    width: 280px;
+    max-width: 100vw;
+    backdrop-filter: blur(12px);
+    transition: transform 0.4s ease-in-out;
+    transform: translateX(calc(-100% - var(--card-spacing)));
+    z-index: 1;
+}
+
+#music-icon {
+    grid-row: 1;
+    grid-column: 1;
+    height: 100%;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--card-spacing);
+    border: var(--card-border);
+    box-sizing: border-box;
+}
+
+#music-title {
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+
+
+#music-player button {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    background: transparent;
+    transition: all 0.2s ease-in-out;
+    filter: invert(0);
+    border: none;
+    border-radius: var(--card-spacing);
+    cursor: pointer;
+}
+
+#music-player button:hover {
+    background: #000;
+    filter: invert(1);
+}
+
+#music-player > button > div {
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+}
+
+#music-back-button div {
+    background: url("/assets/images/icons/chevron-down.svg");
+    transform: rotate(90deg);
+}
+
+#music-next-button div {
+    background: url("/assets/images/icons/chevron-down.svg");
+    transform: rotate(-90deg);
+}
+
+#music-play-pause-button.paused div {
+    background-image: url("/assets/images/icons/pause.svg")
+}
+
+#music-play-pause-button:not(.paused) div {
+    background-image: url("/assets/images/icons/chevron-down-filled.svg");
+    transform: rotate(-90deg);
+}
+
+#music-back-button {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#music-play-pause-button {
+    grid-column: 2;
+    grid-row: 2;
+}
+#music-next-button {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+#music-player-hitbox {
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    height: 300px;
+    width: 400px;
+    z-index: 0;
+}
+body:has(#music-player-hitbox:hover) #music-player, #music-player:hover {
+    transform: translateX(+0px);
+}
