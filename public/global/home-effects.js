@@ -200,11 +200,10 @@ class SnowParticleEffect {
 // Wave Points Effect (Your original effect)
 class WavePointsEffect {
     constructor(options = {}) {
-        // Default options
         this.options = Object.assign(
             {
-                numWaves: 60,
-                rows: 60,
+                numWaves: 100,
+                rows: 80,
                 gravityStrength: 10,
                 waveSpeed: 0.0000015,
             },
@@ -222,26 +221,21 @@ class WavePointsEffect {
         this.height = height;
         this.ctx = ctx;
 
-        // Calculate scales
         this.recalculateScales();
 
-        // Generate grid points
         this.generatePoints();
 
-        // Generate wave points
         this.generateWavePoints();
     }
 
     recalculateScales() {
-        // Calculate scales to maintain even spacing
         this.xScale =
             Math.sqrt(this.width ** 2 + this.height ** 2) / this.options.rows;
         if (this.height >= this.width) {
             this.xScale *= 3;
         }
-        this.yScale = this.xScale; // Keep square grid
+        this.yScale = this.xScale;
 
-        // Calculate number of rows and columns needed
         this.rows = Math.ceil((this.width * 1.2) / this.xScale);
         this.columns = Math.ceil((this.height * 1.2) / this.yScale);
     }
@@ -249,7 +243,6 @@ class WavePointsEffect {
     generatePoints() {
         this.points = [];
 
-        // Start position at -10% of canvas
         const startX = -0.1 * this.width;
         const startY = -0.1 * this.height;
 
@@ -268,15 +261,14 @@ class WavePointsEffect {
     generateWavePoints() {
         this.wavePoints = [];
 
-        // Initialize wave points with different phases and frequencies
         for (let i = 0; i < this.options.numWaves; i++) {
             this.wavePoints.push({
                 x: Math.random() * this.width,
                 y: Math.random() * this.height,
                 amplitude: Math.random() * 20 + 5,
-                frequency: Math.random() * 0.4 + 0.8, // Random frequency multiplier
-                phase: Math.random() * Math.PI * 2, // Random initial phase offset
-                wave: Math.random() * Math.PI * 2, // Start at random position in the cycle
+                frequency: Math.random() * 0.4 + 0.8,
+                phase: Math.random() * Math.PI * 2,
+                wave: Math.random() * Math.PI * 2,
             });
         }
     }
@@ -299,31 +291,24 @@ class WavePointsEffect {
     }
 
     update(fpsCompensation) {
-        // Reset points to their original positions
         this.points.forEach((point) => {
-            point.y = point.originalY; // Reset to original Y position
+            point.y = point.originalY;
             point.x = point.originalX;
         });
 
-        // Apply gravity towards wave points
         this.points.forEach((point) => {
-            // Find the nearest wave point
             this.wavePoints.forEach((wave) => {
-                // Increment each wave's position based on its unique frequency
                 wave.wave +=
                     this.options.waveSpeed * wave.frequency * fpsCompensation;
 
-                const dx = wave.x - point.x; // Change in x
-                const dy = wave.y - point.y; // Change in y
+                const dx = wave.x - point.x;
+                const dy = wave.y - point.y;
 
-                // Normalize the direction vector to ensure consistent speed
                 const distanceToWave = Math.hypot(dx, dy);
                 if (distanceToWave > 0) {
-                    // Calculate normalized direction
                     const normX = dx / distanceToWave;
                     const normY = dy / distanceToWave;
 
-                    // Use the wave's unique phase in the sin calculation
                     point.x +=
                         normX *
                         this.options.gravityStrength *
@@ -340,23 +325,12 @@ class WavePointsEffect {
     }
 
     draw(ctx) {
-        // Draw points
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         this.points.forEach((point) => {
             ctx.beginPath();
-            ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+            ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
             ctx.fill();
         });
-
-        // Uncomment to see wave points
-        /*
-        ctx.fillStyle = 'red';
-        this.wavePoints.forEach(wave => {
-            ctx.beginPath();
-            ctx.arc(wave.x, wave.y, 8, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        */
     }
 }
 
@@ -1372,7 +1346,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!Account?.getValue("effect")) {
         Account?.setValue("effect", effect);
     }*/
-   const effect = 5;
+   const effect = 0;
     const effects = {
         waves: WavePointsEffect,
         particle_field: ParticleFieldEffect,

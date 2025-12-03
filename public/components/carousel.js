@@ -4,6 +4,11 @@ const autoScrollDelay = 8000; // ms for the poopy carousel to auto scroll
 var autoScrollWaitTime = autoScrollDelay / 2; // dont change this
 const autoScrollPollInterval = 100;
 var carouselIsHovered = false;
+var carouselScrollAttempts = 0;
+var isScrolling = false;
+var scrollTimeoutId = null;
+
+
 
 
 function scrollCarousel() {
@@ -35,6 +40,7 @@ function scrollCarouselBackward() {
 
 function updateCarouselPositions() {
   const items = carouselImages.getElementsByClassName("carousel-img");
+  
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     item.style.transform = `translateX(calc(${i * 100}% - 100%))`;
@@ -77,19 +83,21 @@ document.addEventListener("DOMContentLoaded", (e) => {
     const currentIndex = getCurrentIndex();
     const total = items.length;
 
-    const forward = (targetIndex - currentIndex + total) % total;
+    const forward = (targetIndex - currentIndex + total - carouselScrollAttempts) % total;
     const backward = (currentIndex - targetIndex + total) % total;
 
     if (forward === 0) return;
-
-    if (forward <= backward) {
-      for (let i = 0; i < forward; i++) scrollCarousel();
+    
+      const oldCarouselScrollAttempts = carouselScrollAttempts;
+        carouselScrollAttempts = forward;
+      if (oldCarouselScrollAttempts <= 0) attemptCarouselScroll();
+    /*if (forward <= backward) {
     } else {
       for (let i = 0; i < backward; i++) scrollCarouselBackward();
-    }
+    }*/
   });
   setInterval(() => {
-    if (!carouselIsHovered) {
+    if (!carouselIsHovered && carouselScrollAttempts <= 0) {
       autoScrollWaitTime += autoScrollPollInterval;
     } else {
       autoScrollWaitTime = 0;
@@ -106,9 +114,28 @@ document.addEventListener("DOMContentLoaded", (e) => {
   carousel.addEventListener("mouseleave", (e) => {
     carouselIsHovered = false;
   })
+  setTimeout(() => {
+    for (const img of items) {
+      img.style.transition = "transform 1s cubic-bezier(0.25, 0.1, 0.25, 1)";
+    }
+  }, autoScrollPollInterval)
 });
 
 function carouselOpen() {
   const href = carouselImages.children[1].getAttribute("data-href");
   window.open(href, "_blank");
+}
+
+async function attemptCarouselScroll() {
+  if (carouselScrollAttempts <= 0 || isScrolling) return;
+  
+  isScrolling = true;
+  
+  while (carouselScrollAttempts > 0) {
+    carouselScrollAttempts--;
+    scrollCarousel();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  
+  isScrolling = false;
 }

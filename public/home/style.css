@@ -71,9 +71,10 @@ body {
     background-color: #000;
     width: calc(100% - 96px);
     border-radius: var(--card-spacing);
-    border: var(--card-border);
+    border: solid 5px rgb(0, 0, 0.5);
     overflow: hidden;
     position: relative;
+    /*! box-sizing: border-box; */
 }
 
 #carousel .carousel-img {
@@ -84,7 +85,7 @@ body {
     left: 0px;
     top: 0px;
     transform: translateX(+0px);
-    transition: transform 0.2s ease-in-out;
+    /*transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1);*/
     user-select: none;
     -webkit-user-drag: none;
 }
@@ -137,16 +138,17 @@ body {
   height: 100%;
   aspect-ratio: 1 / 1;
   border-radius: 9999px;
-  background-color: var(--card-background);
-  border: var(--card-border);
+  background-color: rgba(255, 255, 255, 0.2);
+  /*! border: var(--card-border); */
   box-sizing: border-box;
   transform: scale(1);
   transition: all 0.2s ease-in-out;
+  box-shadow: 0px 0px 0px #fff0;
 }
 .carousel-dot.active-carousel-dot {
-  transform: scale(1.2);
+  /*! transform: scale(1.2); */
   background: #fff;
-  border-color: #fff;
+  box-shadow: 0px 0px 48px #fff8;
 }
 
 #carousel-cover {
@@ -172,18 +174,22 @@ body {
   top: 50%;
   transform: translate(-50%, -50%) scale(1);
   background: var(--card-background);
-  padding: var(--card-spacing) calc(var(--card-spacing) * 2);
-  border: var(--card-border);
+  padding: var(--card-spacing) calc(var(--card-spacing) * 1) var(--card-spacing) calc(var(--card-spacing) * 2);
   font-size: 2em;
-  border-radius: var(--card-spacing);
+  border-radius: calc((1em + 3 * var(--card-spacing)) / 2.7);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  border: solid 5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: center;
 }
 
 #carousel-cover button:hover {
-    transform: translate(-50%, -50%) scale(1.2);
-    background: #fff;
-    color: #000;
+    transform: translate(-50%, -55%) scale(1);
+    /*background: #fff;
+    color: #000;*/
 }
 
 #music-player {
@@ -294,4 +300,16 @@ body {
 }
 body:has(#music-player-hitbox:hover) #music-player, #music-player:hover {
     transform: translateX(+0px);
+}
+
+
+#carousel-cover button::after {
+  content: "";
+  height: 1em;
+  aspect-ratio: 1 / 1;
+  background: url(/assets/images/icons/chevron-down.svg);
+  background-size: 200%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  transform: rotate(-90deg);
 }

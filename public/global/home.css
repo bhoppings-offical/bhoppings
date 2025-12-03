@@ -9,7 +9,7 @@ html, body {
 }
 
 :root {
-  --background: linear-gradient(to right, #669);
+  --background: linear-gradient(to right, #00CCFF, #00FFD0);
   --theme-color: linear-gradient(to right, #D185FF, #51CBFF);
   /*cards*/
     --card-background: rgba(0, 0, 0, 0.2);
@@ -21,6 +21,8 @@ html, body {
     --context-border: solid 2px #2f2f2f;
     --context-spacing: 18px;
     --context-blur: 2px;
+    --navbar-glow-intensity: 4px;
+  --navbar-glow-opacity: 0.5;
 }
 
 html {
@@ -52,12 +54,12 @@ body {
 
 * {
   color: #fff;
-  font-family: -apple-system, "Inter", sans-serif;
+  font-family: -apple-system, "Instrument Sans", sans-serif;
   user-select: none;
 }
 
 #grain {
-  /*display: none;*/
+  display: none;
   width: 100vw;
   height: 100vh;
   background: url("/assets/images/backgrounds/grain.jpg");
@@ -81,15 +83,21 @@ body {
 
 #navbar {
   position: fixed;
-  left: 0px;
-  top: 0px; 
-  width: 100vw;
+  left: 50vw;
+  top: 24px; 
+  width: fit-content;
   display: flex;
   flex-direction: row;
   gap: 24px;
   padding: 24px;
   box-sizing: border-box;
   align-items: center;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  /*! box-shadow: inset 0px 0px 12px #fff; */
+  overflow: visible;
 }
 
 .navbar-item {
@@ -215,7 +223,7 @@ body {
   content: "";
   height: 0.8em;
   aspect-ratio: 1 / 1;
-  display: inline-block;
+  display: none;
   background-size: cover;
   transform: rotate(0deg);
   transition: transform 0.2s ease-in-out;
@@ -226,17 +234,17 @@ body {
 }
 
 #navbar > .navbar-item:last-of-type {
-    background: #fff;
-    color: #000;
-    padding: 12px 24px;
-    border-radius: 6px;
-    align-items: center;
-    gap: 12px;
-    font-size: 24px;
-    transform: translateY(+0px);
-    transition: transform 0.2s ease-in-out;
-    line-height: 1em;
-    justify-self: flex-end;
+    /*! background: #fff; */
+    /*! color: #000; */
+    /*! padding: 12px 24px; */
+    /*! border-radius: 6px; */
+    /*! align-items: center; */
+    /*! gap: 12px; */
+    /*! font-size: 24px; */
+    /*! transform: translateY(+0px); */
+    /*! transition: transform 0.2s ease-in-out; */
+    /*! line-height: 1em; */
+    /*! justify-self: flex-end; */
     /*position: absolute;
     right: 24px;
     top: 50%;*/
@@ -253,7 +261,91 @@ body {
 
 @media screen and (max-width: 1200px) {
   #navbar {
-    overflow-y: hidden;
-  overflow-x: scroll;
+    /*! overflow-y: hidden; */
+  /*! overflow-x: scroll; */
   }
 }
+
+
+
+
+#navbar-glow::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(100% - var(--navbar-glow-intensity));
+  height: calc(100% - var(--navbar-glow-intensity));
+  background-color: #000;
+  border-radius: 9999px;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+}
+#navbar-glow {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--theme-color);
+  z-index: -1;
+  opacity: var(--navbar-glow-opacity);
+  display: block;
+  mix-blend-mode: lighten;
+  overflow: hidden;
+}
+
+
+#navbar-glow::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 2;
+  backdrop-filter: blur(2px);
+}
+
+@keyframes rotateCentered {
+  0% {
+    transform: translate(-50%, -50%) rotate(+0deg) scaleX(var(--scale-x));
+  }
+
+  100% {
+
+    transform: translate(-50%, -50%) rotate(+360deg) scaleX(var(--scale-x));
+  }
+}
+
+
+#navbar-glow-shimmer {
+  background: conic-gradient(transparent 40%,white,transparent 60%);
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(+38deg) scaleX(var(--scale-x));
+  z-index: 1;
+  --scale-x: 1;
+  animation: rotateCentered 3s linear infinite;
+}
+
+
+#navbar-shimmer-cover {
+  /*! ontent: ""; */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  background-color: #000;
+  border-radius: 9999px;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+}
+

@@ -13,8 +13,10 @@ const navbarItems = [
     { text: "orik", href: "/orik" }
   ]},
   { text: "nexa", href: "/nexa" },
-  { text: "Apps", href: "/apps", icon: "/assets/images/icons/package.svg"}
+  { text: "Apps", href: "/apps", /*icon: "/assets/images/icons/package.svg"*/}
 ];
+
+var navbarGlowShimmer;
 
 function navbarItem(item) {
   const e = document.createElement("div");
@@ -54,6 +56,13 @@ function navbar() {
     const e = navbarItem(i);
     nav.appendChild(e);
   }
+  const glow = document.createElement("div");
+  glow.id = "navbar-glow";
+  glow.innerHTML = `<div id="navbar-glow-shimmer"></div>`
+  const glowCover = document.createElement("div");
+  glowCover.id = "navbar-shimmer-cover";
+  nav.appendChild(glow);
+  glow.appendChild(glowCover);
   return nav;
 }
 
@@ -74,4 +83,30 @@ document.addEventListener("DOMContentLoaded", () => {
             window.open(href, "_blank");
         };
     })
+    navbarGlowShimmer = document.getElementById("navbar-glow-shimmer");
+updateNavbarGlowSize();
 });
+
+
+
+function updateNavbarGlowSize() {
+  const transform = getComputedStyle(navbarGlowShimmer).transform;
+  let angleDeg;
+
+  if (transform === "none") {
+    angleDeg = 0;
+  } else {
+    const vals = transform.match(/matrix\((.+)\)/)[1].split(", ");
+    const a = parseFloat(vals[0]);
+    const b = parseFloat(vals[1]);
+    angleDeg = Math.atan2(b, a) * (180 / Math.PI);
+  }
+
+  const angleRad = (angleDeg * Math.PI) / 180;
+
+  const width = Math.abs(Math.cos(angleRad));
+
+  navbarGlowShimmer.style.setProperty("--scale-x", width);
+
+  requestAnimationFrame(updateNavbarGlowSize);
+}
