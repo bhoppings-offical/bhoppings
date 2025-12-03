@@ -12,9 +12,10 @@ html, body {
   --background: linear-gradient(to right, #669);
   --theme-color: linear-gradient(to right, #D185FF, #51CBFF);
   /*cards*/
-    --card-background: rgba(0, 0, 0, 0.66);
-    --card-border: solid 2px #2f2f2f;
+    --card-background: rgba(0, 0, 0, 0.2);
+    --card-border: solid 2px rgba(0, 0, 0, 0.2);
     --card-spacing: 24px;
+    --card-blur: 12px;
   /*context*/
     --context-background: rgba(0, 0, 0, 1);
     --context-border: solid 2px #2f2f2f;

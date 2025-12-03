@@ -200,7 +200,7 @@ body {
     gap: var(--card-spacing);
     width: 280px;
     max-width: 100vw;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(var(--card-blur));
     transition: transform 0.4s ease-in-out;
     transform: translateX(calc(-100% - var(--card-spacing)));
     z-index: 1;

@@ -6,116 +6,194 @@ class CanvasAnimationFramework {
         this.ctx = this.canvas.getContext("2d");
         this.resizeCanvas();
         this.lastFrameTime = performance.now();
-        this.deltaTime = 0; // Time since last frame in seconds
+        this.deltaTime = 0;
         this.fps = 0;
         this.frameCount = 0;
         this.lastFpsUpdateTime = performance.now();
         this.currentEffect = null;
-        this.speedCoefficient = 50.0; // Default speed coefficient (1.0 = normal speed)
-        // Set up event listeners
+        this.speedCoefficient = 50.0;
         window.addEventListener("resize", this.resizeCanvas.bind(this));
     }
 
-    // Set the simulation speed
     setSpeed(coefficient) {
         this.speedCoefficient = coefficient;
     }
 
-    // Get the current simulation speed
     getSpeed() {
         return this.speedCoefficient;
     }
 
-    // Setup canvas dimensions
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        // If we have an active effect, notify it of resize
-        if (
-            this.currentEffect &&
-            typeof this.currentEffect.onResize === "function"
-        ) {
+        if (this.currentEffect && typeof this.currentEffect.onResize === "function") {
             this.currentEffect.onResize(this.canvas.width, this.canvas.height);
         }
     }
-    // Set the active effect
+
     setEffect(effect) {
-        // Clean up previous effect if it has a dispose method
-        if (
-            this.currentEffect &&
-            typeof this.currentEffect.dispose === "function"
-        ) {
+        if (this.currentEffect && typeof this.currentEffect.dispose === "function") {
             this.currentEffect.dispose();
         }
         this.currentEffect = effect;
-        // Initialize the effect with current canvas dimensions
         if (typeof this.currentEffect.init === "function") {
-            this.currentEffect.init(
-                this.canvas.width,
-                this.canvas.height,
-                this.ctx,
-            );
+            this.currentEffect.init(this.canvas.width, this.canvas.height, this.ctx);
         }
-        // Start animation loop if not already running
         if (!this.isAnimating) {
             this.startAnimationLoop();
         }
     }
-    // Calculate and update FPS
+
     updateFPS() {
         this.frameCount++;
         const currentTime = performance.now();
         const elapsed = currentTime - this.lastFpsUpdateTime;
-        // Update FPS approximately once per second
         if (elapsed >= 1000) {
             this.fps = Math.round((this.frameCount * 1000) / elapsed);
             this.frameCount = 0;
             this.lastFpsUpdateTime = currentTime;
-            // Notify effect of current FPS (just for information, not for timing)
-            if (
-                this.currentEffect &&
-                typeof this.currentEffect.onFpsUpdate === "function"
-            ) {
+            if (this.currentEffect && typeof this.currentEffect.onFpsUpdate === "function") {
                 this.currentEffect.onFpsUpdate(this.fps);
             }
         }
     }
-    // Main animation loop
+
     startAnimationLoop() {
         this.isAnimating = true;
         this.lastFrameTime = performance.now();
         this.animate();
     }
-    animate(currentTime) {
-        // Calculate delta time in seconds
-        currentTime = currentTime || performance.now();
-        this.deltaTime = (currentTime - this.lastFrameTime) / 1000; // Convert to seconds
-        this.lastFrameTime = currentTime;
-        // Prevent extremely large delta times (e.g., when tab is inactive)
-        if (this.deltaTime > 0.1) this.deltaTime = 0.016; // Cap at roughly 60fps equivalent
 
-        // Apply speed coefficient to delta time
+    animate(currentTime) {
+        currentTime = currentTime || performance.now();
+        this.deltaTime = (currentTime - this.lastFrameTime) / 1000;
+        this.lastFrameTime = currentTime;
+        if (this.deltaTime > 0.1) this.deltaTime = 0.016;
+
         const adjustedDeltaTime = this.deltaTime * this.speedCoefficient;
 
-        // Update FPS counter
         this.updateFPS();
-        // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        // If we have an active effect, update and draw it
-        if (
-            this.currentEffect &&
-            typeof this.currentEffect.update === "function"
-        ) {
+
+        if (this.currentEffect && typeof this.currentEffect.update === "function") {
             this.currentEffect.update(adjustedDeltaTime);
         }
-        if (
-            this.currentEffect &&
-            typeof this.currentEffect.draw === "function"
-        ) {
+        if (this.currentEffect && typeof this.currentEffect.draw === "function") {
             this.currentEffect.draw(this.ctx);
         }
-        // Continue animation loop
+
         requestAnimationFrame(this.animate.bind(this));
+    }
+}
+
+// Snow Particle Effect
+class SnowParticleEffect {
+    constructor(options = {}) {
+        this.options = Object.assign({
+            particleCount: 300,
+            mouseInfluence: 10
+        }, options);
+
+        this.particles = [];
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.mouseXMiddle = 0;
+        this.width = 0;
+        this.height = 0;
+    }
+
+    init(width, height, ctx) {
+        this.width = width;
+        this.height = height;
+        this.ctx = ctx;
+
+        // Create particles
+        this.particles = [];
+        for (let i = 0; i < this.options.particleCount; i++) {
+            this.particles.push(this.createParticle());
+        }
+
+        // Set up mouse tracking
+        document.addEventListener("mousemove", this.handleMouseMove.bind(this));
+    }
+
+    createParticle() {
+        return {
+            y: Math.random() * this.height,
+            x: Math.random() * this.width,
+            dir: this.randomAngleDownwards(),
+            size: Math.random() * 3 + 1
+        };
+    }
+
+    randomAngleDownwards() {
+        return Math.random() * (Math.PI * 0.4) + Math.PI * 0.35;
+    }
+
+    handleMouseMove(e) {
+        this.mouseX = e.pageX;
+        this.mouseY = e.pageY;
+        this.mouseXMiddle = this.mouseX - this.width / 2;
+    }
+
+    resetParticle(particle) {
+        const random = Math.random() * (this.width + this.height * 2);
+        let x, y;
+
+        if (random <= this.height) {
+            x = 0;
+            y = random;
+        } else if (random >= this.height && random <= this.width + this.height) {
+            x = random - this.height;
+            y = 0;
+        } else if (random >= this.width + this.height) {
+            x = this.width;
+            y = random - this.width - this.height;
+        } else {
+            x = 0;
+            y = 0;
+            console.warn("Snow particle reset failed; Defaulting to (0, 0).");
+        }
+
+        particle.x = x;
+        particle.y = y;
+    }
+
+    onResize(width, height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    update(deltaTime) {
+        for (let i = 0; i < this.particles.length; i++) {
+            let particle = this.particles[i];
+
+            // Move particle based on direction
+            particle.x += Math.cos(particle.dir) * 2;
+            particle.y += Math.sin(particle.dir) * 2;
+
+            // Add mouse influence
+            particle.x += (this.mouseXMiddle / this.width) * this.options.mouseInfluence;
+
+            // Reset particle if it goes off screen
+            if (particle.y > this.height || particle.x < 0 || particle.x > this.width) {
+                this.resetParticle(particle);
+            }
+        }
+    }
+
+    draw(ctx) {
+        ctx.fillStyle = "#fff";
+        for (let i = 0; i < this.particles.length; i++) {
+            let particle = this.particles[i];
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    dispose() {
+        document.removeEventListener("mousemove", this.handleMouseMove);
     }
 }
 
@@ -1294,13 +1372,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!Account?.getValue("effect")) {
         Account?.setValue("effect", effect);
     }*/
-   const effect = 0;
+   const effect = 5;
     const effects = {
         waves: WavePointsEffect,
         particle_field: ParticleFieldEffect,
         shooting_stars: ShootingStarsEffect,
         starfield: StarFieldEffect,
         neural: NeuralEffect,
+        snow: SnowParticleEffect
     };
 
     const effectInstance = new effects[Object.keys(effects)[effect]]();
