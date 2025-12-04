@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Counter</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #2a2a2a;
+        }
+        
+        .container {
+            /*! background: #3a3a3a; */
+            padding: 40px;
+            border-radius: 20px;
+            /*! box-shadow: 0 10px 40px rgba(0,0,0,0.5); */
+            text-align: center;
+        }
+        
+        h1 {
+            color: #f5f5f0;
+            margin-bottom: 20px;
+        }
+        
+        #touchCount {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+        
+        #increment {
+            background: #ffd700;
+            color: #2a2a2a;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        #increment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+            background: #ffdf00;
+        }
+        
+        #increment:active {
+            transform: translateY(0);
+        }
+        
+        #increment:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #b0b0a8;
+            min-height: 20px;
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        .success {
+            color: #ffd700;
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Damyan has innapropriately touched his girlfriend</h1>
+        <div id="touchCount">Loading...</div>
+        <h1>times in total.</h1>
+        <button id="increment">+1 Touch</button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        const g = "6931f3be43b1c97be9d840cf";
+        const k = "$2a$10$B.SDLui2MiVV648M3WaNQ.72.HVEzNrixWggMyXAjLG8Xo8dHGohm";
+        const API_URL = `https://api.jsonbin.io/v3/b/${g}`;
+        
+        let currentData = null;
+        const button = document.getElementById("increment");
+        const countDisplay = document.getElementById("touchCount");
+        const statusDisplay = document.getElementById("status");
+        
+        // Load current count on page load
+        async function loadCount() {
+            try {
+                const response = await fetch(API_URL, {
+                    headers: {
+                        "X-Master-Key": k
+                    }
+                });
+                
+                if (!response.ok) throw new Error("Failed to load data");
+                
+                const result = await response.json();
+                currentData = result.record;
+                
+                // Initialize touches if it doesn't exist
+                if (typeof currentData.touches !== 'number') {
+                    currentData.touches = 0;
+                }
+                
+                countDisplay.textContent = currentData.touches;
+                statusDisplay.textContent = "Ready!";
+                statusDisplay.className = "status success";
+            } catch (error) {
+                console.error("Error loading count:", error);
+                countDisplay.textContent = "Error";
+                statusDisplay.textContent = "Failed to load counter";
+                statusDisplay.className = "status error";
+            }
+        }
+        
+        // Increment and update
+        button.addEventListener("click", async () => {
+            button.disabled = true;
+            statusDisplay.textContent = "Updating...";
+            statusDisplay.className = "status";
+            
+            try {
+                // Increment locally
+                currentData.touches = (currentData.touches || 0) + 1;
+                
+                // Update in JSONBin
+                const response = await fetch(API_URL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": k
+                    },
+                    body: JSON.stringify(currentData)
+                });
+                
+                if (!response.ok) throw new Error("Failed to update");
+                
+                // Update display
+                countDisplay.textContent = currentData.touches;
+                statusDisplay.textContent = "Updated!";
+                statusDisplay.className = "status success";
+                
+                // Clear success message after 2 seconds
+                setTimeout(() => {
+                    statusDisplay.textContent = "";
+                }, 2000);
+            } catch (error) {
+                console.error("Error updating count:", error);
+                // Revert local change on error
+                currentData.touches--;
+                countDisplay.textContent = currentData.touches;
+                statusDisplay.textContent = "Update failed!";
+                statusDisplay.className = "status error";
+            } finally {
+                button.disabled = false;
+            }
+        });
+        
+        // Load initial count
+        loadCount();
+    </script>
+</body>
+</html>
