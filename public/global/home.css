@@ -9,7 +9,7 @@ html, body {
 }
 
 :root {
-  --background: linear-gradient(to right, #00CCFF, #00FFD0);
+  --background: linear-gradient(to right, #668, #668);
   --theme-color: linear-gradient(to right, #D185FF, #51CBFF);
   /*cards*/
     --card-background: rgba(0, 0, 0, 0.2);
@@ -323,16 +323,20 @@ body {
 
 
 #navbar-glow-shimmer {
-  background: conic-gradient(transparent 40%,white,transparent 60%);
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  background: radial-gradient(#fff, #fff0);
+  height: 100%;
+  aspect-ratio: 2 / 1;
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(+38deg) scaleX(var(--scale-x));
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
   z-index: 1;
   --scale-x: 1;
-  animation: rotateCentered 3s linear infinite;
+  /* animation: rotateCentered 3s linear infinite; */
+  will-change: transform, --angle;
+  border-radius: 9999px;
+  mix-blend-mode: luminosity saturation;
+  opacity: 0.5;
 }
 
 
@@ -346,6 +350,8 @@ body {
   background-color: #000;
   border-radius: 9999px;
   z-index: 1;
-  transform: translate(-50%, -50%);
+  --x: 0px;
+  --y: 0px;
+  transform: translate(-50%, -50%) translate(var(--x), var(--y));
 }
 
