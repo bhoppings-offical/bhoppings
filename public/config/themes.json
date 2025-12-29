@@ -1,0 +1,104 @@
+{
+  "default": {
+    "primary": ["#D185FF", "#51CBFF"],
+    "background": ["#12151D"]
+  },
+  "oled": {
+    "primary": ["#fff"],
+    "background": ["#000"]
+  },
+  "monochrome": {
+    "primary": ["#FFFFFF", "#444444"],
+    "background": ["#1E1E1E"]
+  },
+  "debug": {    
+    "primary": ["#f00", "#0f0", "#00f"],
+    "background": ["#ff0", "#0ff", "#f0f"]
+  },
+
+  "amethyst": {
+    "primary": ["#A63AFF", "#B873F0"],
+    "background": ["#2B0D43"]
+  },
+  "celestial": {
+    "primary": ["#00FBFF", "#FF0000"],
+    "background": ["#00FBFF", "#FF0000"]
+  },
+  "lavendar_haze": {
+    "primary": ["#FFDAB9", "#663399"],
+    "background": ["#FFDAB9", "#663399"]
+  },
+  "ocean_sage": {
+    "primary": ["#CAFFFD", "#007870"],
+    "background": ["#CAFFFD", "#007870"]
+  },
+  "aquatic": {
+    "primary": ["#00CCFF", "#00FFD0"],
+    "background": ["#00CCFF", "#00FFD0"]
+  },
+  "mystic": {
+    "primary": ["#FF00D4", "#BB00FF"],
+    "background": ["#FF00D4", "#BB00FF"]
+  },
+  "bubblegum": {
+    "primary": ["#D185FF", "#51CBFF"],
+    "background": ["#D185FF", "#51CBFF"]
+  },
+  "emerald_mist": {
+    "primary": ["#1B4D3E", "#2F847C"],
+    "background": ["#1B4D3E", "#2F847C"]
+  },
+  "cream": {
+    "primary": ["#FFBA7E", "#FF8400"],
+    "background": ["#FFBA7E", "#FF8400"]
+  },
+  "lemon": {
+    "primary": ["#FFF264", "#FFFF00"],
+    "background": ["#FFF264", "#FFFF00"]
+  },
+  "festive": {
+    "primary": ["#00FF37", "#FF0000"],
+    "background": ["#00FF37", "#FF0000"]
+  },
+  "duskfire": {
+    "primary": ["#FF00EE", "#FF9000"],
+    "background": ["#FF00EE", "#FF9000"]
+  },
+  "vaporwave": {
+    "primary": ["#FF00E1", "#FF00E1"],
+    "background": ["#FF00E1", "#FF00E1"]
+  },
+  "ember": {
+    "primary": ["#FF0000", "#440000"],
+    "background": ["#200404"]
+  },
+
+  "arborealis": {
+    "primary": ["#008080", "#663399", "#FF8082"],
+    "background": ["#008080", "#663399", "#FF8082"]
+  },
+  "midnight_meadow": {
+    "primary": ["#4B0082", "#9932CC", "#00CED1"],
+    "background": ["#4B0082", "#9932CC", "#00CED1"]
+  },
+  "orchard": {
+    "primary": ["#DA70D6", "#40E0D0", "#00BFFF"],
+    "background": ["#DA70D6", "#40E0D0", "#00BFFF"]
+  },
+  "sapphire": {
+    "primary": ["#4682B4", "#1E90FF", "#00FFFF"],
+    "background": ["#4682B4", "#1E90FF", "#00FFFF"]
+  },
+  "spring_jade": {
+    "primary": ["#00BFFF", "#00FF7F", "#B5FFB8"],
+    "background": ["#00BFFF", "#00FF7F", "#B5FFB8"]
+  },
+  "lilac_pasture": {
+    "primary": ["#8A2BE2", "#BD70E6", "#FFA4E5"],
+    "background": ["#8A2BE2", "#BD70E6", "#FFA4E5"]
+  },
+  "starlit_coral": {
+    "primary": ["#FF5864", "#FAB872", "#FAB872"],
+    "background": ["#FF5864", "#FAB872", "#FAB872"]
+  }
+}

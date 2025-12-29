@@ -1,0 +1,16 @@
+{
+  "snow": ["#FFFFFF"],
+  "ocean": ["#3AC4FF"],
+  "rose": ["#FF3AC1"],
+  "aquamarine": ["#3AFFF2"],
+  "crimson": ["#FF3A3A"],
+  "emerald": ["#54FF3A"],
+  "amethyst": ["#A63AFF"],
+  "sunset": ["#FFA63A"],
+  "twilight": ["#A63AFF", "#237999"],
+  "ember": ["#520000", "#FF3C00"],
+  "festive": ["#00FF37", "#FF0000"],
+  "vaporwave": ["#FF00E1", "#00FFFB"],
+  "monochrome": ["#000000", "#FFFFFF"],
+  "celestial": ["#00FBFF", "#FF0000"]
+}

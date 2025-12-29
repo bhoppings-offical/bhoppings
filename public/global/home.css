@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Kumbh+Sans:wght,YOPQ@100..900,300&display=swap');
 
 html, body {
   height: 100vh;
@@ -9,7 +9,7 @@ html, body {
 }
 
 :root {
-  --background: linear-gradient(to right, #668, #668);
+  --background: linear-gradient(to right, #12151D, #12151D);
   --theme-color: linear-gradient(to right, #D185FF, #51CBFF);
   /*cards*/
     --card-background: rgba(0, 0, 0, 0.2);
@@ -23,6 +23,8 @@ html, body {
     --context-blur: 2px;
     --navbar-glow-intensity: 4px;
   --navbar-glow-opacity: 0.5;
+
+  --navbar-safe-padding: 128px;
 }
 
 html {
@@ -49,7 +51,10 @@ body {
     hsla(0, 0%, 0%, 0.697) 99.2%,
     hsla(0, 0%, 0%, 0.69) 100%
   );*/
-  background: linear-gradient(to bottom, #000, #000a);
+  background: linear-gradient(to bottom, #000, #0000);
+  display: flex;
+  flex-direction: row;
+  /*! padding-top: var(--navbar-safe-padding); */
 }
 
 * {
@@ -355,3 +360,11 @@ body {
   transform: translate(-50%, -50%) translate(var(--x), var(--y));
 }
 
+.box {
+  padding: 48px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: solid 2px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+}

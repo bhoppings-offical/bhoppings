@@ -13,7 +13,7 @@ body {
     display: flex;
     flex-direction: column;
     transform: translateX(+0px);
-    height: calc(100% - var(--navbar-safe-padding));
+    height: 100%;
     justify-content: center;
     gap: 12px;
     /*! align-items: center; */
@@ -50,7 +50,7 @@ body {
     font-size: 4em;
     width: fit-content;
     font-weight: 500;
-    font-family: "Kumbh Sans", sans-serif;
+    font-family: "Instrument Sans", sans-serif;
     display: flex;
     align-content: center;
     flex-direction: row;
@@ -61,20 +61,6 @@ body {
     font-weight: 600;
     background-size: cover;
     cursor: pointer;
-    position: relative;
-    overflow: visible;
-}
-
-#bhop-big::before {
-    content: "bhop";
-    font: inherit;
-    position: absolute;
-    left:0px;
-    top:0px;
-    background-clip: text;
-    background-image: var(--theme-color);
-    filter: blur(6px) opacity(2);
-    font-weight: 600;
 }
 
 #subtitle {
