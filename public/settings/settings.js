@@ -20,6 +20,8 @@ function updateSidebar() {
 function settingsReady() {
   updateSidebar();
   renderSettings();
+  document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
+  document.getElementById("settings-content-loading").style.display = "none";
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
     if (e.target.parentElement.parentElement.id === "cursor-section") {
       const cursorId = e.target.getAttribute("data-cursor-id");
@@ -38,7 +40,7 @@ function formatKey(key) {
   return key
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(' ').replace("Oled", "OLED");
 }
 
 function applyCursorColor(svg, colors) {

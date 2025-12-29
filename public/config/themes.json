@@ -11,10 +11,6 @@
     "primary": ["#FFFFFF", "#444444"],
     "background": ["#1E1E1E"]
   },
-  "debug": {    
-    "primary": ["#f00", "#0f0", "#00f"],
-    "background": ["#ff0", "#0ff", "#f0f"]
-  },
 
   "amethyst": {
     "primary": ["#A63AFF", "#B873F0"],
@@ -76,6 +72,10 @@
   "arborealis": {
     "primary": ["#008080", "#663399", "#FF8082"],
     "background": ["#008080", "#663399", "#FF8082"]
+  },
+  "rainbow": {
+    "primary": ["#FF00FF", "#FFFF00", "#00FFFF"],
+    "background": ["#FF00FF", "#FFFF00", "#00FFFF"]
   },
   "midnight_meadow": {
     "primary": ["#4B0082", "#9932CC", "#00CED1"],

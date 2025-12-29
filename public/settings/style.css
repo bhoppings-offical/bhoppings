@@ -22,6 +22,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   overflow-y: scroll;
+  transform: translateY(+100%);
+  transition: transform 1s ease-in-out;
 }
 #settings-sidebar {
   padding: 24px;
@@ -84,9 +86,17 @@
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  filter: invert(0);
+  transition: filter 0.2s ease-in-out, color 0.2s ease-in-out;
+  cursor: pointer;
 }
 
-#settings-content-container > :first-child {
+.settings-item-button:hover {
+    filter: invert(1);
+    color: black;
+}
+
+#settings-content-container > h1:first-of-type {
   margin-top: var(--navbar-safe-padding);
 }
 
@@ -110,4 +120,33 @@
   mask: url("/assets/images/icons/bhop-b.svg") no-repeat center;
   mask-size: 50% 50%;
   background-color: red; /* whatever color you want the mask to show */
+  background-size: 60%;
+  background-position: center;
+}
+
+#settings-content-loading {
+    width:100%;
+    height:100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+#settings-content-loading-circle {
+    transform: translate(-50%, -50%) rotate(0deg);
+    height: 10%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: translate(-50%, -50%) rotate(+0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(+360deg);
+    }
 }

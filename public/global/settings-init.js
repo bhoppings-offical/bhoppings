@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
+  
+    fetch("/config/themes.json").then(r => r.json()).then(d => {window.themes = d});
+
   if (!ls.getItem("settings")) {
     ls.setItem("settings", JSON.stringify(defaultSettings));
   }
@@ -29,8 +32,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     style.id = "theme-root-style";
     style.innerHTML = `
       :root {
-        --theme-color: linear-gradient(to right, ${settings.cacheTheme.primary.join(", ")});
-        --background: linear-gradient(to right, ${settings.cacheTheme.background.join(", ")});
+        --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
+        --background: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")});
       }
     `;
     document.head.appendChild(style);
@@ -43,8 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function updateCacheTheme() {
     const settings = getSettings();
-
-    const themes = await fetch("/config/themes.json").then(r => r.json());
+    const themes = window.themes || await fetch("/config/themes.json").then(r => r.json());
     settings.cacheTheme = themes[settings.theme];
 
     setSettings(settings);
