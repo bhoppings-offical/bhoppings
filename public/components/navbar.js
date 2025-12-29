@@ -76,11 +76,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const navbarElement = injectNavbar();
   navbarGlowShimmer = document.getElementById("navbar-glow-shimmer");
 
+  navbarElement.querySelectorAll(".navbar-item[data-href]").forEach(item => {
+    item.addEventListener("click", () => {
+      const href = item.getAttribute("data-href");
+      if (href) {
+        window.open(href, "_self");
+      }
+    });
+  });
+
   window.navbarWidth = navbarElement.offsetWidth;
   window.navbarHeight = navbarElement.offsetHeight;
 
   requestAnimationFrame(moveNavbarShimmer);
 });
+
 
 
 let t = 0;
