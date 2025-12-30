@@ -64,7 +64,7 @@ function navbar() {
   glowCover.id = "navbar-shimmer-cover";
   const mobileClickOutArea = document.createElement("div");
   mobileClickOutArea.id = "navbar-clickout-area";
-  nav.appendChild(mobileClickOutArea);
+  //nav.appendChild(mobileClickOutArea);
   nav.appendChild(glow);
   glow.appendChild(glowCover);
   return nav;
@@ -94,13 +94,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   requestAnimationFrame(moveNavbarShimmer);
 
-  function resizeClickoutArea() {
-    const clickout = document.getElementById("navbar-clickout-area");
-    const w = clickout.parentElement.scrollWidth;
-    clickout.style.width = w + "px";
-  }
-  resizeClickoutArea();
-  setInterval(resizeClickoutArea, 5000);
+  document.addEventListener('click', (e) => {
+  const dropdowns = document.querySelectorAll('.navbar-item:focus');
+  dropdowns.forEach((item) => {
+    if (!item.contains(e.target)) {
+      item.blur(); // remove focus manually
+    }
+  });
+});
+
 });
 
 
