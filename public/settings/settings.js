@@ -23,13 +23,13 @@ function settingsReady() {
   document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
   document.getElementById("settings-content-loading").style.display = "none";
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
-    if (e.target.parentElement.parentElement.id === "cursor-section") {
+    if (e.target.parentElement.parentElement.id === "cursor-section" && e.target.classList.contains("settings-item-button")) {
       const cursorId = e.target.getAttribute("data-cursor-id");
       setCursor(cursorId)
     }
   });
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
-    if (e.target.parentElement.parentElement.id === "theme-section") {
+    if (e.target.parentElement.parentElement.id === "theme-section" && e.target.classList.contains("settings-item-button")) {
       const themeId = e.target.getAttribute("data-theme-id");
       applyTheme(themeId)
     }
@@ -61,7 +61,9 @@ function renderSettings() {
   const themeSection = document.getElementById("theme-section");
   const effectSection = document.getElementById("effect-section");
   cursorSection.innerHTML = "";
+  
   for (let i = 0; i < Object.keys(cursors).length; i ++) {
+    
     const key = Object.keys(cursors)[i];
     const cursor = cursors[key];
     const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button" data-cursor-id="${key}">${formatKey(key)}</div>`;
@@ -70,9 +72,16 @@ function renderSettings() {
     elem.innerHTML = innerHTML;
     cursorSection.appendChild(elem);
   }
+  (function() {
+    const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/icons/times-square.svg" /></div><div class="settings-item-button" data-cursor-id="none">Default</div>`;
+    const elem = document.createElement("div");
+    elem.classList.add("settings-item");
+    elem.innerHTML = innerHTML;
+    cursorSection.appendChild(elem);
+  })();
   themeSection.innerHTML = "";
   for (let i = 0; i < Object.keys(themes).length; i ++) {
-    const key = Object.keys(themes)[i];
+      const key = Object.keys(themes)[i];
     const theme = themes[key];
     const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button" data-theme-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");

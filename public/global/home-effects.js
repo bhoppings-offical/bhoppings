@@ -1355,7 +1355,7 @@ document.addEventListener("DOMContentLoaded", () => {
         neural: NeuralEffect,
         snow: SnowParticleEffect
     };
-
+window.effects = Object.keys(effects);
     const effectInstance = new effects[Object.keys(effects)[effect]]();
 
     // Use the framework to run the effect

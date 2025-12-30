@@ -46,11 +46,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function injectRootStyle(settings) {
     const style = document.createElement("style");
     style.id = "theme-root-style";
+    const cursorLine = settings.cursor == "none" ? "" : `--cursor: url("${svgToDataURL(applyCursorColor(window.cursorSvg || (await fetch("/assets/images/cursor.svg").then(r => r.text())), settings.cacheCursor || defaultSettings.cacheCursor))}")`
     style.innerHTML = `
       :root {
         --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
         --background: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")});
-        --cursor: url("${svgToDataURL(applyCursorColor(window.cursorSvg || (await fetch("/assets/images/cursor.svg").then(r => r.text())), settings.cacheCursor || defaultSettings.cacheCursor))}")
+        ${cursorLine}
       }
     `;
     document.head.appendChild(style);
