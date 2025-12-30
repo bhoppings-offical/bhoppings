@@ -151,6 +151,33 @@
     }
 }
 
-#settings-content-container::webkit-scrollbar {
-  
+
+@media screen and (max-width: 1200px) {
+    #sidebar-container {
+      display: none !important;
+    }
+    #cursor-section {
+      display: none;
+    }
+    #settings-content-container > h1:first-of-type {
+      display: none;
+    }
+    #settings-content-container > h1:nth-of-type(2) {
+      margin-top: 80px;
+    }
+    #settings-content-container {
+      width: 100vw;
+    }
+
+    .settings-section {
+      flex-direction: column;
+    }
+    .settings-item {
+      width: calc(100vw - 144px);
+      margin: 24px;
+      margin-bottom: 0px;
+    }
+    #settings-content-container h1 {
+      margin-left: 24px;
+    }
 }

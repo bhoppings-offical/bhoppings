@@ -64,7 +64,7 @@ function renderSettings() {
   for (let i = 0; i < Object.keys(cursors).length; i ++) {
     const key = Object.keys(cursors)[i];
     const cursor = cursors[key];
-    const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button" data-cursor-id="${key}">Apply ${formatKey(key)}</div>`;
+    const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button" data-cursor-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
     elem.classList.add("settings-item");
     elem.innerHTML = innerHTML;
@@ -74,7 +74,7 @@ function renderSettings() {
   for (let i = 0; i < Object.keys(themes).length; i ++) {
     const key = Object.keys(themes)[i];
     const theme = themes[key];
-    const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button" data-theme-id="${key}">Apply ${formatKey(key)}</div>`;
+    const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button" data-theme-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
     elem.classList.add("settings-item");
     elem.innerHTML = innerHTML;
