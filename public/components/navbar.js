@@ -62,6 +62,9 @@ function navbar() {
   glow.innerHTML = `<div id="navbar-glow-shimmer"></div>`;
   const glowCover = document.createElement("div");
   glowCover.id = "navbar-shimmer-cover";
+  const mobileClickOutArea = document.createElement("div");
+  mobileClickOutArea.id = "navbar-clickout-area";
+  nav.appendChild(mobileClickOutArea);
   nav.appendChild(glow);
   glow.appendChild(glowCover);
   return nav;

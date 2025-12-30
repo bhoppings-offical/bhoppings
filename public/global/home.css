@@ -209,6 +209,15 @@ body {
   word-wrap: none;
 }
 
+
+#navbar-clickout-area {
+  position: absolute;
+  left: 0px;
+  top: 100%;
+  height: 100vh;
+  width: 100%;
+}
+
 .navbar-dropdown .navbar-item:hover {
   background: #fff;
   color: #000;
