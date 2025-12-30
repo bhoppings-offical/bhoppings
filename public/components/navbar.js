@@ -93,6 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
   window.navbarHeight = navbarElement.offsetHeight;
 
   requestAnimationFrame(moveNavbarShimmer);
+
+  function resizeClickoutArea() {
+    const clickout = document.getElementById("navbar-clickout-area");
+    const w = clickout.parentElement.scrollWidth;
+    clickout.style.width = w + "px";
+  }
+  resizeClickoutArea();
+  setInterval(resizeClickoutArea, 5000);
 });
 
 

@@ -303,6 +303,7 @@ body {
     overflow-x: scroll !important;
     width: 100vw !important;
     border-radius: 0px;
+    overflow-y: hidden;
   }
   #navbar:has(.navbar-item:focus) {
     padding-bottom: 100vh;
