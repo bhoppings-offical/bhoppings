@@ -1,5 +1,19 @@
+function svgToDataURL(svgString) {
+  // 1. Define the data URL prefix
+  const prefix = 'data:image/svg+xml,';
+  
+  // 2. Encode the SVG string for URL safety
+  // This is a simple encoding. For full optimization/edge cases, 
+  // a library like 'mini-svg-data-uri' might be better.
+  const encodedSVG = encodeURIComponent(svgString)
+    .replace(/'/g, '%27') // Replace single quotes with %27
+    .replace(/"/g, '%22'); // Replace double quotes with %22
+
+  // 3. Combine the prefix and the encoded string
+  return prefix + encodedSVG;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const ls = window.localStorage;
 
   const defaultSettings = {
     cursor: "snow",
@@ -14,26 +28,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   
     fetch("/config/themes.json").then(r => r.json()).then(d => {window.themes = d});
+    fetch("/config/cursors.json").then(r => r.json()).then(d => {window.cursors = d});
+    fetch("/assets/images/cursor.svg").then(r => r.json()).then(d => {window.cursorSvg = d});
 
-  if (!ls.getItem("settings")) {
-    ls.setItem("settings", JSON.stringify(defaultSettings));
+  if (!localStorage.getItem("settings")) {
+    localStorage.setItem("settings", JSON.stringify(defaultSettings));
   }
 
   function getSettings() {
-    return JSON.parse(ls.getItem("settings"));
+    return JSON.parse(localStorage.getItem("settings"));
   }
 
   function setSettings(settings) {
-    ls.setItem("settings", JSON.stringify(settings));
+    localStorage.setItem("settings", JSON.stringify(settings));
   }
 
-  function injectRootStyle(settings) {
+  async function injectRootStyle(settings) {
     const style = document.createElement("style");
     style.id = "theme-root-style";
     style.innerHTML = `
       :root {
         --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
         --background: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")});
+        --cursor: url("${svgToDataURL(applyCursorColor(window.cursorSvg || (await fetch("/assets/images/cursor.svg").then(r => r.text())), settings.cacheCursor || defaultSettings.cacheCursor))}")
       }
     `;
     document.head.appendChild(style);
@@ -68,4 +85,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   injectRootStyle(settings);
 
   window.applyTheme = applyTheme;
+
+  function applyCursorColor(svg, colors) {
+  const uniqueId = colors.join('_').replace(/#/g, '');
+  const gradientId = `paint0_linear_${uniqueId}`;
+
+  return svg
+    .replace(/paint0_linear_[^"]+/g, gradientId)
+    .replace(/stop-color="white"/, `stop-color="${colors[0]}"`)
+    .replace(/stop-color="#EEEEEE"/, `stop-color="${colors[1] || colors[0]}"`);
+}
+async function setCursor(key) {
+  const cursors = window.cursors || await fetch("/config/cursors.json").then(r => r.json());
+  const settings = JSON.parse(localStorage.getItem("settings"));
+  settings.cursor = key;
+  const cursorSvgOld = window.cursorSvg || await fetch("/assets/images/cursor.svg").then(r => r.json());
+  const cursorColor = cursors[key];
+  settings.cacheCursor = cursorColor;
+  localStorage.setItem("settings", JSON.stringify(settings));
+    removeRootStyle();
+    injectRootStyle(settings);
+}
+
+window.applyCursorColor = applyCursorColor;
+window.setCursor = setCursor;
 });

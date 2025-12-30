@@ -202,9 +202,9 @@ class WavePointsEffect {
     constructor(options = {}) {
         this.options = Object.assign(
             {
-                numWaves: 100,
+                numWaves: 150,
                 rows: 80,
-                gravityStrength: 10,
+                gravityStrength: 7,
                 waveSpeed: 0.0000015,
             },
             options,

@@ -150,3 +150,7 @@
         transform: translate(-50%, -50%) rotate(+360deg);
     }
 }
+
+#settings-content-container::webkit-scrollbar {
+  
+}

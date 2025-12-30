@@ -25,7 +25,7 @@ function settingsReady() {
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
     if (e.target.parentElement.parentElement.id === "cursor-section") {
       const cursorId = e.target.getAttribute("data-cursor-id");
-      applyCursor(cursorId)
+      setCursor(cursorId)
     }
   });
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
@@ -46,12 +46,13 @@ function formatKey(key) {
 function applyCursorColor(svg, colors) {
   const uniqueId = colors.join('_').replace(/#/g, '');
   const gradientId = `paint0_linear_${uniqueId}`;
-  
+
   return svg
-    .replace("white", colors[0])
-    .replace("#EEEEEE", colors[1] || colors[0])
-    .replace(/paint0_linear_2743_7907/g, gradientId);
+    .replace(/paint0_linear_[^"]+/g, gradientId)
+    .replace(/stop-color="white"/, `stop-color="${colors[0]}"`)
+    .replace(/stop-color="#EEEEEE"/, `stop-color="${colors[1] || colors[0]}"`);
 }
+
 
 function renderSettings() {
   const cursors = window.cursors;
