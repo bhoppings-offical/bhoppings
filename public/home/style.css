@@ -114,27 +114,7 @@ body {
     top: 0px;
 }
 
-@media screen and (max-width: 1200px) {
-    body {
-        flex-direction:column;
-    }
-    #home-left, #home-right {
-        width:100%;
-  
-    }
-    #home-right {
-        padding: 48px;
-        justify-items: flex-end;
-    }
-    #home-left {
-        height: fit-content;
-        padding-top: 80px;
-        padding: 24px;
-    }
-    #carousel {
-        width: 100%;
-    }
-}
+
 
 
 #carousel-nav {
@@ -327,4 +307,30 @@ body:has(#music-player-hitbox:hover) #music-player, #music-player:hover {
   background-repeat: no-repeat;
   background-position: center center;
   transform: rotate(-90deg);
+}
+
+@media screen and (max-width: 1200px) {
+    body {
+        flex-direction:column !important;
+    }
+    #home-left, #home-right {
+        width:100%;
+  
+        height: fit-content;
+    }
+    #home-right {
+        padding: 48px;
+        justify-items: flex-end;
+    }
+    #home-left {
+        height: fit-content;
+        padding-top: 80px;
+        padding: 24px;
+        padding-top: var(--navbar-safe-padding);
+    }
+    #carousel {
+        width: 100%;
+    }
+
+    
 }

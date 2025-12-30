@@ -127,6 +127,7 @@ body {
   width: fit-content;
   display: flex;
   flex-direction: row;
+  text-wrap: nowrap;
 }
 
 .navbar-dropdown {
@@ -282,9 +283,20 @@ body {
 }
 
 @media screen and (max-width: 1200px) {
+  
+  #navbar-glow {
+    display: none !important;
+  }
   #navbar {
-    /*! overflow-y: hidden; */
-  /*! overflow-x: scroll; */
+    left: 0px !important;
+    top: 0px !important;
+    transform: none !important;
+    overflow-x: scroll !important;
+    width: 100vw !important;
+    border-radius: 0px;
+  }
+  #navbar:has(.navbar-item:focus) {
+    padding-bottom: 100vh;
   }
 }
 
