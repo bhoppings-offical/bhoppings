@@ -17,6 +17,16 @@ app.get("/", (req, res) => {
   res.sendFile(publicPath("index.html"));
 })
 
+const redirects = {
+  "/nexa": "/apps/nexa"
+}
+
+for (const key of Object.keys(redirects)) {
+  app.get(key, (req, res) => {
+    res.redirect(redirects[key]);
+  })
+}
+
 app.use((req, res) => {
   res.status(404).sendFile(publicPath("404/index.html"));
 })

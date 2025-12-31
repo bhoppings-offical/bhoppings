@@ -1,0 +1,35 @@
+[
+  {
+        "name": "Quill",
+        "url": "/quill",
+        "image": "quill.png",
+        "fromRoot": true,
+        "new": true
+    },
+    {
+        "name": "Nexa",
+        "url": "/nexa",
+        "image": "nexa.png",
+        "fromRoot": true,
+        "tags": ["ai"]
+    },
+    {
+        "name": "Poop Playground",
+        "url": "/games/poop-playground",
+        "image": "poop.png",
+        "fromRoot": true,
+        "new": true
+    },
+    {
+        "name": "Orik",
+        "url": "/orik",
+        "image": "orik.png",
+        "fromRoot": true,
+        "tags": ["multiplayer", "ai"]
+    },
+    {
+        "name": "Poop Shooter 3D",
+        "url": "/poopshooter3d",
+        "image": "poopshooter3d.png"
+    }
+]
