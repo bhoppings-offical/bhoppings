@@ -14,7 +14,6 @@
   position: relative;
 }
 
-
 #apps-container {
   width: 100vw;
   height: 100vh;
@@ -24,6 +23,8 @@
   gap: 48px;
   padding: 48px;
   overflow-y: scroll;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 body {
   display: flex;
@@ -50,9 +51,14 @@ body {
   aspect-ratio: 1 / 1;
   border-radius: 24px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .app-icon img {
-  width: 100%;
+  flex: 1;
+  height: 100%;
 }
 
 .app-button:hover {
