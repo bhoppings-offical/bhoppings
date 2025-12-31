@@ -106,6 +106,9 @@ async function setCursor(key) {
   localStorage.setItem("settings", JSON.stringify(settings));
     removeRootStyle();
     injectRootStyle(settings);
+    if (updateSidebar) {
+      updateSidebar();
+    }
 }
 
 window.applyCursorColor = applyCursorColor;

@@ -16,6 +16,10 @@
     "primary": ["#A63AFF", "#B873F0"],
     "background": ["#2B0D43"]
   },
+  "blush": {
+    "primary": ["#FF00E1", "#FF00E1"],
+    "background": ["#FF00E1", "#FF00E1"]
+  },
   "celestial": {
     "primary": ["#00FBFF", "#FF0000"],
     "background": ["#00FBFF", "#FF0000"]
@@ -60,20 +64,15 @@
     "primary": ["#FF00EE", "#FF9000"],
     "background": ["#FF00EE", "#FF9000"]
   },
-  "vaporwave": {
-    "primary": ["#FF00E1", "#FF00E1"],
-    "background": ["#FF00E1", "#FF00E1"]
-  },
   "ember": {
     "primary": ["#FF0000", "#440000"],
     "background": ["#200404"]
   },
-
   "arborealis": {
     "primary": ["#008080", "#663399", "#FF8082"],
-    "background": ["#008080", "#663399", "#FF8082"]
+    "background": ["#FF8082", "#663399", "#008080"]
   },
-  "rainbow": {
+  "colorway": {
     "primary": ["#FF00FF", "#FFFF00", "#00FFFF"],
     "background": ["#FF00FF", "#FFFF00", "#00FFFF"]
   },
@@ -100,5 +99,17 @@
   "starlit_coral": {
     "primary": ["#FF5864", "#FAB872", "#FAB872"],
     "background": ["#FF5864", "#FAB872", "#FAB872"]
+  },
+  "vaporwave": {
+    "primary": ["#FF00D0", "#0084FF", "#00FFFF"],
+    "background": ["#EA00FF", "#1E90FF", "#00FFFF"]
+  },
+  "subzero": {
+    "primary": ["#00F0FF", "#008B9E"],
+    "background": ["#001F3F", "#33A8B8", "#76CFD4"]
+  },
+  "inferno": {
+    "primary": ["#FF3C00", "#FFC300", "#FF7700"],
+    "background": ["#89400C", "#FFAE00", "#FF2600"]
   }
 }

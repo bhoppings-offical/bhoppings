@@ -13,8 +13,7 @@ const navbarItems = [
     { text: "orik", href: "/orik" }
   ]},
   { text: "nexa", href: "/nexa" },
-  { text: "Apps", href: "/apps" },
-  { text: "settings temporary button", href: "/settings" }
+  { text: "apps", href: "/apps" }
 ];
 
 let navbarGlowShimmer;

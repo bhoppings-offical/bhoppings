@@ -64,7 +64,8 @@ body {
     hsla(0, 0%, 0%, 0.697) 99.2%,
     hsla(0, 0%, 0%, 0.69) 100%
   );*/
-  background: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.8), #0000);
+  background: linear-gradient(180deg, rgb(0% 0% 0%) 0%, rgb(0% 0% 0% / 0.999755859375) 6.25%, rgb(0% 0% 0% / 0.998046875) 12.5%, rgb(0% 0% 0% / 0.993408203125) 18.75%, rgb(0% 0% 0% / 0.984375) 25%, rgb(0% 0% 0% / 0.969482421875) 31.25%, rgb(0% 0% 0% / 0.947265625) 37.5%, rgb(0% 0% 0% / 0.916259765625) 43.75%, rgb(0% 0% 0% / 0.875) 50%, rgb(0% 0% 0% / 0.822021484375) 56.25%, rgb(0% 0% 0% / 0.755859375) 62.5%, rgb(0% 0% 0% / 0.675048828125) 68.75%, rgb(0% 0% 0% / 0.578125) 75%, rgb(0% 0% 0% / 0.463623046875) 81.25%, rgb(0% 0% 0% / 0.330078125) 87.5%, rgb(0% 0% 0% / 0.176025390625) 93.75%, rgb(0% 0% 0% / 0) 100% );
+
   display: flex;
   flex-direction: row;
   /*! padding-top: var(--navbar-safe-padding); */
@@ -74,7 +75,7 @@ body {
   color: #fff;
   font-family: -apple-system, "Instrument Sans", sans-serif;
   user-select: none;
-  cursor: var(--cursor), default !important;
+  cursor: var(--cursor), auto !important;
 }
 
 #grain {
@@ -97,7 +98,8 @@ body {
   top: 0px;
   width: 100vw;
   height: 100vh;
-  mix-blend-mode: soft-light;
+  mix-blend-mode: normal;
+  opacity: 0.5;
   pointer-events: none;
 }
 

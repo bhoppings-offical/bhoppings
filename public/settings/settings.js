@@ -1,9 +1,8 @@
 $(document).ready(async () => {
-  [window.cursorSvg, window.bIconSvg, window.effectIconSvg, window.cursors, window.themes] =
+  [window.cursorSvg, window.bIconSvg, window.cursors, window.themes] =
   await Promise.all([
     fetch("/assets/images/cursor.svg").then(r => r.text()),
     fetch("/assets/images/icons/bhop-b.svg").then(r => r.text()),
-    fetch("/assets/images/icons/bolt.svg").then(r => r.text()),
     fetch("/config/cursors.json").then(r => r.json()),
     fetch("/config/themes.json").then(r => r.json())
   ]);
@@ -11,9 +10,7 @@ $(document).ready(async () => {
 });
 
 function updateSidebar() {
-  $("#sidebar-button-cursor").append($(cursorSvg));
-  $("#sidebar-button-theme").append($(bIconSvg));
-  $("#sidebar-button-effect").append($(effectIconSvg));
+  $("#sidebar-button-cursor").empty().append($(applyCursorColor(cursorSvg, window.cursors[JSON.parse(localStorage.getItem("settings")).cursor] || ["#fff", "#fff"])));
 }
 
 
@@ -32,6 +29,15 @@ function settingsReady() {
     if (e.target.parentElement.parentElement.id === "theme-section" && e.target.classList.contains("settings-item-button")) {
       const themeId = e.target.getAttribute("data-theme-id");
       applyTheme(themeId)
+    }
+  });
+  document.getElementById("settings-content-container").addEventListener("click", (e) => {
+    if (e.target.parentElement.parentElement.id === "effect-section" && e.target.classList.contains("settings-item-button")) {
+      const id = e.target.getAttribute("data-effect-id");
+      setEffect(id);
+      const sett = JSON.parse(localStorage.getItem("settings"));
+      sett.effect = id;
+      localStorage.setItem("settings", JSON.stringify(sett));
     }
   });
 }
@@ -89,4 +95,14 @@ function renderSettings() {
     elem.innerHTML = innerHTML;
     themeSection.appendChild(elem);
   }
+  effectSection.innerHTML = "";
+  for (let i = 0; i < Object.keys(window.effects).length; i ++) {
+    const name = window.effects[i];
+    const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/effect-icons/${name}.svg" /></div><div class="settings-item-button" data-effect-id="${name}">${formatKey(name)}</div>`;
+    const elem = document.createElement("div");
+    elem.classList.add("settings-item");
+    elem.innerHTML = innerHTML;
+    effectSection.appendChild(elem);
+  }
+  document.getElementById("settings-content-container").scrollTop = 0;
 }

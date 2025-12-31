@@ -325,7 +325,7 @@ class WavePointsEffect {
     }
 
     draw(ctx) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
         this.points.forEach((point) => {
             ctx.beginPath();
             ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
@@ -475,66 +475,62 @@ class ShootingStarsEffect {
     }
 
     createStar(randomizeY = false) {
-        // Calculate direction vector based on angle
-        const dirX = Math.sin(this.options.angle);
-        const dirY = Math.cos(this.options.angle);
-        const canvas = document.getElementById("waveCanvas");
+    // Calculate direction vector based on angle
+    const dirX = Math.sin(this.options.angle);
+    const dirY = Math.cos(this.options.angle);
 
-        // Randomize starting position
-        // For stars to come from top, we position them above the canvas
-        let x;
-        let y;
+    // Randomize starting position
+    let x;
+    let y;
 
-        if (randomizeY) {
-            // For initial population, distribute stars across the field
-            y =
-                Math.random() * (this.height + this.options.respawnBuffer) -
-                this.options.respawnBuffer;
-            x =
-                Math.random() * (this.width + 2 * this.options.respawnBuffer) -
-                this.options.respawnBuffer;
+    if (randomizeY) {
+        // For initial population, distribute stars across the field
+        y =
+            Math.random() * (this.height + this.options.respawnBuffer) -
+            this.options.respawnBuffer;
+        x =
+            Math.random() * (this.width + 2 * this.options.respawnBuffer) -
+            this.options.respawnBuffer;
+    } else {
+        // Use this.width and this.height instead of canvas.width and canvas.height
+        const random = Math.random() * (this.width + this.height * 2);
+        if (random <= this.height) {
+            x = 0;
+            y = random;
+        } else if (
+            random >= this.height &&
+            random <= this.width + this.height
+        ) {
+            x = random - this.height;
+            y = 0;
+        } else if (random >= this.width + this.height) {
+            x = this.width;
+            y = random - this.width - this.height;
         } else {
-            const random = Math.random() * (canvas.width + canvas.height * 2);
-            if (random <= canvas.height) {
-                x = 0;
-                y = random;
-            } else if (
-                random >= canvas.height &&
-                random <= canvas.width + canvas.height
-            ) {
-                x = random - canvas.height;
-                y = 0;
-            } else if (random >= canvas.width + canvas.height) {
-                x = canvas.width;
-                y = random - canvas.width - canvas.height;
-            } else {
-                x = 0;
-                y = 0;
-                console.warn(
-                    "Conditions for snow particle reset failed; Defaulting to top left (0, 0).",
-                );
-            }
+            x = 0;
+            y = 0;
+            console.warn(
+                "Conditions for snow particle reset failed; Defaulting to top left (0, 0).",
+            );
         }
-
-        return {
-            x: x,
-            y: y,
-            size:
-                Math.random() * (this.options.maxSize - this.options.minSize) +
-                this.options.minSize,
-            speed:
-                Math.random() *
-                    (this.options.maxSpeed - this.options.minSpeed) +
-                this.options.minSpeed,
-            // Store the direction vector for this star
-            dirX: dirX,
-            dirY: dirY,
-            // To create twinkling effect
-            brightness: Math.random() * 0.5 + 0.5,
-            // Store previous positions for the tail
-            trail: [],
-        };
     }
+
+    return {
+        x: x,
+        y: y,
+        size:
+            Math.random() * (this.options.maxSize - this.options.minSize) +
+            this.options.minSize,
+        speed:
+            Math.random() *
+                (this.options.maxSpeed - this.options.minSpeed) +
+            this.options.minSpeed,
+        dirX: dirX,
+        dirY: dirY,
+        brightness: Math.random() * 0.5 + 0.5,
+        trail: [],
+    };
+}
 
     onResize(width, height) {
         this.width = width;
@@ -637,7 +633,7 @@ class ShootingStarsEffect {
 class StarFieldEffect {
     constructor() {
         // Configuration
-        this.STAR_COLOR = "rgba(255, 255, 255, 0.1)";
+        this.STAR_COLOR = "rgba(255, 255, 255, 0.2)";
         this.STAR_SIZE = 3;
         this.STAR_MIN_SCALE = 1;
         this.OVERFLOW_THRESHOLD = 50;
@@ -1341,12 +1337,19 @@ class NeuralEffect {
 }
 
 const animationFramework = new CanvasAnimationFramework("effectCanvas");
+
+function setEffect(name) {
+    const effectInstance = new window.effectClasses[name]();
+
+    // Use the framework to run the effect
+    animationFramework.setEffect(effectInstance);
+}
 document.addEventListener("DOMContentLoaded", () => {
     /*const effect = Account?.getValue("effect") || 0;
     if (!Account?.getValue("effect")) {
         Account?.setValue("effect", effect);
     }*/
-   const effect = 0;
+   //const effect = 0;
     const effects = {
         waves: WavePointsEffect,
         particle_field: ParticleFieldEffect,
@@ -1356,8 +1359,7 @@ document.addEventListener("DOMContentLoaded", () => {
         snow: SnowParticleEffect
     };
 window.effects = Object.keys(effects);
-    const effectInstance = new effects[Object.keys(effects)[effect]]();
-
-    // Use the framework to run the effect
-    animationFramework.setEffect(effectInstance);
+window.effectClasses = effects;
+    const effect = JSON.parse(localStorage.getItem("settings")).effect;
+    setEffect(effect);
 });
