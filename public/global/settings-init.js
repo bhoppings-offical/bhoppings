@@ -15,6 +15,10 @@ function svgToDataURL(svgString) {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
+  if (!localStorage.getItem("app-favorites")) {
+    localStorage.setItem("app-favorites", JSON.stringify([]));
+  }
+
   const defaultSettings = {
     cursor: "snow",
     theme: "default",
