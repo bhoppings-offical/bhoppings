@@ -3,7 +3,7 @@ const navbarItems = [
   {
     text: "software",
     items: [
-      { text: "quill", href: "/quill" },
+      { text: "quill", href: "/downloads/quill" },
       { text: "tangox", href: "/downloads/tangox" },
       { text: "tango clicker", href: "/downloads/tangoclicker" }
     ]
@@ -12,7 +12,6 @@ const navbarItems = [
     { text: "lume", href: "/lume" },
     { text: "orik", href: "/orik" }
   ]},
-  { text: "nexa", href: "/nexa" },
   { text: "apps", href: "/app-library" }
 ];
 
