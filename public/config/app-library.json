@@ -2,7 +2,7 @@
     
     {
         "name": "Quill",
-        "url": "/quill",
+        "url": "/downloads/quill",
         "image": "quill.png",
         "fromRoot": true,
         "new": true
