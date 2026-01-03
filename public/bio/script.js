@@ -1,3 +1,4 @@
+"use strict";
 var canvas = document.getElementById("effect");
 var ctx = canvas.getContext("2d");
 var particles = [];
@@ -14,7 +15,7 @@ $(document).on("mousemove", (e) => {
   mouseXMiddle = mouseX - canvas.width / 2;
 });
 
-var localStorage = window.localStorage;
+window.localStorage;
 
 document.addEventListener("keydown", (e) => {
   if (e.key == " ") {

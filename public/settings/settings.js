@@ -1,3 +1,5 @@
+"use strict";
+
 $(document).ready(async () => {
   [window.cursorSvg, window.bIconSvg, window.cursors, window.themes] =
   await Promise.all([
@@ -40,6 +42,59 @@ function settingsReady() {
       localStorage.setItem("settings", JSON.stringify(sett));
     }
   });
+  $(".sidebar-button").on("click", function(e) {
+    const idTable = {
+      "sidebar-button-cursor": "cursor-section",
+      "sidebar-button-theme": "theme-section",
+      "sidebar-button-effect": "effect-section"
+    }
+    const id = idTable[$(this).attr("id")];
+    scrollToElement($(`#${id}`))
+  })
+//chatgpt nerd scrolling
+const idTable = {
+  "sidebar-button-cursor": "cursor-section",
+  "sidebar-button-theme": "theme-section",
+  "sidebar-button-effect": "effect-section"
+};
+
+const $container = $("#settings-content-container");
+const $sections = $.map(idTable, (sectionId) => $(`#${sectionId}`));
+let activeButton = null;
+
+$container.on("scroll", function() {
+  const containerScrollTop = $container.scrollTop();
+  const containerHeight = $container.height();
+
+  let mostVisibleSection = null;
+  let maxVisibleHeight = 0;
+
+  $sections.forEach(($section) => {
+    const sectionTop = $section.position().top;
+    const sectionHeight = $section.outerHeight();
+
+    // Calculate visible portion of the section
+    const visibleTop = Math.max(sectionTop, 0);
+    const visibleBottom = Math.min(sectionTop + sectionHeight, containerHeight);
+    const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+    if (visibleHeight > maxVisibleHeight) {
+      maxVisibleHeight = visibleHeight;
+      mostVisibleSection = $section;
+    }
+  });
+
+  if (!mostVisibleSection) return;
+
+  const sectionId = mostVisibleSection.attr("id");
+  const buttonId = Object.entries(idTable).find(([key, val]) => val === sectionId)?.[0];
+  if (!buttonId || buttonId === activeButton) return;
+
+  if (activeButton) $(`#${activeButton}`).removeClass("active");
+  $(`#${buttonId}`).addClass("active");
+  activeButton = buttonId;
+});
+
 }
 
 function formatKey(key) {
@@ -105,4 +160,44 @@ function renderSettings() {
     effectSection.appendChild(elem);
   }
   document.getElementById("settings-content-container").scrollTop = 0;
+}
+
+function getScrollParent($el) {
+  let $parent = $el.parent();
+
+  while ($parent.length) {
+    if ($parent[0] === document.body) break;
+
+    const overflowY = $parent.css("overflow-y");
+    if (overflowY === "auto" || overflowY === "scroll") {
+      return $parent;
+    }
+
+    $parent = $parent.parent();
+  }
+
+  return $("html, body");
+}
+
+
+function scrollToElement(element, duration = 400) {
+  const $el = $(element);
+  if (!$el.length) return;
+
+  const $parent = getScrollParent($el);
+
+  const elementTop = $el.offset().top;
+  const parentTop = $parent.offset()?.top || 0;
+
+  const elementHeight = $el.outerHeight();
+  const parentHeight = $parent.innerHeight();
+
+  const targetScrollTop =
+    $parent.scrollTop() +
+    (elementTop - parentTop) - 192;
+
+  $parent.animate(
+    { scrollTop: targetScrollTop },
+    duration
+  );
 }

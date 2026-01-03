@@ -10,7 +10,7 @@ function appCard(app) {
   }
   const icon = $("<div></div>").addClass("app-icon");
   const iconImg = $("<img />").prop("src", "/assets/images/app-icons/" + app.image);
-  const button = $("<div></div>").text(app.name).addClass("app-button").click(function(e) {
+  const button = $("<div></div>").html(app.name).addClass("app-button").click(function(e) {
     window.open($(this).parent().data("href"), "_blank");
   })
   card.append(favorite, icon.append(iconImg), icon, button);

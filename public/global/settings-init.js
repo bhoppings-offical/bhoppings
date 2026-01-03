@@ -1,3 +1,5 @@
+"use strict";
+
 function svgToDataURL(svgString) {
   // 1. Define the data URL prefix
   const prefix = 'data:image/svg+xml,';

@@ -1,3 +1,4 @@
+"use strict";
 const navbarItems = [
   { text: "bio", href: "/" },
   {
