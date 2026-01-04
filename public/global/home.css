@@ -369,8 +369,8 @@ body {
 
 
 #navbar-glow-shimmer {
-  background: radial-gradient(#fff, #fff0);
-  height: 100%;
+  background: #fff;
+  height: calc(150% - 48px);
   aspect-ratio: 2 / 1;
   position: absolute;
   left: var(--x);
@@ -383,6 +383,7 @@ body {
   border-radius: 9999px;
   mix-blend-mode: luminosity saturation;
   opacity: 0.5;
+  filter: blur(24px);
 }
 
 

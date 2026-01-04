@@ -10,6 +10,9 @@ function appCard(app) {
   }
   const icon = $("<div></div>").addClass("app-icon");
   const iconImg = $("<img />").prop("src", "/assets/images/app-icons/" + app.image);
+  if (app.tags && app.tags.includes("broken")) {
+    icon.css("filter", "grayscale(1) brightness(0.5)");
+  }
   const button = $("<div></div>").html(app.name).addClass("app-button").click(function(e) {
     window.open($(this).parent().data("href"), "_blank");
   })
@@ -21,7 +24,11 @@ function renderApps() {
   const container = $("#apps-container");
   container.empty();
   const favorites = JSON.parse(window.localStorage.getItem("app-favorites"));
-  window.apps.sort((a, b) => {
+  
+window.apps.sort((a, b) => {
+  return (a.tags ? a.tags.includes("broken") : 0) - (b.tags ? b.tags.includes("broken") : 0)
+})
+window.apps.sort((a, b) => {
   const aFav = favorites.includes(a.name);
   const bFav = favorites.includes(b.name);
 

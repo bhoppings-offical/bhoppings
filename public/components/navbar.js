@@ -107,9 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 let t = 0;
-const shimmerSpeed = 10;
-
+const shimmerSpeed = 2;
+let oldNow = 0;
 function moveNavbarShimmer() {
+  const frameTime = performance.now() - oldNow;
+  oldNow = performance.now();
   const navbarPerimeter = 2 * (navbarWidth + navbarHeight);
 
   const dist = (t * shimmerSpeed) % navbarPerimeter;
