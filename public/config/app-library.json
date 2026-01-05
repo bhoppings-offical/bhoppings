@@ -423,7 +423,7 @@
         "name": "InfiniCraft",
         "url": "/infinicraft",
         "image": "infinicraft.png",
-        "tags": ["multiplayer", "ai"]
+        "tags": ["multiplayer", "ai", "broken"]
     },
     {
         "name": "Inflation Fetish",

@@ -18,7 +18,8 @@ app.get("/", (req, res) => {
 })
 
 const redirects = {
-  "/nexa": "/apps/nexa"
+  "/nexa": "/apps/nexa",
+  "/apps": "/app-library"
 }
 
 for (const key of Object.keys(redirects)) {

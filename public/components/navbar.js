@@ -4,15 +4,12 @@ const navbarItems = [
   {
     text: "software",
     items: [
-      { text: "quill", href: "/downloads/quill" },
-      { text: "tangox", href: "/downloads/tangox" },
-      { text: "tango clicker", href: "/downloads/tangoclicker" }
+      //{ text: "quill", href: "/downloads/quill" },
+      { text: "tangox", href: "/downloads/TangoX.exe" },
+      { text: "tango clicker", href: "/downloads/TangoClicker.exe" }
     ]
   },
-  { text: "assets", items: [
-    { text: "lume", href: "/lume" },
-    { text: "orik", href: "/orik" }
-  ]},
+    { text: "lume", href: "/apps/lume" },
   { text: "apps", href: "/app-library" }
 ];
 
