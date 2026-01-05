@@ -8,7 +8,7 @@
   "lemon": ["#EEFF22"],
   "sunset": ["#FFA63A"],
   "crimson": ["#FF3A3A"],
-  "monochrome": ["#FFFFFF", "#000000"],
+  "monochrome": ["#FFFFFF", "#444444"],
   "vaporwave": ["#FF00E1", "#00FFFB"],
   "twilight": ["#A63AFF", "#237999"],
   "celestial": ["#00FBFF", "#FF0000"],

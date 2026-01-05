@@ -444,7 +444,7 @@ class ShootingStarsEffect {
         // Default options
         this.options = Object.assign(
             {
-                starCount: 100, // Number of stars
+                starCount: 180, // Number of stars
                 minSpeed: 3, // Minimum speed
                 maxSpeed: 10, // Maximum speed
                 minSize: 0.5, // Minimum star size

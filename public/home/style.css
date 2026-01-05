@@ -65,7 +65,7 @@ body {
     overflow: visible;
 }
 
-#bhop-big::before {
+#bhop-big-glow {
     content: "bhop";
     font: inherit;
     position: absolute;
@@ -75,6 +75,7 @@ body {
     background-image: var(--theme-color);
     filter: blur(6px) opacity(2);
     font-weight: 600;
+    color: transparent;
 }
 
 #subtitle {
@@ -314,7 +315,7 @@ body:has(#music-player-hitbox:hover) #music-player, #music-player:hover {
         flex-direction:column !important;
     }
     #home-left, #home-right {
-        width:100%;
+        width: 100%;
   
         height: fit-content;
     }
@@ -333,4 +334,86 @@ body:has(#music-player-hitbox:hover) #music-player, #music-player:hover {
     }
 
     
+}
+
+#bhop-big-o-spacer {
+    opacity: 0;
+    /*! display: none; */
+}
+
+#bhop-big::before {
+    content: "o";
+    font-size: inherit;
+    position: absolute;
+    left: 50%;
+    top: 0px;
+    background-image: inherit;
+    background-clip: inherit;
+    background-size: 400% 100%;
+    background-position-x: 65%;
+    /*! visibility: hidden; */
+    opacity: 1;
+    transition: opacity 0.2s ease-in;
+}
+
+#bhop-big:hover::before {
+    opacity: 0;
+}
+
+#bhop-big-gear {
+    /*! width: 0.5em; */
+    color: transparent;
+    background-clip: border-box;
+    position: absolute;
+    right: 41px;
+    bottom: 7px;
+    background-image: inherit;
+    mask: url("/assets/images/shapes/bhop-gear.svg");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    aspect-ratio: 1 / 1;
+    height: 0.55em;
+    background-size: 400% 100%;
+    background-position-x: 65%;
+    transform-origin: center center;
+    transition: transform 1s ease-in-out, opacity 0.2s ease-in;
+    opacity: 0;
+}
+
+@keyframes rotate {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+#bhop-big-gear::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    /*! animation: rotate 1s linear infinite; */
+    background-image: inherit;
+    background-position-x: inherit;
+    background-size: inherit;
+    position: absolute;
+    left: 50%;
+    height: 100%;
+    top: 50%;
+    width: 100%;
+    transition: inherit;
+}
+
+
+#bhop-big:hover #bhop-big-gear {
+  transform: rotate(360deg);
+  opacity: 1;
+}
+#bhop-big:hover #bhop-big-gear::before {
+  transform: translate(-50%, -50%) rotate(-360deg);
 }
