@@ -5,7 +5,7 @@
         "url": "/downloads/quill",
         "image": "quill.png",
         "fromRoot": true,
-        "tags": ["ai", "broken"]
+        "tags": ["ai"]
     },
     {
         "name": "Nexa",
@@ -32,13 +32,13 @@
         "name": "Annoy the AI",
         "url": "/annoy-the-ai",
         "image": "annoy-the-ai.png",
-        "tags": ["ai", "broken"]
+        "tags": ["ai"]
     },
     {
         "name": "Draw Something",
         "url": "/draw-something",
         "image": "draw-something.png",
-        "tags": ["ai", "broken"]
+        "tags": ["ai"]
     },
     {
         "name": "End of the World",
@@ -49,9 +49,9 @@
         "name": "Evil Google",
         "url": "/evil-google",
         "image": "evil-google.png",
-        "tags": ["ai", "broken"]
+        "tags": ["ai"]
     },
-    { "name": "Fogmorph", "url": "/fogmorph", "image": "fogmorph.png", "tags": ["ai", "broken"]},
+    { "name": "Fogmorph", "url": "/fogmorph", "image": "fogmorph.png", "tags": ["ai"]},
     {
         "name": "Go Literally Anywhere",
         "url": "/go-literally-anywhere",
@@ -68,43 +68,38 @@
         "name": "Minecraft Mixing Table",
         "url": "/minecraft-mixing-table",
         "image": "minecraft-mixing-table.png",
-        "tags": ["ai", "broken"]
+        "tags": ["ai"]
     },
     {
         "name": "Minecraft Log Analyzer",
         "url": "/minecraftloganalyzer",
         "image": "minecraftloganalyzer.png",
-        "tags": ["ai", "broken"]
+        "tags": ["ai"]
     },
     {
         "name": "Rocket Runner",
         "url": "/rocketrunner",
-        "image": "rocketrunner.png",
-        "tags": ["broken"]
+        "image": "rocketrunner.png"
     },
     {
         "name": "Schloober Hangout",
         "url": "/schloober-hangout",
-        "image": "schloober-hangout.png",
-        "tags": ["broken"]
+        "image": "schloober-hangout.png"
     },
     {
         "name": "Survive or Die",
         "url": "/survive-or-die",
-        "image": "survive-or-die.png",
-        "tags": ["broken"]
+        "image": "survive-or-die.png"
     },
     {
         "name": "Wireframe Tetris Survival",
         "url": "/wireframe-tetris-survival",
-        "image": "wireframe-tetris-survival.png",
-        "tags": ["broken"]
+        "image": "wireframe-tetris-survival.png"
     },
     {
         "name": "Recursive Maze Escape",
         "url": "/recursive-maze-escape",
-        "image": "recursive-maze-escape.png",
-        "tags": ["broken"]
+        "image": "recursive-maze-escape.png"
     },
     { "name": "❓Enhance", "url": "/enhance", "image": "enhance.png" },
     {
@@ -117,20 +112,18 @@
         "name": "3D Connect Four",
         "url": "/3d-connect-four",
         "image": "3d-connect-four.png",
-        "tags": ["multiplayer", "broken"]
+        "tags": ["multiplayer "]
     },
     {
         "name": "3D Driving Game",
         "url": "/3d_driving_game",
-        "image": "3d_driving_game.png",
-        "tags": ["broken"]
+        "image": "3d_driving_game.png"
     },
     { "name": "3D Engine", "url": "/3dengine", "image": "3dengine.png" },
     {
         "name": "3D Maze Generator",
         "url": "/3dmaze-gen",
-        "image": "3dmaze-gen.png",
-        "tags": ["broken"]
+        "image": "3dmaze-gen.png"
     },
     { "name": "3D Pong", "url": "/3d-pong", "image": "3d-pong.png" },
     {
@@ -148,7 +141,7 @@
         "name": "3D Voxel Engine",
         "url": "/3d-voxel-engine",
         "image": "3d-voxel-engine.png",
-        "tags": ["multiplayer", "broken"]
+        "tags": ["multiplayer "]
     },
     { "name": "AdamOS", "url": "/adamos", "image": "adamos.png" },
     {
@@ -205,8 +198,7 @@
         "url": "/bmovie-planet",
         "image": "bmovie-planet.png"
     },
-    { "name": "Books", "url": "/books", "image": "books.png",
-        "tags": ["broken"] },
+    { "name": "Books", "url": "/books", "image": "books.png" },
     {
         "name": "Breadstick Simulator",
         "url": "/breadsticksim",
@@ -245,14 +237,13 @@
     {
         "name": "Cosmic Clicker",
         "url": "/cosmicclicker",
-        "image": "cosmicclicker.png",
-        "tags": ["broken"]
+        "image": "cosmicclicker.png"
     },
     {
         "name": "Cosmic Hangout",
         "url": "/cosmic-hangout",
         "image": "cosmic-hangout.png",
-        "tags": ["multiplayer", "broken"]
+        "tags": ["multiplayer "]
     },
     { "name": "Crazy Cars", "url": "/crazycars", "image": "crazycars.png" },
     {
@@ -308,8 +299,7 @@
     {
         "name": "EaglerCraft",
         "url": "/eaglercraft",
-        "image": "eaglercraft.png",
-        "tags": ["broken"]
+        "image": "eaglercraft.png"
     },
     { "name": "Earth", "url": "/earth", "image": "earth.png" },
     {
@@ -336,13 +326,12 @@
         "name": "Endless Office",
         "url": "/endless-office",
         "image": "endless-office.png",
-        "tags": ["multiplayer", "broken"]
+        "tags": ["multiplayer "]
     },
     {
         "name": "Evil Google",
         "url": "/evil_google",
-        "image": "evil_google.png",
-        "tags": ["broken"]
+        "image": "evil_google.png"
     },
     {
         "name": "Falling Sand Simulator 98",
@@ -423,7 +412,7 @@
         "name": "InfiniCraft",
         "url": "/infinicraft",
         "image": "infinicraft.png",
-        "tags": ["multiplayer", "ai", "broken"]
+        "tags": ["multiplayer", "ai"]
     },
     {
         "name": "Inflation Fetish",
@@ -491,8 +480,7 @@
     {
         "name": "Motor Cycle Playground",
         "url": "/motorcycleplayground",
-        "image": "motorcycleplayground.png",
-        "tags": ["broken"]
+        "image": "motorcycleplayground.png"
     },
     {
         "name": "Multicolored Shader",
@@ -558,8 +546,7 @@
         "image": "protocol_533.png"
     },
     { "name": "PWP", "url": "/pwp", "image": "pwp.png" },
-    { "name": "PX Fun", "url": "/pxfun", "image": "pxfun.png" ,
-        "tags": ["broken"]},
+    { "name": "PX Fun", "url": "/pxfun", "image": "pxfun.png" },
     { "name": "Quantum", "url": "/quantum", "image": "quantum.png" },
     {
         "name": "Quantum Poop",
@@ -575,8 +562,7 @@
     {
         "name": "Realistic 3D Terrain",
         "url": "/realistic-3d-terrain",
-        "image": "realistic-3d-terrain.png",
-        "tags": ["broken"]
+        "image": "realistic-3d-terrain.png"
     },
     { "name": "Retro Grid", "url": "/retrogrid", "image": "retrogrid.png" },
     {
@@ -631,7 +617,7 @@
         "name": "Space Explorer",
         "url": "/space-explorer",
         "image": "space-explorer.png",
-        "tags": ["multiplayer", "broken"]
+        "tags": ["multiplayer "]
     },
     {
         "name": "Space Sim Realistic",
@@ -671,7 +657,7 @@
         "name": "Tetris",
         "url": "/tetris",
         "image": "tetris.png",
-        "tags": ["multiplayer", "broken"]
+        "tags": ["multiplayer "]
     },
     {
         "name": "The Backrooms 2",

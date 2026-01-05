@@ -732,11 +732,11 @@ function loadRoomTextures(roomPrompt) {
     showStatusMessage('Loading new room...');
     imagesLoaded = 0; 
     
-    const wallTexture = textureLoader.load('https://image.pollinations.ai/prompt/the%20wall%20texture%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
-    const floorTexture = textureLoader.load('https://image.pollinations.ai/prompt/the%20floor%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
-    const ceilingTexture = textureLoader.load('https://image.pollinations.ai/prompt/the%20ceiling%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
-    const doorTexture1 = textureLoader.load('https://image.pollinations.ai/prompt/a%20door%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
-    const doorTexture2 = textureLoader.load('https://image.pollinations.ai/prompt/another%20door%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
+    const wallTexture = textureLoader.load('https://image.pollinations.com/prompt/the%20wall%20texture%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
+    const floorTexture = textureLoader.load('https://image.pollinations.com/prompt/the%20floor%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
+    const ceilingTexture = textureLoader.load('https://image.pollinations.com/prompt/the%20ceiling%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
+    const doorTexture1 = textureLoader.load('https://image.pollinations.com/prompt/a%20door%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
+    const doorTexture2 = textureLoader.load('https://image.pollinations.com/prompt/another%20door%20to%20' + encodeURIComponent(roomPrompt), checkAllImagesLoaded);
     
     return {
         wall: wallTexture,
@@ -1514,7 +1514,7 @@ function generateMap() {
             roomDiv.style.top = `${(-y * 45) + 2000}px`;
 
             if (x === 0 && y === 0) {
-                const iconUrl = 'https://image.pollinations.ai/prompt/' + encodeURIComponent('Make an icon for "A alien weird universe"');
+                const iconUrl = 'https://image.pollinations.com/prompt/' + encodeURIComponent('Make an icon for "A alien weird universe"');
                 roomDiv.style.backgroundImage = `url(${iconUrl})`;
                 roomDiv.style.backgroundColor = ''; // Remove background color if needed
             } else if (roomPrompts[roomKey]) {

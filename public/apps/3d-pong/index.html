@@ -303,8 +303,8 @@ function drawGame(game) {
   ctx.lineTo(canvas.width / 2, canvas.height);
   ctx.stroke();
   ctx.setLineDash([]);
-  leftPaddle.ai(balls);
-  rightPaddle.ai(balls);
+  leftPaddle.com(balls);
+  rightPaddle.com(balls);
   balls.forEach(ball => {
     ball.update(leftPaddle, rightPaddle, games.indexOf(game));
     ball.draw(ctx);

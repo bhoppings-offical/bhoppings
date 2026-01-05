@@ -846,7 +846,7 @@
     
         aimbotToggle.addEventListener('click', () => {
             aimbotToggle.classList.toggle('active');
-            hacks.aimbot = aimbotToggle.classList.contains('active');
+            hacks.commbot = aimbotToggle.classList.contains('active');
         });
     
         autoShootToggle.addEventListener('click', () => {
@@ -915,7 +915,7 @@
     
         camera.position.copy(playerBody.position);
         
-        if(hacks.aimbot && enemies.length > 0) {
+        if(hacks.commbot && enemies.length > 0) {
             let closest = enemies.reduce((prev, curr) => 
                 prev.mesh.position.distanceTo(camera.position) < curr.mesh.position.distanceTo(camera.position) ? prev : curr
             );
