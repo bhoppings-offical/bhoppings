@@ -6,6 +6,11 @@
         "image": "quill.png",
         "fromRoot": true,
         "tags": ["ai"]
+    },{
+        "name": "Poop Playground",
+        "url": "/poop-playground",
+        "image": "poop.png",
+        "tags": ["ai"]
     },
     {
         "name": "Nexa",
