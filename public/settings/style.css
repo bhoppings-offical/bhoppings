@@ -24,6 +24,7 @@
   overflow-y: scroll;
   transform: translateY(+100%);
   transition: transform 1s ease-in-out;
+  /*! overflow-x: scroll; */
 }
 #settings-sidebar {
   padding: 24px;
@@ -228,4 +229,97 @@
   
   background: #fff;
   mask-image: url("/assets/images/icons/bolt.svg");
+}
+
+
+.settings-list {
+  background: var(--card-background);
+  padding: 48px;
+  border-radius: 48px;
+  border: var(--card-border);
+  width: calc(100% - 120px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  backdrop-filter:blur(3px);
+}
+.settings-list-row {
+  display: flex;
+  flex-direction: row;
+}
+.settings-list-row-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+.settings-list-row-name {
+  font-size: 24px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+.settings-list-row-desc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.beta-tag {
+  height: 100%;
+  background: var(--theme-color);
+  aspect-ratio: 144 / 49;
+  mask: url("/assets/images/shapes/beta.svg");
+}
+
+.switch {
+  height: 36px;
+  width: 72px;
+  border-radius:9999px;
+  background: #3f3f3f;
+  border: solid 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  box-sizing: border-box;
+  /*! overflow: hidden; */
+}
+
+.switch::before {
+  content: "";
+  width: 100%;
+  /*! height: 100%; */
+  background-image: var(--theme-color);
+  height: 100%;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  border-radius: 9999px;
+  /*! opacity: 0; */
+  transition: all 0.2s ease-in;
+  background-position-x: -100%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+
+.switch.enabled::before {
+  /*! left: 0px; */
+  /*! width: 100%; */
+  background-position-x: 0%;
+}
+.settings-list-row-right {
+  overflow: hidden;
+}
+.switch::after {
+  content: "";
+  height: calc(100% + 4px);
+  aspect-ratio: 1 / 1;
+  background: #fff;
+  border-radius: 9999px;
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease-in;
+}
+.switch.enabled::after {
+  left: calc(100% - 18px);
 }

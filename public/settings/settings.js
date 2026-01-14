@@ -133,13 +133,13 @@ function renderSettings() {
     elem.innerHTML = innerHTML;
     cursorSection.appendChild(elem);
   }
-  (function() {
+  /*(function() {
     const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/icons/times-square.svg" /></div><div class="settings-item-button" data-cursor-id="none">Default</div>`;
     const elem = document.createElement("div");
     elem.classList.add("settings-item");
     elem.innerHTML = innerHTML;
     cursorSection.appendChild(elem);
-  })();
+  })();*/
   themeSection.innerHTML = "";
   for (let i = 0; i < Object.keys(themes).length; i ++) {
       const key = Object.keys(themes)[i];
