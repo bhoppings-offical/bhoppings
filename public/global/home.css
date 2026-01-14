@@ -120,6 +120,7 @@ body {
   overflow: hidden;
   /*! box-shadow: inset 0px 0px 12px #fff; */
   overflow: visible;
+  z-index: 9999;
 }
 
 .navbar-item {

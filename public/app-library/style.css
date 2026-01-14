@@ -478,12 +478,12 @@ input[type="search"]::-webkit-search-cancel-button {
 .app-title {
   display: flex;
   width: calc(100% - 72px);
-  padding: 12px;
+  /*! padding: 12px; */
   flex-direction: row;
   align-items: center;
   font-size: 24px;
   background: rgba(0, 0, 0, 0.5);
-  border: solid 5px rgba(0, 0, 0, 0.2);
+  /*! border: solid 5px rgba(0, 0, 0, 0.2); */
   border-radius: 0px 0px 24px 24px;
   box-sizing: border-box;
   border-top: 0px;
@@ -608,4 +608,12 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .app-title span {
   z-index: 1;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border: solid 5px rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 0px 0px 24px 24px;
+  border-top: 0px;
 }
