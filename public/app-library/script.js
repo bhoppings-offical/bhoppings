@@ -2,7 +2,8 @@
 
 function appCard(app) {
   const card = $("<div></div>").addClass("app-card").data("href", ((app.fromRoot ? "" : "/apps/") + app.url).replace(/\/\//, "/"));
-  const favorite = $("<div></div>").addClass("app-favorite").data("name", app.name);
+  const favoriteOutline = $("<img>").attr("src", "/assets/images/shapes/favorite-border.svg").addClass("favorite-border");
+  const favorite = $("<div></div>").addClass("app-favorite").data("name", app.name).append(favoriteOutline);
   
   const favorites = JSON.parse(localStorage.getItem("app-favorites"));
   if (favorites.includes(app.name)) {
@@ -13,10 +14,12 @@ function appCard(app) {
   if (app.tags && app.tags.includes("broken")) {
     icon.css("filter", "grayscale(1) brightness(0.5)");
   }
-  const button = $("<div></div>").html(app.name).addClass("app-button").click(function(e) {
-    window.open($(this).parent().data("href"), "_blank");
+  const button = $("<div></div>").html("<span>Open</span>").addClass("app-button").click(function(e) {
+    window.open($(this).parent().parent().data("href"), "_blank");
   })
-  card.append(favorite, icon.append(iconImg), icon, button);
+ const title = $("<div></div>").html(app.name).addClass("app-title")
+ icon.append(iconImg, button, favorite);
+  card.append(icon, icon, title);
   return card;
 }
 
@@ -34,30 +37,47 @@ window.apps.sort((a, b) => {
 
   return bFav - aFav;
 });
-
+  let favoriteTitleExists = false;
+  if (favorites.length >= 1) {
+    const $e = $("<h1></h1>").html(`Your Favorites <span class='small'>(${favorites.length})</span>`);
+      container.append($e);
+  }
   for (const app of window.apps) {
+    if (!favorites.includes(app.name) && !favoriteTitleExists) {
+      const $e = $("<h1></h1>").html(`Not Favorited <span class='small'>(${window.apps.length - favorites.length})</span>`);
+      favoriteTitleExists = true;
+      container.append($e);
+    }
     const card = appCard(app);
     container.append(card);
   }
 }
 
-$(document).ready(async function(e) {
+$(document).ready(async function () {
   window.apps = await fetch("/config/app-library.json").then(r => r.json());
   renderApps();
-  $("#apps-container").on("click", function(e) {
-    if ($(e.target).hasClass("app-favorite")) {
-      favoriteApp($(e.target).data("name"));
-    }
-  })
+
+  $("#apps-container").on("click", function (e) {
+    const $favorite = $(e.target).closest(".app-favorite");
+
+    if (!$favorite.length) return;
+
+    const name = $favorite.data("name");
+    if (!name) return;
+
+    favoriteApp(name);
+  });
+
   $("#apps-container").scrollTop(0);
-  $("#search-input").on("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    search();
-  }
+
+  $("#search-input").on("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      search();
+    }
+  });
 });
 
-})
 
 function favoriteApp(name) {
   const favorites = JSON.parse(localStorage.getItem("app-favorites"));
@@ -76,6 +96,11 @@ function search() {
   renderApps();
   const query = $("#search-input").val();
   const passing = fuzzySuggest(query, window.apps).map(o => o.name);
+  if (query.trim() == "") {
+    $("#apps-container h1").show();
+  } else {
+    $("#apps-container h1").hide();
+  }
 
   $(".app-card").each(function () {
     const name = $(this).find(".app-favorite").data("name");
