@@ -17,8 +17,10 @@ function appCard(app) {
   const button = $("<div></div>").html("<span>Open</span>").addClass("app-button").click(function(e) {
     window.open($(this).parent().parent().data("href"), "_blank");
   })
- const title = $("<div></div>").html(app.name).addClass("app-title")
+ const title = $("<div></div>").html(`<span>${app.name}</span>`).addClass("app-title")
+ const titleBackground = $("<img>").prop("src", "/assets/images/app-icons/" + app.image).addClass("title-bg");
  icon.append(iconImg, button, favorite);
+ title.append(titleBackground);
   card.append(icon, icon, title);
   return card;
 }

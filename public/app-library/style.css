@@ -294,7 +294,7 @@ input[type="search"]::-webkit-search-cancel-button {
   /*! padding: 48px; */
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0px;
   /*! border-radius: 48px; */
   width: calc(20% - 39px);
   /*! backdrop-filter: blur(3px); */
@@ -303,6 +303,8 @@ input[type="search"]::-webkit-search-cancel-button {
   box-sizing: border-box;
   position: relative;
   /*! overflow: hidden; */
+  /*! justify-content: center; */
+  align-items: center;
 }
 
 #apps-container {
@@ -475,11 +477,18 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .app-title {
   display: flex;
-  width: 100%;
-  justify-content: center;
+  width: calc(100% - 72px);
+  padding: 12px;
   flex-direction: row;
   align-items: center;
   font-size: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  border: solid 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0px 0px 24px 24px;
+  box-sizing: border-box;
+  border-top: 0px;
+  position: relative;
+  overflow: hidden;
 }
 
 .app-icon::after {
@@ -583,4 +592,20 @@ input[type="search"]::-webkit-search-cancel-button {
   font-weight: 400;
   font-family: "Instrument Sans", sans-serif;
   color: rgba(255, 255, 255, 0.7);
+}
+
+
+.title-bg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: calc(100% + 48px);
+  width: calc(100% + 48px);
+  filter: blur(24px) brightness(0.5);
+  z-index: 0;
+  transform: translate(-50%, -50%);
+}
+
+.app-title span {
+  z-index: 1;
 }
