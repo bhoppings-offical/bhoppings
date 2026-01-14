@@ -1,43 +1,74 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
+<!doctype html>
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="initial-scale=1.0,width=device-width" />
+    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="google-site-verification"
+      content="gEZW0Romg5lx3iDIbOF3QGgLAP1RR7lG0Dmj7i2qHK0"
+    />
+    <meta
+      name="description"
+      content="Bhoppings.de is dedicated to only bringing you the best experience and highest quality website we can offer. From games, to cool / interesting projects, our website has something for everyone."
+    />
+    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico" />
     <title>Bhoppings</title>
-    <link rel="stylesheet" href="/bio/style.css" />
+    <link rel="stylesheet" href="bio.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link rel="preload" href="/assets/images/backgrounds/bio.jpg" />
   </head>
+
   <body>
-    <div id="backdrop">
-      <div id="grain"></div>
-      <canvas id="effect"></canvas>
+    <!-- <video src="https://r2.guns.lol/3df88f90-0bc2-42bd-b0f8-c02a5569b9b3.mp4" autoplay id="background"></video> -->
+
+    <canvas id="effect"></canvas>
+
+    <div id="container">
+      <div id="name-container">
+        <img src="/assets/images/pfp/bhop.png" id="pfp" onclick="window.open('/home', '_self')" />
+        <img id="sparkles" src="/assets/images/animated/sparkle_white.gif" />
+        <h1 id="name">Bhop</h1>
+        <div id="bio">professional skid</div>
+      </div>
     </div>
 
-    <div id="center">
-      <img id="pfp" src="/assets/images/pfp/bhop.png" onclick="window.open('/home', '_self');" />
-      <div id="username">Bhop</div>
-      <div id="caption">professional skid</div>
+    <div id="links">
+      <a
+        class="link-button"
+        onclick="javascript: window.open('https://discordapp.com/users/1237591310278463502', '_blank');"
+      >
+        <img class="link-img" src="/assets/images/icons/discord.png" />
+      </a>
+      <a
+        class="link-button"
+        onclick="javascript: window.open('https://www.tiktok.com/@bhoppingz', '_blank');"
+      >
+        <img class="link-img" src="/assets/images/icons/tiktok.png" />
+      </a>
+      <a
+        class="link-button"
+        onclick="javascript: window.open('https://github.com/bhxp', '_blank');"
+      >
+        <img class="link-img" src="/assets/images/icons/github.png" />
+      </a>
+      <a
+        class="link-button"
+        onclick="javascript: window.open('https://open.spotify.com/user/31zvux3kw6otgrc6czgj5544ddkm?si=70e7ce28ac034cc2', '_blank');"
+      >
+        <img class="link-img" src="/assets/images/icons/spotify.png" />
+      </a>
     </div>
 
-
-    <div id="link-bar">
-      <div class="link-button" data-href="https://discordapp.com/users/1237591310278463502">
-        <img src="/assets/images/icons/discord.png" />
-      </div>
-      
-      <div class="link-button" data-href="https://github.com/bhoppings-offical">
-        <img src="/assets/images/icons/github.png" />
-      </div>
-      
-      <div class="link-button" data-href="https://open.spotify.com/user/31zvux3kw6otgrc6czgj5544ddkm?si=70e7ce28ac034cc2">
-        <img src="/assets/images/icons/spotify.png" />
-      </div>
-      
-      <div class="link-button" data-href="https://www.tiktok.com/@ballbirds">
-        <img src="/assets/images/icons/tiktok.png" />
-      </div>
+    <div id="views" style="display: none">
+      <img src="images/eye.png" /><span id="view-count">0</span>
     </div>
+
+    <a
+      id="home-button"
+      onclick="javascript: window.open('/home', '_blank');"
+      class="link-button"
+    >
+      <img src="/assets/images/icons/home.svg" />
+    </a>
 
     <div id="cover">
       <div id="cover-title">
@@ -45,6 +76,39 @@
       </div>
     </div>
   </body>
-    <audio id="all-music" src="/assets/audio/all-music.mp3"></audio>
-  <script src="/bio/script.js"></script>
+  <script src="bio.js"></script>
+
+  <script>
+    // Create an audio element and set its source
+    var audio = new Audio("/assets/audio/all-music.mp3");
+    audio.volume = 0.03;
+
+    // Add an event listener to the document body to play the audio on click
+    document.body.onclick = function () {
+      console.log("Body clicked"); // Debug log
+      audio.play().catch(function (error) {
+        console.error("Error playing audio:", error); // Log any playback errors
+      });
+    };
+    // Fetch view count from the endpoint and update the view-count element
+    fetch('/view-count')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('view-count').textContent = data.viewCount;
+      })
+      .catch(error => {
+        console.error('Error fetching view count:', error);
+      });
+  </script>
+
+  <!-- script src's below -->
+
+  <script type="text/javascript" src="/particle-lib.js"></script>
+  <script type="text/javascript" src="/global/settings-init.js"></script>
+
 </html>

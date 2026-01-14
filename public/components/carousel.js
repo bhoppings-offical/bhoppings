@@ -1,3 +1,4 @@
+"use strict";
 const carouselImages = document.getElementById("carousel-images");
 const carousel = document.getElementById("carousel");
 const autoScrollDelay = 8000; // ms for the poopy carousel to auto scroll

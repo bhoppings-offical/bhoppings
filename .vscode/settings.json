@@ -1,0 +1,21 @@
+{
+  "vscord.app.name": "Visual Studio Code",
+  "vscord.status.problems.text": "- {problems_count} {problems_pluralize} found",
+  "vscord.status.problems.enabled": false,
+  "vscord.status.details.text.editing": "Editing {file_name}{file_extension}",
+  "vscord.status.state.text.editing": "Working on {file_name}{file_extension}",
+  "vscord.status.image.large.debugging.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/debugging.png",
+  "vscord.status.image.large.editing.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/{lang}.png",
+  "vscord.status.image.large.idle.key": "http://bhoppings.de/assets/images/pfp/bhop.png",
+  "vscord.status.image.large.notInFile.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/idle-{app_id}.png",
+  "vscord.status.image.large.viewing.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/{lang}.png",
+  "vscord.status.image.small.debugging.key": "http://bhoppings.de/assets/images/pfp/bhop.png",
+  "vscord.status.image.small.editing.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/{app_id}.png",
+  "vscord.status.image.small.idle.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/idle.png",
+  "vscord.status.image.small.notInFile.key": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/idle.png",
+  "vscord.status.image.small.viewing.key": "http://bhoppings.de/assets/images/pfp/bhop.png",
+  "vscord.status.image.large.notInFile.text": "",
+  "vscord.status.details.text.notInFile": "Not in a file!",
+  "vscord.status.details.enabled": true,
+  "vscord.status.details.idle.enabled": true
+}

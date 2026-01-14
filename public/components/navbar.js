@@ -1,19 +1,16 @@
+"use strict";
 const navbarItems = [
   { text: "bio", href: "/" },
   {
     text: "software",
     items: [
-      { text: "quill", href: "/quill" },
-      { text: "tangox", href: "/downloads/tangox" },
-      { text: "tango clicker", href: "/downloads/tangoclicker" }
+      //{ text: "quill", href: "/downloads/quill" },
+      { text: "tangox", href: "/downloads/TangoX.exe" },
+      { text: "tango clicker", href: "/downloads/TangoClicker.exe" }
     ]
   },
-  { text: "assets", items: [
-    { text: "lume", href: "/lume" },
-    { text: "orik", href: "/orik" }
-  ]},
-  { text: "nexa", href: "/nexa" },
-  { text: "Apps", href: "/apps" }
+    { text: "lume", href: "/apps/lume" },
+  { text: "apps", href: "/app-library" }
 ];
 
 let navbarGlowShimmer;
@@ -61,6 +58,9 @@ function navbar() {
   glow.innerHTML = `<div id="navbar-glow-shimmer"></div>`;
   const glowCover = document.createElement("div");
   glowCover.id = "navbar-shimmer-cover";
+  const mobileClickOutArea = document.createElement("div");
+  mobileClickOutArea.id = "navbar-clickout-area";
+  //nav.appendChild(mobileClickOutArea);
   nav.appendChild(glow);
   glow.appendChild(glowCover);
   return nav;
@@ -76,17 +76,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const navbarElement = injectNavbar();
   navbarGlowShimmer = document.getElementById("navbar-glow-shimmer");
 
+  navbarElement.querySelectorAll(".navbar-item[data-href]").forEach(item => {
+    item.addEventListener("click", () => {
+      const href = item.getAttribute("data-href");
+      if (href) {
+        window.open(href, "_self");
+      }
+    });
+  });
+
   window.navbarWidth = navbarElement.offsetWidth;
   window.navbarHeight = navbarElement.offsetHeight;
 
   requestAnimationFrame(moveNavbarShimmer);
+
+  document.addEventListener('click', (e) => {
+  const dropdowns = document.querySelectorAll('.navbar-item:focus');
+  dropdowns.forEach((item) => {
+    if (!item.contains(e.target)) {
+      item.blur(); // remove focus manually
+    }
+  });
+});
+
 });
 
 
-let t = 0;
-const shimmerSpeed = 10;
 
+let t = 0;
+const shimmerSpeed = 2;
+let oldNow = 0;
 function moveNavbarShimmer() {
+  const frameTime = performance.now() - oldNow;
+  oldNow = performance.now();
   const navbarPerimeter = 2 * (navbarWidth + navbarHeight);
 
   const dist = (t * shimmerSpeed) % navbarPerimeter;
