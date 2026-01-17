@@ -19,7 +19,13 @@ function updateSidebar() {
 function settingsReady() {
   updateSidebar();
   renderSettings();
-  applyGlass();
+  applyGlass()
+  if (!JSON.parse(window.localStorage.getItem("settings")).liquidGlass) {
+    hideGlass();
+  } else {
+    showGlass();
+    $("#glass-switch").addClass("enabled")
+  }
   document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
   document.getElementById("settings-content-loading").style.display = "none";
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
@@ -55,6 +61,23 @@ function settingsReady() {
     const id = idTable[$(this).attr("id")];
     scrollToElement($(`#${id}`))
   })
+
+  $("#glass-switch").on("click", function(e) {
+      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      if (settings.liquidGlass) {
+        settings.liquidGlass = false;
+        $(this).removeClass("enabled");
+        hideGlass();
+
+      }
+      else {
+        $(this).addClass("enabled");
+        settings.liquidGlass = true;
+        showGlass();
+
+      }
+      window.localStorage.setItem("settings", JSON.stringify(settings));
+    })
 //chatgpt nerd scrolling
 const idTable = {
   "sidebar-button-cursor": "cursor-section",
@@ -105,7 +128,7 @@ function formatKey(key) {
   return key
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ').replace("Oled", "OLED");
+    .join(' ').replace("Oled", "OLED").replace("Default", "Legacy");
 }
 
 function applyCursorColor(svg, colors) {

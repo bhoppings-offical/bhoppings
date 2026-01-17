@@ -298,6 +298,7 @@
   background-repeat: no-repeat;
   background-size: 100% 100%;
   clip-path: polygon(0% 0%, 25% 0%, 25% 100%, 0% 100%);
+  pointer-events: none;
 }
 
 
@@ -321,7 +322,8 @@
   top: 50%;
   transform: translate(-50%, -50%);
   transition: all 0.1s ease-out;
+  pointer-events: none;
 }
 .switch.enabled::after {
-  left: calc(100% - 18px);
+  left: calc(100% - 16px);
 }

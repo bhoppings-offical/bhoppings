@@ -25,5 +25,15 @@ function applyGlass() {
 }
 
 document.addEventListener("DOMContentLoaded", function(e) {
-    applyGlass();
+    const settings = JSON.parse(window.localStorage.getItem("settings"));
+    if (settings.liquidGlass) applyGlass();
 })
+
+function showGlass() {
+        $(".liquid-glass .liquidGlassMaterial").show();
+        $('link[href="/global/glass.css"]').prop('disabled', false);
+}
+function hideGlass() {
+        $(".liquid-glass .liquidGlassMaterial").hide();
+        $('link[href="/global/glass.css"]').prop('disabled', true);
+}
