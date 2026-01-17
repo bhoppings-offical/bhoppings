@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     cacheTheme: {
       primary: ["#D185FF", "#51CBFF"],
       background: ["#12151D"]
+    },
+    extraSettings: {
+      "liquid_glass": false
     }
   };
 

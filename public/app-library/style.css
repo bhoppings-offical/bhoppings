@@ -189,7 +189,7 @@ input[type="search"]::-webkit-search-cancel-button {
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  font-size: 24px;
+  font-size: 16px;
 }
 
 .app-icon::after {
@@ -216,7 +216,7 @@ input[type="search"]::-webkit-search-cancel-button {
   padding: 12px 12px 12px 48px;
   background-color: rgba(0, 0, 0, 0.3);
   border: solid 6px rgba(0, 0, 0, 0.3);
-  font-size: 24px;
+  font-size: 16px;
   border-radius: 9999px;
   backdrop-filter: blur(32px);
   display: flex;
@@ -481,7 +481,7 @@ input[type="search"]::-webkit-search-cancel-button {
   /*! padding: 12px; */
   flex-direction: row;
   align-items: center;
-  font-size: 24px;
+  font-size: 16px;
   background: rgba(0, 0, 0, 0.5);
   /*! border: solid 5px rgba(0, 0, 0, 0.2); */
   border-radius: 0px 0px 24px 24px;

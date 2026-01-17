@@ -19,6 +19,7 @@ function updateSidebar() {
 function settingsReady() {
   updateSidebar();
   renderSettings();
+  applyGlass();
   document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
   document.getElementById("settings-content-loading").style.display = "none";
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
@@ -41,6 +42,9 @@ function settingsReady() {
       sett.effect = id;
       localStorage.setItem("settings", JSON.stringify(sett));
     }
+  });
+  $(".switch").on("click", function(e) {
+    $(this).toggleClass("enabled");
   });
   $(".sidebar-button").on("click", function(e) {
     const idTable = {
@@ -129,7 +133,7 @@ function renderSettings() {
     const cursor = cursors[key];
     const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button" data-cursor-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
-    elem.classList.add("settings-item");
+    elem.classList.add("settings-item", "liquid-glass");
     elem.innerHTML = innerHTML;
     cursorSection.appendChild(elem);
   }
@@ -146,7 +150,7 @@ function renderSettings() {
     const theme = themes[key];
     const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button" data-theme-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
-    elem.classList.add("settings-item");
+    elem.classList.add("settings-item", "liquid-glass");
     elem.innerHTML = innerHTML;
     themeSection.appendChild(elem);
   }
@@ -155,7 +159,7 @@ function renderSettings() {
     const name = window.effects[i];
     const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/effect-icons/${name}.svg" /></div><div class="settings-item-button" data-effect-id="${name}">${formatKey(name)}</div>`;
     const elem = document.createElement("div");
-    elem.classList.add("settings-item");
+    elem.classList.add("settings-item", "liquid-glass");
     elem.innerHTML = innerHTML;
     effectSection.appendChild(elem);
   }
