@@ -169,8 +169,8 @@ class SnowParticleEffect {
             let particle = this.particles[i];
 
             // Move particle based on direction
-            particle.x += Math.cos(particle.dir) * 2;
-            particle.y += Math.sin(particle.dir) * 2;
+            particle.x += Math.cos(particle.dir) * 2 * deltaTime;
+            particle.y += Math.sin(particle.dir) * 2 * deltaTime;
 
             // Add mouse influence
             particle.x += (this.mouseXMiddle / this.width) * this.options.mouseInfluence;
