@@ -131,6 +131,7 @@ body {
   display: flex;
   flex-direction: row;
   text-wrap: nowrap;
+  text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 .navbar-dropdown {
@@ -254,7 +255,7 @@ body {
   display: flex;
 }*/
 
-#navbar > .navbar-item:last-of-type img {
+#navbar.legacy > .navbar-item:last-of-type img {
   content: "";
   height: 0.8em;
   aspect-ratio: 1 / 1;
@@ -268,29 +269,29 @@ body {
   opacity: 0;
 }
 
-#navbar > .navbar-item:last-of-type {
-    /*! background: #fff; */
-    /*! color: #000; */
-    /*! padding: 12px 24px; */
-    /*! border-radius: 6px; */
-    /*! align-items: center; */
-    /*! gap: 12px; */
-    /*! font-size: 24px; */
-    /*! transform: translateY(+0px); */
-    /*! transition: transform 0.2s ease-in-out; */
-    /*! line-height: 1em; */
-    /*! justify-self: flex-end; */
-    /*position: absolute;
+#navbar.legacy > .navbar-item:last-of-type {
+    background: #fff;
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 6px;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    transform: translateY(+0px);
+    transition: transform 0.2s ease-in-out;
+    line-height: 1em;
+    justify-self: flex-end;
+    position: absolute;
     right: 24px;
-    top: 50%;*/
-    /*! align-self: bottom; */
+    top: 50%;
+    align-self: bottom;
     margin-left: auto;
 }
 
-#navbar > .navbar-item:last-of-type::before {
+#navbar.legacy > .navbar-item:last-of-type::before {
   display: none;
 }
-#navbar > .navbar-item:last-of-type:hover {
+#navbar.legacy > .navbar-item:last-of-type:hover {
   transform: translateY(-6px);
 }
 
@@ -311,6 +312,23 @@ body {
   #navbar:has(.navbar-item:focus) {
     padding-bottom: 100vh;
   }
+}
+
+#navbar.legacy #navbar-glow {
+  display: none !important;
+}
+#navbar.legacy {
+  left: 0px !important;
+  top: 0px !important;
+  transform: none !important;
+  overflow-x: scroll !important;
+  width: 100vw !important;
+  border-radius: 0px;
+  overflow-y: hidden;
+  backdrop-filter: none !important;
+}
+#navbar.legacy:has(.navbar-item:focus) {
+  padding-bottom: 100vh;
 }
 
 

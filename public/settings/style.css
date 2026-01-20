@@ -263,6 +263,10 @@
 .settings-list-row-desc {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
 }
 .beta-tag {
   height: 100%;
@@ -310,6 +314,11 @@
 }
 .settings-list-row-right {
   overflow: hidden;
+  padding: 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 .switch::after {
   content: "";
@@ -318,7 +327,7 @@
   background: #fff;
   border-radius: 9999px;
   position: absolute;
-  left: 18px;
+  left: 16px;
   top: 50%;
   transform: translate(-50%, -50%);
   transition: all 0.1s ease-out;
@@ -326,4 +335,28 @@
 }
 .switch.enabled::after {
   left: calc(100% - 16px);
+}
+
+.key,
+.key * {
+  box-sizing: border-box;
+}
+.key {
+  background: #000;
+  border-radius: 4px;
+  padding: 3px 8px 3px 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  color: #fff;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
 }

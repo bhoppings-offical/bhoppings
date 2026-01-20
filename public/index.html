@@ -104,6 +104,9 @@
       .catch(error => {
         console.error('Error fetching view count:', error);
       });
+      document.addEventListener("DOMContentLoaded", function(e) {
+        if (JSON.parse(window.localStorage.getItem("settings")).skipBio) window.open("/home", "_self");
+      })
   </script>
 
   <!-- script src's below -->

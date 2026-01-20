@@ -26,6 +26,12 @@ function settingsReady() {
     showGlass();
     $("#glass-switch").addClass("enabled")
   }
+  if (JSON.parse(window.localStorage.getItem("settings")).legacyNavbar) {
+    $("#navbar-switch").addClass("enabled")
+  }
+  if (JSON.parse(window.localStorage.getItem("settings")).skipBio) {
+    $("#bio-switch").addClass("enabled")
+  }
   document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
   document.getElementById("settings-content-loading").style.display = "none";
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
@@ -74,6 +80,35 @@ function settingsReady() {
         $(this).addClass("enabled");
         settings.liquidGlass = true;
         showGlass();
+
+      }
+      window.localStorage.setItem("settings", JSON.stringify(settings));
+    })
+    $("#navbar-switch").on("click", function(e) {
+      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      if (settings.legacyNavbar) {
+        settings.legacyNavbar = false;
+        $(this).removeClass("enabled");
+        $("#navbar").removeClass("legacy");
+
+      }
+      else {
+        $(this).addClass("enabled");
+        settings.legacyNavbar = true;
+        $("#navbar").addClass("legacy");
+
+      }
+      window.localStorage.setItem("settings", JSON.stringify(settings));
+    })
+    $("#bio-switch").on("click", function(e) {
+      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      if (settings.skipBio) {
+        settings.skipBio = false;
+        $(this).removeClass("enabled");
+      }
+      else {
+        $(this).addClass("enabled");
+        settings.skipBio = true;
 
       }
       window.localStorage.setItem("settings", JSON.stringify(settings));

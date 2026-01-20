@@ -155,7 +155,7 @@ function fuzzySuggest(query, items, maxDistance = 3) {
 
     return (
       name.includes(searchInput) ||
-      levenshtein(searchInput, name) <= maxDistance
+      (levenshtein(searchInput, name) <= maxDistance && name.length > 5) || searchInput == ""
     );
   });
 }

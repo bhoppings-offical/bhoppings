@@ -13,5 +13,6 @@
   "twilight": ["#A63AFF", "#237999"],
   "celestial": ["#00FBFF", "#FF0000"],
   "ember": ["#FF3C00", "#520000"],
-  "festive": ["#00FF37", "#FF0000"]
+  "festive": ["#00FF37", "#FF0000"],
+  "ocean waves": ["#4AE8EF", "#3AC4FF"]
 }
