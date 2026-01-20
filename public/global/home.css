@@ -39,9 +39,25 @@ html, body {
     background-clip: padding-box;
 }
 
+@keyframes backgroundMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
 
 html {
-  background: var(--background);
+  background-image: var(--background);
+  background-size: 120% 100%;
+  background-repeat: repeat-x;
+  background-position: 0% 0%;
+  animation: backgroundMove 5s ease-in-out infinite;
 }
 
 body {
@@ -99,7 +115,7 @@ body {
   width: 100vw;
   height: 100vh;
   mix-blend-mode: normal;
-  opacity: 0.5;
+  opacity: 0.8;
   pointer-events: none;
 }
 
@@ -116,7 +132,7 @@ body {
   align-items: center;
   transform: translateX(-50%);
   border-radius: 9999px;
-  backdrop-filter: blur(3px);
+  /*! backdrop-filter: blur(3px); */
   overflow: hidden;
   /*! box-shadow: inset 0px 0px 12px #fff; */
   overflow: visible;
@@ -154,7 +170,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: visible;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(12px);
   box-sizing: border-box;
 }
 
@@ -358,8 +374,9 @@ body {
   z-index: -1;
   opacity: var(--navbar-glow-opacity);
   display: block;
-  mix-blend-mode: lighten;
+  /* mix-blend-mode: lighten; */
   overflow: hidden;
+  /*! backdrop-filter: blur(6px); */
 }
 
 
@@ -400,7 +417,7 @@ body {
   /* animation: rotateCentered 3s linear infinite; */
   will-change: transform, --angle;
   border-radius: 9999px;
-  mix-blend-mode: luminosity saturation;
+  /*mix-blend-mode: luminosity saturation;*/
   opacity: 0.5;
   filter: blur(24px);
 }
@@ -428,4 +445,16 @@ body {
   box-sizing: border-box;
   backdrop-filter: blur(12px);
   border-radius: 24px;
+}
+
+
+#navbar::after {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(12px);
+  z-index: -2;
 }

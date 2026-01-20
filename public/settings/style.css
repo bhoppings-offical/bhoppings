@@ -42,8 +42,8 @@
   position: relative;
 }
 .sidebar-button svg {
-  width: 70%;
-  height: 70%;
+  width: 90%;
+  height: 90%;
 }
 
 
@@ -87,7 +87,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 18px;
   filter: invert(0);
   transition: filter 0.2s ease-in-out, color 0.2s ease-in-out;
   cursor: pointer;
@@ -272,7 +272,7 @@
   height: 100%;
   background: var(--theme-color);
   aspect-ratio: 144 / 49;
-  mask: url("/assets/images/shapes/beta.svg");
+  mask: url("/assets/images/shapes/beta.svg") no-repeat;
 }
 
 .switch {
