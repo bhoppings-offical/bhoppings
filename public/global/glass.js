@@ -26,7 +26,10 @@ function applyGlass() {
 
 document.addEventListener("DOMContentLoaded", function(e) {
     const settings = JSON.parse(window.localStorage.getItem("settings"));
-    if (settings.liquidGlass) applyGlass();
+    if (settings.liquidGlass) {
+        applyGlass();
+        requestAnimationFrame(() => checkGlassBounding(true));
+    }
 })
 
 function showGlass() {
@@ -36,4 +39,27 @@ function showGlass() {
 function hideGlass() {
         $(".liquid-glass .liquidGlassMaterial").hide();
         $('link[href="/global/glass.css"]').prop('disabled', true);
+}
+
+function checkGlassBounding(loop = false) {
+    const glass = document.getElementsByClassName("liquid-glass");
+    for (let i = 0; i < glass.length; i++) {
+        const elem = glass[i];
+        const rect = elem.getBoundingClientRect();
+        const glassMaterial = elem.getElementsByClassName("liquidGlassMaterial")[0];
+        if (!glassMaterial) continue;
+
+        const leniencyX = rect.width;   // horizontal leniency
+        const leniencyY = rect.height;  // vertical leniency
+
+        if (rect.left > window.innerWidth + leniencyX ||
+            rect.top > window.innerHeight + leniencyY ||
+            rect.right < -leniencyX ||
+            rect.bottom < -leniencyY) {
+            glassMaterial.style.setProperty("display", "none", "important");
+        } else {
+            glassMaterial.style.display = "block";
+        }
+    }
+    if (loop) requestAnimationFrame(() => checkGlassBounding(true));
 }

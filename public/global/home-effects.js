@@ -760,7 +760,7 @@ class StarFieldEffect {
     onTouchMove(event) {
         this.touchInput = true;
         this.movePointer(event.touches[0].clientX, event.touches[0].clientY);
-        event.preventDefault();
+        //event.preventDefault();
     }
 
     // Event handler for mouse/touch end

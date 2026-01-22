@@ -3,7 +3,7 @@
 function appCard(app) {
   const card = $("<div></div>").addClass("app-card").data("href", ((app.fromRoot ? "" : "/apps/") + app.url).replace(/\/\//, "/"));
   const favoriteOutline = $("<img>").attr("src", "/assets/images/shapes/favorite-border.svg").addClass("favorite-border");
-  const favorite = $("<div></div>").addClass("app-favorite").data("name", app.name).append(favoriteOutline);
+  const favorite = $("<div></div>").addClass("app-favorite").data("name", app.name).append(favoriteOutline).addClass("liquid-glass");
   
   const favorites = JSON.parse(localStorage.getItem("app-favorites"));
   if (favorites.includes(app.name)) {
@@ -14,10 +14,10 @@ function appCard(app) {
   if (app.tags && app.tags.includes("broken")) {
     icon.css("filter", "grayscale(1) brightness(0.5)");
   }
-  const button = $("<div></div>").html("<span>Open</span>").addClass("app-button").click(function(e) {
+  const button = $("<div></div>").html("<span>Open</span>").addClass("app-button").addClass("liquid-glass").click(function(e) {
     window.open($(this).parent().parent().data("href"), "_blank");
   })
- const title = $("<div></div>").html(`<span>${app.name}</span>`).addClass("app-title")
+ const title = $("<div></div>").html(`<span>${app.name}</span>`).addClass("app-title").addClass("liquid-glass");
  const titleBackground = $("<img>").prop("src", "/assets/images/app-icons/" + app.image).addClass("title-bg");
  icon.append(iconImg, button, favorite);
  title.append(titleBackground);
@@ -53,6 +53,7 @@ window.apps.sort((a, b) => {
     const card = appCard(app);
     container.append(card);
   }
+  if (JSON.parse(window.localStorage.getItem("settings")).liquidGlass) applyGlass();
 }
 
 $(document).ready(async function () {
@@ -78,6 +79,8 @@ $(document).ready(async function () {
       search();
     }
   });
+  const settings = JSON.parse(window.localStorage.getItem("settings"));
+    if (settings.liquidGlass) applyGlass();
 });
 
 

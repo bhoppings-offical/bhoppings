@@ -346,6 +346,9 @@ body {
 #navbar.legacy:has(.navbar-item:focus) {
   padding-bottom: 100vh;
 }
+#navbar.legacy::after {
+  backdrop-filter: none !important;
+}
 
 
 

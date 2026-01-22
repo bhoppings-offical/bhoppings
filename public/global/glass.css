@@ -21,6 +21,7 @@
     z-index: 1;
     background-color: rgba(50, 50, 50, 0.2) !important;
     backdrop-filter: none !important;
+    border: none !important;
 }
 .liquidGlassMaterial {
     position: absolute;

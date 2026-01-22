@@ -87,7 +87,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 24px;
   filter: invert(0);
   transition: filter 0.2s ease-in-out, color 0.2s ease-in-out;
   cursor: pointer;
@@ -359,4 +359,7 @@
   font-size: 12px;
   font-weight: 500;
   width: fit-content;
+}
+.liquidGlassMaterial {
+  position: absolute;
 }
