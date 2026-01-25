@@ -26,6 +26,12 @@ function settingsReady() {
     showGlass();
     $("#glass-switch").addClass("enabled")
   }
+  if (JSON.parse(window.localStorage.getItem("settings")).legacyNavbar) {
+    $("#navbar-switch").addClass("enabled")
+  }
+  if (JSON.parse(window.localStorage.getItem("settings")).skipBio) {
+    $("#bio-switch").addClass("enabled")
+  }
   document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
   document.getElementById("settings-content-loading").style.display = "none";
   document.getElementById("settings-content-container").addEventListener("click", (e) => {
@@ -74,6 +80,35 @@ function settingsReady() {
         $(this).addClass("enabled");
         settings.liquidGlass = true;
         showGlass();
+
+      }
+      window.localStorage.setItem("settings", JSON.stringify(settings));
+    })
+    $("#navbar-switch").on("click", function(e) {
+      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      if (settings.legacyNavbar) {
+        settings.legacyNavbar = false;
+        $(this).removeClass("enabled");
+        $("#navbar").removeClass("legacy");
+
+      }
+      else {
+        $(this).addClass("enabled");
+        settings.legacyNavbar = true;
+        $("#navbar").addClass("legacy");
+
+      }
+      window.localStorage.setItem("settings", JSON.stringify(settings));
+    })
+    $("#bio-switch").on("click", function(e) {
+      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      if (settings.skipBio) {
+        settings.skipBio = false;
+        $(this).removeClass("enabled");
+      }
+      else {
+        $(this).addClass("enabled");
+        settings.skipBio = true;
 
       }
       window.localStorage.setItem("settings", JSON.stringify(settings));
@@ -154,7 +189,7 @@ function renderSettings() {
     
     const key = Object.keys(cursors)[i];
     const cursor = cursors[key];
-    const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button" data-cursor-id="${key}">${formatKey(key)}</div>`;
+    const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button liquid-glass" data-cursor-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
     elem.classList.add("settings-item", "liquid-glass");
     elem.innerHTML = innerHTML;
@@ -171,7 +206,7 @@ function renderSettings() {
   for (let i = 0; i < Object.keys(themes).length; i ++) {
       const key = Object.keys(themes)[i];
     const theme = themes[key];
-    const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button" data-theme-id="${key}">${formatKey(key)}</div>`;
+    const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button liquid-glass" data-theme-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
     elem.classList.add("settings-item", "liquid-glass");
     elem.innerHTML = innerHTML;
@@ -180,7 +215,7 @@ function renderSettings() {
   effectSection.innerHTML = "";
   for (let i = 0; i < Object.keys(window.effects).length; i ++) {
     const name = window.effects[i];
-    const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/effect-icons/${name}.svg" /></div><div class="settings-item-button" data-effect-id="${name}">${formatKey(name)}</div>`;
+    const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/effect-icons/${name}.svg" /></div><div class="settings-item-button liquid-glass" data-effect-id="${name}">${formatKey(name)}</div>`;
     const elem = document.createElement("div");
     elem.classList.add("settings-item", "liquid-glass");
     elem.innerHTML = innerHTML;
@@ -228,3 +263,7 @@ function scrollToElement(element, duration = 400) {
     duration
   );
 }
+
+$("#settings-content-container").on("scroll", function(e) {
+  checkGlassBounding();
+})

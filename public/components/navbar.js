@@ -98,6 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+if (JSON.parse(localStorage.getItem("settings")).legacyNavbar) {
+    document.getElementById("navbar").classList.add("legacy");
+  }
 
 });
 

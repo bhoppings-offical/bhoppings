@@ -30,9 +30,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       primary: ["#D185FF", "#51CBFF"],
       background: ["#12151D"]
     },
-    liquidGlass: false
+    liquidGlass: false,
+    legacyNavbar: false,
+    skipBio: false
   };
 
+  function mergeSettings() {
+    const settings = JSON.parse(localStorage.getItem("settings")) || defaultSettings;
+    for (const key in defaultSettings) {
+      if (!settings[key]) {
+        settings[key] = defaultSettings[key];
+      }
+    }
+  }
+
+  mergeSettings();
   
     fetch("/config/themes.json").then(r => r.json()).then(d => {window.themes = d});
     fetch("/config/cursors.json").then(r => r.json()).then(d => {window.cursors = d});
@@ -41,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!localStorage.getItem("settings")) {
     localStorage.setItem("settings", JSON.stringify(defaultSettings));
   }
+  
 
   function getSettings() {
     return JSON.parse(localStorage.getItem("settings"));

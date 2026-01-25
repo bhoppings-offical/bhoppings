@@ -21,6 +21,7 @@
     z-index: 1;
     background-color: rgba(50, 50, 50, 0.2) !important;
     backdrop-filter: none !important;
+    border: none !important;
 }
 .liquidGlassMaterial {
     position: absolute;
@@ -80,7 +81,7 @@
     mask-composite: exclude, exclude;
 }
 .liquidGlassMaterial .liquidGlassBlur {
-    backdrop-filter: blur(var(--extra-blur)) brightness(1.25);
+    backdrop-filter: blur(calc(var(--extra-blur) * 4)) brightness(1.25);
     border-radius: calc(inherit - (var(--emboss-width) + var(--refraction-width)));
     margin: calc(var(--emboss-width) + var(--refraction-width));
 }
@@ -90,7 +91,7 @@
 }
 .liquidGlassMaterial .BlendEdge {
     z-index: 8;
-    backdrop-filter: blur(calc(var(--edge-width) * 0.4)) contrast(1) saturate(1.2);
+    backdrop-filter: blur(calc(var(--edge-width) * 4)) contrast(1) saturate(1.2);
 }
 
 .liquidGlassMaterial:before {
@@ -115,7 +116,7 @@
     border-radius: inherit;
     padding: 1px;
     border: 0 solid transparent;
-    backdrop-filter: brightness(1.2) contrast(1) saturate(1) opacity(1);
+    backdrop-filter: brightness(1.2) contrast(1) saturate(1) opacity(1) blur(6px);
     mask: 
         linear-gradient(white 0 0) padding-box,
         linear-gradient(white 0 0) content-box;

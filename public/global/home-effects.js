@@ -169,8 +169,8 @@ class SnowParticleEffect {
             let particle = this.particles[i];
 
             // Move particle based on direction
-            particle.x += Math.cos(particle.dir) * 2;
-            particle.y += Math.sin(particle.dir) * 2;
+            particle.x += Math.cos(particle.dir) * 2 * deltaTime;
+            particle.y += Math.sin(particle.dir) * 2 * deltaTime;
 
             // Add mouse influence
             particle.x += (this.mouseXMiddle / this.width) * this.options.mouseInfluence;
@@ -202,7 +202,7 @@ class WavePointsEffect {
     constructor(options = {}) {
         this.options = Object.assign(
             {
-                numWaves: 150,
+                numWaves: 100,
                 rows: 80,
                 gravityStrength: 7,
                 waveSpeed: 0.0000015,
@@ -760,7 +760,7 @@ class StarFieldEffect {
     onTouchMove(event) {
         this.touchInput = true;
         this.movePointer(event.touches[0].clientX, event.touches[0].clientY);
-        event.preventDefault();
+        //event.preventDefault();
     }
 
     // Event handler for mouse/touch end
