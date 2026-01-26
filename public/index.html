@@ -1,117 +1,85 @@
-<!doctype html>
-<html>
+<!DOCTYPE HTML>
+<html lang="en-US">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta
-      name="google-site-verification"
-      content="gEZW0Romg5lx3iDIbOF3QGgLAP1RR7lG0Dmj7i2qHK0"
-    />
-    <meta
-      name="description"
-      content="Bhoppings.de is dedicated to only bringing you the best experience and highest quality website we can offer. From games, to cool / interesting projects, our website has something for everyone."
-    />
-    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico" />
-    <title>Bhoppings</title>
-    <link rel="stylesheet" href="bio.css" />
+    <title>bhoppings //</title>
+    <link rel="stylesheet" href="./bio.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   </head>
-
   <body>
-    <!-- <video src="https://r2.guns.lol/3df88f90-0bc2-42bd-b0f8-c02a5569b9b3.mp4" autoplay id="background"></video> -->
-
-    <canvas id="effect"></canvas>
-
-    <div id="container">
-      <div id="name-container">
-        <img src="/assets/images/pfp/bhop.png" id="pfp" onclick="window.open('/home', '_self')" />
-        <img id="sparkles" src="/assets/images/animated/sparkle_white.gif" />
-        <h1 id="name">Bhop</h1>
-        <div id="bio">professional skid</div>
+    <video
+  id="background-video"
+  autoplay
+  loop
+  muted
+  playsinline
+  preload="auto"
+>
+  <source src="https://ik.imagekit.io/zztshabnu/BACKGROUND.mp4?updatedAt=1769317381281" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+<div id="center-container">
+    <div id="center" class="widget liquid-glass">
+      <div id="center-top">
+        <div id="pfp">
+          <div id="pfp-img"></div>
+          <img id="pfp-overlay" src="/assets/images/overlays/pfp_decor.png" />
+        </div>
+        <div id="nameplate">
+          <span>Bhoppings</span>
+          <img src="/assets/images/animated/sparkle_white.gif" id="nameplate-sparkle" />
+        </div>
+      </div>
+      <div id="bar" class="widget">
+        <img id="view-icon" src="/assets/images/icons/eye-pixel.svg" />
+        <span id="view-count">1,743</span>
+        <span id="separator"></span>
+        <span>professional skid</span>
+      </div>
+      <div id="socials">
+        <div class="social-button" data-href="https://discord.com/users/bhoppings"><img src="/assets/images/icons/bio/discord.png" /></div>
+        <div class="social-button" data-href="https://github.com/bhoppings-offical"><img src="/assets/images/icons/bio/github.png" /></div>
+        <div class="social-button" data-href="https://www.tiktok.com/@ballbirds"><img src="/assets/images/icons/bio/tiktok.png" /></div>
+        <div class="social-button" data-href="https://open.spotify.com/user/31zvux3kw6otgrc6czgj5544ddkm?si=32d5ae4d41ec4e16"><img src="/assets/images/icons/bio/spotify.png" /></div>
+        <div class="social-button" data-href="https://www.blackspigot.com/members/bhoppings.525445/"><img src="/assets/images/icons/bio/black-spigot.png" /></div>
+        <div class="social-button" data-href="https://www.unknowncheats.me/forum/members/5871936.html"><img src="/assets/images/icons/bio/unknown-cheats.png" /></div>
       </div>
     </div>
-
-    <div id="links">
-      <a
-        class="link-button"
-        onclick="javascript: window.open('https://discordapp.com/users/1237591310278463502', '_blank');"
-      >
-        <img class="link-img" src="/assets/images/icons/discord.png" />
-      </a>
-      <a
-        class="link-button"
-        onclick="javascript: window.open('https://www.tiktok.com/@bhoppingz', '_blank');"
-      >
-        <img class="link-img" src="/assets/images/icons/tiktok.png" />
-      </a>
-      <a
-        class="link-button"
-        onclick="javascript: window.open('https://github.com/bhxp', '_blank');"
-      >
-        <img class="link-img" src="/assets/images/icons/github.png" />
-      </a>
-      <a
-        class="link-button"
-        onclick="javascript: window.open('https://open.spotify.com/user/31zvux3kw6otgrc6czgj5544ddkm?si=70e7ce28ac034cc2', '_blank');"
-      >
-        <img class="link-img" src="/assets/images/icons/spotify.png" />
-      </a>
-    </div>
-
-    <div id="views" style="display: none">
-      <img src="images/eye.png" /><span id="view-count">0</span>
-    </div>
-
-    <a
-      id="home-button"
-      onclick="javascript: window.open('/home', '_blank');"
-      class="link-button"
-    >
-      <img src="/assets/images/icons/home.svg" />
-    </a>
-
-    <div id="cover">
-      <div id="cover-title">
-        <div id="animatedText">Click to enter...</div>
+    <div id="activity" class="widget liquid-glass">
+      <div id="activity-active">
+        <div id="activity-active-left">
+          <div id="activity-title">IntelliJ IDEA Community</div>
+          <div id="activity-description">Idling</div>
+        </div>
+        <img id="activity-icon" src="/assets/images/icons/bio/intellij.png" />
       </div>
     </div>
+  </div>
+    <img id="dither" src="/assets/images/overlays/fake_dither.png" />
+<div id="click-to-enter"><span>Click to enter</span></div>
+<canvas id="dither-overlay"></canvas>
+<style>
+#dither-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: multiply;
+  opacity: 0.2;
+  filter: blur(0.5px);
+}
+</style>
+
+
+
+    <!-- background https://ik.imagekit.io/zztshabnu/BACKGROUND.mp4?updatedAt=1769317381281 -->
+     <script src="/global/glass.js"></script>
+     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+     <script src="/global/settings-init.js"></script>
+     <script src="./bio.js"></script>
   </body>
-  <script src="bio.js"></script>
-
-  <script>
-    // Create an audio element and set its source
-    var audio = new Audio("/assets/audio/all-music.mp3");
-    audio.volume = 0.03;
-
-    // Add an event listener to the document body to play the audio on click
-    document.body.onclick = function () {
-      console.log("Body clicked"); // Debug log
-      audio.play().catch(function (error) {
-        console.error("Error playing audio:", error); // Log any playback errors
-      });
-    };
-    // Fetch view count from the endpoint and update the view-count element
-    fetch('/view-count')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        document.getElementById('view-count').textContent = data.viewCount;
-      })
-      .catch(error => {
-        console.error('Error fetching view count:', error);
-      });
-      document.addEventListener("DOMContentLoaded", function(e) {
-        if (JSON.parse(window.localStorage.getItem("settings")).skipBio) window.open("/home", "_self");
-      })
-  </script>
-
-  <!-- script src's below -->
-
-  <script type="text/javascript" src="/particle-lib.js"></script>
-  <script type="text/javascript" src="/global/settings-init.js"></script>
-
 </html>
