@@ -14,10 +14,15 @@ $(document).ready(function() {
 
   $("#click-to-enter").on("click", function(e) {
     $(this).fadeOut(500, "swing");
+    console.log("fade out")
   })
 
   $("img").on("drag", function(e) {
     e.preventDefault();
+  })
+
+  $(document).on("keydown", function(e) {
+    if (e.key === " ") window.open("/home", "_self")
   })
 });
 

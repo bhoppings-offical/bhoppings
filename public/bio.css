@@ -221,6 +221,7 @@ body {
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(32px);
+  z-index: 9998;
 }
 
 #click-to-enter span {
