@@ -122,3 +122,10 @@ async function refreshActivity() {
   }
   setTimeout(refreshActivity, 10000);
 }
+
+$(document).ready(function(e) {
+  fetch("/api/views").then(r => r.json()).then(d => $("#view-count").text(d.value));
+  if (JSON.parse(localStorage.getItem("visitedBio"))) return;
+  localStorage.setItem("visitedBio", "true");
+  fetch("/api/views/up");
+})
