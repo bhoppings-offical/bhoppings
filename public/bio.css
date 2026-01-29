@@ -269,13 +269,18 @@ body {
   /*margin-top: -0.9090909%;*/
 }
 #activity-active {
-  display: flex;
+  display: none;
   flex-direction: row;
   width: 100%;
   height: 100%;
   align-items: center;
   justify-content: space-between;
 }
+
+#activity.active #activity-active {
+  display: flex;
+}
+
 #activity-active-left {
   display: flex;
   flex: 1;
@@ -290,4 +295,42 @@ body {
 #activity-description {
   font-size: 19.2px;
   color: #7E7E7E;
+}
+
+#activity-idling {
+  display: none;
+  font-size: 19.2px;
+  color: #7E7E7E;
+  display: none;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#activity.idling #activity-idling {
+  display: flex;
+}
+
+#activity-offline {
+  font-size: 19.2px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#activity-offline * {
+  color: #7E7E7E;
+}
+
+#activity-offline-title {
+  font-size: 24px;
+}
+
+#activity.active>#activity-offline, #activity.idling>#activity-offline {
+  display: none;
 }
