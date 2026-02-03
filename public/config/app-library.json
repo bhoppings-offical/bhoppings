@@ -1,6 +1,32 @@
 [
     
     {
+        "name": "World is a Cursor",
+        "url": "/world-is-a-cursor",
+        "image": "world-is-a-cursor.png"
+    },
+    {
+        "name": "Tango's Coffee Shop",
+        "url": "/tangos-coffee",
+        "image": "tangos-coffee.png"
+    },
+    {
+        "name": "2048",
+        "url": "/2048",
+        "image": "2048.png"
+    },
+    { "name": "Neon Serpent", "url": "/neon-serpent", "image": "neon-serpent.png" },
+    {
+        "name": "Abandoned Asylum",
+        "url": "/abandoned-asylum",
+        "image": "abandoned-asylum.png"
+    },
+    {
+        "name": "Click Tango",
+        "url": "/click-tango",
+        "image": "click-tango.png"
+    },
+    {
         "name": "Quill",
         "url": "/downloads/quill",
         "image": "quill.png",
@@ -256,6 +282,7 @@
         "url": "/creaturebuilder",
         "image": "creaturebuilder.png"
     },
+
     {
         "name": "Creature Builder 2",
         "url": "/creaturecreator2",

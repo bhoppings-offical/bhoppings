@@ -1,4 +1,4 @@
-.liquid-glass {
+.liquid-glass:has(.liquidGlassMaterial) {
     --corner-radius: 48px;
     --base-strength: 48px;
     --extra-blur: 0px;

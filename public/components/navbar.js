@@ -42,6 +42,7 @@ function navbarItem(item) {
 function navbar() {
   const nav = document.createElement("div");
   nav.setAttribute("id", "navbar");
+  nav.classList.add("liquid-glass")
   const logo = document.createElement("div");
   logo.setAttribute("id", "navbar-logo");
   logo.innerText = "bhop";

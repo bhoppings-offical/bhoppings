@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tango's Coffee ☕🐱</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <header class="shop-header">
+            <div class="tango-banner">
+                <div class="tango-avatar">🐱</div>
+                <div>
+                    <h1>Tango's Coffee</h1>
+                    <p class="tagline">Pawsitively Purrfect Brews</p>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-box money">
+                    <span class="stat-icon">💰</span>
+                    <span id="money">0</span>
+                </div>
+                <div class="stat-box rating">
+                    <span class="stat-icon">⭐</span>
+                    <span id="rating">5.0</span>
+                </div>
+                <div class="stat-box day">
+                    <span class="stat-icon">📅</span>
+                    <span id="day">Day 1</span>
+                </div>
+                <div class="stat-box prestige" id="prestige-box" style="display:none">
+                    <span class="stat-icon">✨</span>
+                    <span id="prestige">0</span> Prestige
+                </div>
+            </div>
+        </header>
+
+        <main class="main-area">
+            <section class="customer-zone">
+                <h3>Waiting Customers</h3>
+                <div id="customer-queue" class="customer-queue"></div>
+                <div id="active-customer" class="active-customer hidden">
+                    <div class="customer-speech">
+                        <span id="customer-order-text"></span>
+                        <span class="customer-tip" id="customer-tip"></span>
+                    </div>
+                    <div class="patience-bar">
+                        <div id="patience-fill" class="patience-fill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workspace">
+                <div class="tango-station">
+                    <div class="tango-character" id="tango">🐱</div>
+                    <p class="tango-status" id="tango-status">Ready to serve!</p>
+                </div>
+                <div class="order-display" id="order-display">
+                    <h4>Current Order</h4>
+                    <div id="order-steps" class="order-steps"></div>
+                </div>
+                <div class="action-buttons" id="action-buttons"></div>
+            </section>
+
+            <aside class="side-panel">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
+                    <button class="tab-btn" data-tab="prestige">Prestige</button>
+                    <button class="tab-btn" data-tab="stats">Stats</button>
+                </div>
+                <div class="panel-content">
+                    <div id="upgrades-tab" class="tab-pane active">
+                        <h4>🛠️ Shop Upgrades</h4>
+                        <div id="upgrades-list" class="upgrades-list"></div>
+                    </div>
+                    <div id="prestige-tab" class="tab-pane">
+                        <h4>✨ Prestige</h4>
+                        <p class="prestige-desc">Reset your progress to earn Prestige Points! Each point gives +10% to all earnings.</p>
+                        <div class="prestige-info">
+                            <p>Current multiplier: <strong id="prestige-mult">1.0x</strong></p>
+                            <p>Prestige at: <strong id="prestige-threshold">$10,000</strong></p>
+                        </div>
+                        <button id="prestige-btn" class="prestige-btn" disabled>Prestige (Locked)</button>
+                    </div>
+                    <div id="stats-tab" class="tab-pane">
+                        <h4>📊 Statistics</h4>
+                        <div id="stats-list" class="stats-list"></div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Mini-game modals -->
+        <div id="grinder-modal" class="minigame-modal hidden">
+            <div class="minigame-box">
+                <h4>Grind the beans! ☕</h4>
+                <p class="minigame-hint">Click the grinder to grind</p>
+                <div class="grinder-area" id="grinder-area">
+                    <div class="grinder-handle" id="grinder-handle">⚙️</div>
+                    <div class="grinder-hopper">🫘</div>
+                </div>
+                <div class="minigame-progress">
+                    <div id="grind-progress" class="minigame-progress-fill"></div>
+                </div>
+                <span id="grind-count">0 / 6</span>
+            </div>
+        </div>
+
+        <div id="mixer-modal" class="minigame-modal hidden">
+            <div class="minigame-box">
+                <h4>Mix it up! 🥄</h4>
+                <p class="minigame-hint">Stir the drink</p>
+                <div class="mixer-area" id="mixer-area">
+                    <div class="mixing-cup" id="mixing-cup">☕</div>
+                </div>
+                <div class="minigame-progress">
+                    <div id="mix-progress" class="minigame-progress-fill"></div>
+                </div>
+                <span id="mix-count">0 / 5</span>
+            </div>
+        </div>
+
+        <div id="fridge-modal" class="minigame-modal hidden">
+            <div class="minigame-box fridge-box">
+                <h4>🧊 Fridge — Grab what you need</h4>
+                <p class="minigame-hint" id="fridge-hint">Select the item for this order</p>
+                <div class="fridge-shelves" id="fridge-shelves"></div>
+            </div>
+        </div>
+
+        <div id="notification-toast" class="notification-toast"></div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
