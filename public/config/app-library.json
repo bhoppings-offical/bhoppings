@@ -27,6 +27,11 @@
         "image": "click-tango.png"
     },
     {
+        "name": "Jumping Tango",
+        "url": "/jumping-tango",
+        "image": "jumping-tango.png"
+    },
+    {
         "name": "Quill",
         "url": "/downloads/quill",
         "image": "quill.png",
