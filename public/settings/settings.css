@@ -426,3 +426,14 @@
 .settings-list-row-right:has(.slidecontainer) {
   flex: 1;
 }
+
+
+.settings-row-right-between-text {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+.settings-list-row-right:has(.settings-row-right-between-text) {
+  flex-direction: column;
+}
