@@ -17,19 +17,22 @@ function updateSidebar() {
 
 
 function settingsReady() {
+  const settings = JSON.parse(window.localStorage.getItem("settings")) || {};
   updateSidebar();
   renderSettings();
-  applyGlass()
-  if (!JSON.parse(window.localStorage.getItem("settings")).liquidGlass) {
-    hideGlass();
-  } else {
+  applyGlass();
+  if (settings.liquidGlass) {
     showGlass();
-    $("#glass-switch").addClass("enabled")
+    $("#glass-switch").addClass("enabled");
+  } else {
+    hideGlass();
+    handleGlassSwitch();
+    setTimeout(handleGlassSwitch, 1);
   }
-  if (JSON.parse(window.localStorage.getItem("settings")).legacyNavbar) {
+  if (settings.legacyNavbar) {
     $("#navbar-switch").addClass("enabled")
   }
-  if (JSON.parse(window.localStorage.getItem("settings")).skipBio) {
+  if (settings.skipBio) {
     $("#bio-switch").addClass("enabled")
   }
   document.getElementById("settings-content-container").setAttribute("style", "transform: translateY(+0px)");
@@ -55,7 +58,7 @@ function settingsReady() {
       localStorage.setItem("settings", JSON.stringify(sett));
     }
   });
-  $(".switch").on("click", function(e) {
+  $(".switch").not("#glass-switch, #navbar-switch, #bio-switch").on("click", function(e) {
     $(this).toggleClass("enabled");
   });
   $("#background-url").val(JSON.parse(localStorage.getItem("settings")).backgroundUrl)
@@ -79,23 +82,21 @@ function settingsReady() {
     const id = idTable[$(this).attr("id")];
     scrollToElement($(`#${id}`))
   })
-
-  $("#glass-switch").on("click", function(e) {
+function handleGlassSwitch() {
       const settings = JSON.parse(window.localStorage.getItem("settings"));
       if (settings.liquidGlass) {
         settings.liquidGlass = false;
         $(this).removeClass("enabled");
         hideGlass();
-
       }
       else {
         $(this).addClass("enabled");
         settings.liquidGlass = true;
         showGlass();
-
       }
       window.localStorage.setItem("settings", JSON.stringify(settings));
-    })
+    }
+  $("#glass-switch").on("click", handleGlassSwitch)
     $("#navbar-switch").on("click", function(e) {
       const settings = JSON.parse(window.localStorage.getItem("settings"));
       if (settings.legacyNavbar) {
@@ -168,7 +169,6 @@ $container.on("scroll", function() {
   $(`#${buttonId}`).addClass("active");
   activeButton = buttonId;
 });
-
 }
 
 function formatKey(key) {

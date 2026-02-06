@@ -1,4 +1,4 @@
-.liquid-glass:has(.liquidGlassMaterial) {
+.liquid-glass:has(.liquidGlassMaterial:not(.hidden)) {
     --corner-radius: 48px;
     --base-strength: 48px;
     --extra-blur: 0px;
@@ -125,4 +125,8 @@
 .liquidGlassMaterial .Brightness {
     z-index: 13;
     backdrop-filter: brightness(var(--brightness));
+}
+
+.hidden {
+    display: none;
 }
