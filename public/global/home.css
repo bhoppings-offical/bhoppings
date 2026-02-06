@@ -24,7 +24,7 @@ html, body {
     --context-blur: 2px;
     --navbar-glow-intensity: 4px;
   --navbar-glow-opacity: 0.5;
-
+--background-blur: 0px;
   --navbar-safe-padding: 128px;
 }
 
@@ -60,6 +60,18 @@ html {
   animation: backgroundMove 5s ease-in-out infinite;
 }
 
+body::before {
+  content: "";
+  display: block;
+  z-index: -1;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(var(--background-blur));
+}
+
 body {
   /*background: linear-gradient(
     to bottom,
@@ -81,7 +93,6 @@ body {
     hsla(0, 0%, 0%, 0.69) 100%
   );*/
   background: linear-gradient(180deg, rgb(0% 0% 0%) 0%, rgb(0% 0% 0% / 0.999755859375) 6.25%, rgb(0% 0% 0% / 0.998046875) 12.5%, rgb(0% 0% 0% / 0.993408203125) 18.75%, rgb(0% 0% 0% / 0.984375) 25%, rgb(0% 0% 0% / 0.969482421875) 31.25%, rgb(0% 0% 0% / 0.947265625) 37.5%, rgb(0% 0% 0% / 0.916259765625) 43.75%, rgb(0% 0% 0% / 0.875) 50%, rgb(0% 0% 0% / 0.822021484375) 56.25%, rgb(0% 0% 0% / 0.755859375) 62.5%, rgb(0% 0% 0% / 0.675048828125) 68.75%, rgb(0% 0% 0% / 0.578125) 75%, rgb(0% 0% 0% / 0.463623046875) 81.25%, rgb(0% 0% 0% / 0.330078125) 87.5%, rgb(0% 0% 0% / 0.176025390625) 93.75%, rgb(0% 0% 0% / 0) 100% );
-
   display: flex;
   flex-direction: row;
   /*! padding-top: var(--navbar-safe-padding); */
@@ -337,7 +348,7 @@ body {
   left: 0px !important;
   top: 0px !important;
   transform: none !important;
-  overflow-x: scroll !important;
+  overflow-x: auto !important;
   width: 100vw !important;
   border-radius: 0px;
   overflow-y: hidden;

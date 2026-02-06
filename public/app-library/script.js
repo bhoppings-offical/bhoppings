@@ -1,5 +1,5 @@
 "use strict";
-
+// create #app-container > .app-card
 function appCard(app) {
   const card = $("<div></div>").addClass("app-card").data("href", ((app.fromRoot ? "" : "/apps/") + app.url).replace(/\/\//, "/"));
   const favoriteOutline = $("<img>").attr("src", "/assets/images/shapes/favorite-border.svg").addClass("favorite-border");
@@ -24,7 +24,7 @@ function appCard(app) {
   card.append(icon, icon, title);
   return card;
 }
-
+// #apps-container > .app
 function renderApps() {
   const container = $("#apps-container");
   container.empty();
@@ -70,7 +70,6 @@ $(document).ready(async function () {
 
     favoriteApp(name);
   });
-
   $("#apps-container").scrollTop(0);
 
   $("#search-input").on("keydown", function (e) {

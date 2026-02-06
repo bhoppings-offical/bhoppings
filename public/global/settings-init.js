@@ -32,7 +32,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     liquidGlass: false,
     legacyNavbar: false,
-    skipBio: false
+    skipBio: false,
+    backgroundUrl: null,
+    backgroundBlur: 48
   };
 
   function mergeSettings() {
@@ -67,10 +69,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     const style = document.createElement("style");
     style.id = "theme-root-style";
     const cursorLine = settings.cursor == "none" ? "" : `--cursor: url("${svgToDataURL(applyCursorColor(window.cursorSvg || (await fetch("/assets/images/cursor.svg").then(r => r.text())), settings.cacheCursor || defaultSettings.cacheCursor))}")`
-    style.innerHTML = `
+    function safeCssUrl(url) {
+  if (!url) return "";
+  return url.replace(/["')]/g, encodeURIComponent);
+}
+
+const background = settings.backgroundUrl
+  ? `url("${safeCssUrl(settings.backgroundUrl)}")`
+  : `linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")})`;
+style.innerHTML = `
       :root {
         --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
-        --background: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")});
+        --background: ${background};
+        --background-blur: ${settings.backgroundBlur}px;
         ${cursorLine}
       }
     `;
@@ -133,4 +144,38 @@ async function setCursor(key) {
 
 window.applyCursorColor = applyCursorColor;
 window.setCursor = setCursor;
+
+async function setBackground(url) {
+  const settings = JSON.parse(localStorage.getItem("settings"));
+  // If url is falsy (null, "", undefined, etc.), the theme gradient will be used instead
+  settings.backgroundUrl = url || null;
+  localStorage.setItem("settings", JSON.stringify(settings));
+  
+  // Remove and re-inject styles to apply changes immediately
+  removeRootStyle();
+  await injectRootStyle(settings);
+  
+  if (typeof updateSidebar !== 'undefined') {
+    updateSidebar();
+  }
+}
+
+async function setBackgroundBlur(blurAmount) {
+  const settings = JSON.parse(localStorage.getItem("settings"));
+  settings.backgroundBlur = blurAmount;
+  localStorage.setItem("settings", JSON.stringify(settings));
+  
+  // Remove and re-inject styles to apply changes immediately
+  removeRootStyle();
+  await injectRootStyle(settings);
+  
+  if (typeof updateSidebar !== 'undefined') {
+    updateSidebar();
+  }
+}
+
+// Make functions globally available
+window.setBackground = setBackground;
+window.setBackgroundBlur = setBackgroundBlur;
+
 });

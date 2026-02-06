@@ -86,60 +86,58 @@ class CanvasAnimationFramework {
     }
 }
 
-// Snow Particle Effect
 class SnowParticleEffect {
     constructor(options = {}) {
         this.options = Object.assign({
             particleCount: 300,
-            mouseInfluence: 10
+            mouseInfluence: 15
         }, options);
-
         this.particles = [];
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseXMiddle = 0;
         this.width = 0;
         this.height = 0;
+        this.updates = 0;
+        this.deltaTime = 1;
     }
-
     init(width, height, ctx) {
         this.width = width;
         this.height = height;
         this.ctx = ctx;
-
         // Create particles
         this.particles = [];
         for (let i = 0; i < this.options.particleCount; i++) {
             this.particles.push(this.createParticle());
         }
-
         // Set up mouse tracking
         document.addEventListener("mousemove", this.handleMouseMove.bind(this));
     }
-
     createParticle() {
+        const amplitude = Math.random() * 30 + 20;
         return {
             y: Math.random() * this.height,
             x: Math.random() * this.width,
             dir: this.randomAngleDownwards(),
-            size: Math.random() * 3 + 1
+            size: Math.random() * 3 + 1,
+            sway: {
+                phase: Math.random() * 2 * amplitude - amplitude,
+                amplitude: amplitude,
+                frequency: (Math.random() - 0.5) * amplitude / 1500
+            }
         };
     }
-
     randomAngleDownwards() {
         return Math.random() * (Math.PI * 0.4) + Math.PI * 0.35;
     }
-
     handleMouseMove(e) {
         this.mouseX = e.pageX;
         this.mouseY = e.pageY;
         this.mouseXMiddle = this.mouseX - this.width / 2;
     }
-
     resetParticle(particle) {
         const random = Math.random() * (this.width + this.height * 2);
         let x, y;
-
         if (random <= this.height) {
             x = 0;
             y = random;
@@ -154,44 +152,42 @@ class SnowParticleEffect {
             y = 0;
             console.warn("Snow particle reset failed; Defaulting to (0, 0).");
         }
-
         particle.x = x;
         particle.y = y;
     }
-
     onResize(width, height) {
         this.width = width;
         this.height = height;
     }
-
     update(deltaTime) {
+        this.deltaTime = deltaTime;
+        this.updates += deltaTime;
         for (let i = 0; i < this.particles.length; i++) {
             let particle = this.particles[i];
-
+            
             // Move particle based on direction
             particle.x += Math.cos(particle.dir) * 2 * deltaTime;
             particle.y += Math.sin(particle.dir) * 2 * deltaTime;
-
-            // Add mouse influence
-            particle.x += (this.mouseXMiddle / this.width) * this.options.mouseInfluence;
-
+            
+            // Add mouse influence (now frame-rate independent)
+            particle.x += (this.mouseXMiddle / this.width) * this.options.mouseInfluence * deltaTime;
+            
             // Reset particle if it goes off screen
             if (particle.y > this.height || particle.x < 0 || particle.x > this.width) {
                 this.resetParticle(particle);
             }
         }
     }
-
     draw(ctx) {
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = "#fff4";
         for (let i = 0; i < this.particles.length; i++) {
             let particle = this.particles[i];
+            let dx = particle.sway.amplitude * Math.sin(particle.sway.frequency * this.updates + particle.sway.phase);
             ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.arc(particle.x + dx, particle.y, particle.size, 0, Math.PI * 2);
             ctx.fill();
         }
     }
-
     dispose() {
         document.removeEventListener("mousemove", this.handleMouseMove);
     }
