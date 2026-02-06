@@ -1,0 +1,444 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Liquid Painter</title>
+  <style>
+    :root {
+      --bg: #0b0f1e;
+      --bg-2: #151b32;
+      --ink: #f4f0e6;
+      --accent: #ffb703;
+      --accent-2: #62f7ff;
+      --danger: #ff5d6c;
+      --panel: rgba(10, 16, 34, 0.76);
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Gill Sans", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 10%, #2a3154, var(--bg) 55%),
+        linear-gradient(135deg, #0b0e1b 0%, #141a30 60%, #241d2d 100%);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+      margin: 0;
+      letter-spacing: 0.08em;
+    }
+    header p {
+      margin: 0;
+      opacity: 0.7;
+      font-size: 0.95rem;
+    }
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel);
+      padding: 10px 14px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .hud span { font-weight: 600; }
+    .hud button {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #f77f00);
+      color: #1a1306;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(244, 185, 66, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .hud button:hover { transform: translateY(-1px) scale(1.02); }
+    .arena {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+    canvas {
+      width: min(96vw, 1200px);
+      height: min(72vh, 720px);
+      border-radius: 20px;
+      background: radial-gradient(circle at 30% 20%, #1e284a, #0f1323 60%);
+      box-shadow: 0 30px 60px var(--shadow);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      touch-action: none;
+    }
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(10, 13, 24, 0.7);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(8px);
+      max-width: 260px;
+    }
+    .legend strong { color: var(--accent-2); }
+    .status {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(98, 247, 255, 0.12);
+      color: #c8fbff;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 720px) {
+      body { padding: 10px; }
+      .legend, .status { position: static; margin-top: 10px; }
+      .arena { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>LIQUID PAINTER</h1>
+      <p>Pour colored fluid into a shape. Fill it without spilling past the rim.</p>
+    </div>
+    <div class="hud">
+      <span id="fill">Fill: 0%</span>
+      <span id="spills">Spill: 0</span>
+      <button id="reset">New Shape</button>
+    </div>
+  </header>
+
+  <section class="arena">
+    <canvas id="game" width="1200" height="720"></canvas>
+    <div class="legend">
+      <strong>Hold</strong> to pour · <strong>Drag</strong> to move spout · <strong>Arrow keys</strong> tilt gravity.
+    </div>
+    <div class="status" id="status">Gravity: Neutral</div>
+  </section>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const fillEl = document.getElementById("fill");
+    const spillsEl = document.getElementById("spills");
+    const statusEl = document.getElementById("status");
+    const resetBtn = document.getElementById("reset");
+
+    const world = {
+      bounds: { x: 80, y: 80, w: canvas.width - 160, h: canvas.height - 160 },
+      gravity: { x: 0, y: 0.35 },
+      tilt: 0,
+      drag: 0.985,
+    };
+
+    const spout = { x: 260, y: 140, pouring: false };
+    const droplets = [];
+    const puddles = [];
+    const shapes = [];
+
+    const state = {
+      spills: 0,
+      targetFill: 0.68,
+      totalInside: 0,
+      totalOut: 0,
+      shape: null,
+    };
+
+    const palette = ["#ffb703", "#ff7ad9", "#7bdff2", "#b5ff7d", "#ff7849"];
+
+    function makeShape() {
+      const size = 260 + Math.random() * 120;
+      const cx = canvas.width * 0.58;
+      const cy = canvas.height * 0.55;
+      const points = [];
+      const sides = 6 + Math.floor(Math.random() * 5);
+      for (let i = 0; i < sides; i += 1) {
+        const angle = (Math.PI * 2 * i) / sides + Math.random() * 0.35;
+        const radius = size * (0.7 + Math.random() * 0.35);
+        points.push({
+          x: cx + Math.cos(angle) * radius,
+          y: cy + Math.sin(angle) * radius,
+        });
+      }
+      return { points, rim: 8, fill: 0 };
+    }
+
+    function resetGame() {
+      droplets.length = 0;
+      puddles.length = 0;
+      shapes.length = 0;
+      state.spills = 0;
+      state.totalInside = 0;
+      state.totalOut = 0;
+      state.shape = makeShape();
+      shapes.push(state.shape);
+      spout.x = 260;
+      spout.y = 140;
+      world.gravity.x = 0;
+      world.gravity.y = 0.35;
+      world.tilt = 0;
+      updateStatus();
+      updateHud();
+    }
+
+    function updateHud() {
+      const fillRatio = Math.min(state.totalInside / 2000, 1);
+      fillEl.textContent = `Fill: ${Math.round(fillRatio * 100)}%`;
+      spillsEl.textContent = `Spill: ${state.spills}`;
+    }
+
+    function updateStatus() {
+      const labels = ["Neutral", "Left", "Right", "Up", "Down"];
+      statusEl.textContent = `Gravity: ${labels[world.tilt]}`;
+    }
+
+    function pointInPolygon(point, polygon) {
+      let inside = false;
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].x;
+        const yi = polygon[i].y;
+        const xj = polygon[j].x;
+        const yj = polygon[j].y;
+        const intersect = yi > point.y !== yj > point.y &&
+          point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi;
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    function spawnDroplet() {
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      droplets.push({
+        x: spout.x + (Math.random() - 0.5) * 12,
+        y: spout.y + 10,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: 0,
+        r: 6 + Math.random() * 4,
+        color,
+        life: 240,
+        still: 0,
+      });
+    }
+
+    function handleDroplets() {
+      if (spout.pouring) {
+        for (let i = 0; i < 4; i += 1) spawnDroplet();
+      }
+
+      for (const drop of droplets) {
+        drop.vx += world.gravity.x;
+        drop.vy += world.gravity.y;
+        drop.vx *= world.drag;
+        drop.vy *= world.drag;
+        drop.x += drop.vx;
+        drop.y += drop.vy;
+        drop.life -= 1;
+
+        const speed = Math.hypot(drop.vx, drop.vy);
+        if (speed < 0.06) {
+          drop.still += 1;
+        } else {
+          drop.still = 0;
+        }
+      }
+
+      for (let i = droplets.length - 1; i >= 0; i -= 1) {
+        const drop = droplets[i];
+        if (drop.life <= 0 || drop.still > 45) {
+          state.totalOut += drop.r;
+          state.spills += 1;
+          droplets.splice(i, 1);
+          continue;
+        }
+
+        const inside = pointInPolygon(drop, state.shape.points);
+        if (inside) {
+          state.totalInside += drop.r * 0.8;
+          puddles.push({ x: drop.x, y: drop.y, r: drop.r, color: drop.color, life: 80 });
+          droplets.splice(i, 1);
+          continue;
+        }
+
+        const { x, y, w, h } = world.bounds;
+        if (drop.x < x || drop.x > x + w || drop.y < y || drop.y > y + h) {
+          state.totalOut += drop.r;
+          state.spills += 1;
+          droplets.splice(i, 1);
+        }
+      }
+    }
+
+    function updatePuddles() {
+      for (const puddle of puddles) {
+        puddle.life -= 1;
+      }
+      for (let i = puddles.length - 1; i >= 0; i -= 1) {
+        if (puddles[i].life <= 0) puddles.splice(i, 1);
+      }
+    }
+
+    function drawShape() {
+      const shape = state.shape;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(shape.points[0].x, shape.points[0].y);
+      for (let i = 1; i < shape.points.length; i += 1) {
+        ctx.lineTo(shape.points[i].x, shape.points[i].y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = "rgba(98, 247, 255, 0.08)";
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "rgba(98, 247, 255, 0.7)";
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawDroplets() {
+      for (const drop of droplets) {
+        ctx.beginPath();
+        ctx.fillStyle = drop.color;
+        ctx.shadowColor = drop.color;
+        ctx.shadowBlur = 12;
+        ctx.arc(drop.x, drop.y, drop.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function drawPuddles() {
+      for (const puddle of puddles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(puddle.life / 80, 0.3);
+        ctx.fillStyle = puddle.color;
+        ctx.beginPath();
+        ctx.arc(puddle.x, puddle.y, puddle.r * 1.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawSpout() {
+      ctx.save();
+      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.fillRect(spout.x - 18, spout.y - 24, 36, 30);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.strokeRect(spout.x - 18, spout.y - 24, 36, 30);
+      ctx.restore();
+    }
+
+    function drawBounds() {
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.lineWidth = 8;
+      ctx.strokeRect(world.bounds.x, world.bounds.y, world.bounds.w, world.bounds.h);
+      ctx.restore();
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBounds();
+      drawShape();
+      drawPuddles();
+      handleDroplets();
+      drawDroplets();
+      drawSpout();
+      updatePuddles();
+      updateHud();
+
+      const fillRatio = Math.min(state.totalInside / 2000, 1);
+      if (fillRatio >= state.targetFill) {
+        ctx.save();
+        ctx.fillStyle = "rgba(124, 246, 255, 0.9)";
+        ctx.font = "700 42px Space Grotesk";
+        ctx.fillText("SHAPE FILLED!", 780, 140);
+        ctx.restore();
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function setTilt(direction) {
+      world.tilt = direction;
+      const tiltPower = 0.28;
+      if (direction === 1) {
+        world.gravity.x = -tiltPower;
+        world.gravity.y = 0.2;
+      } else if (direction === 2) {
+        world.gravity.x = tiltPower;
+        world.gravity.y = 0.2;
+      } else if (direction === 3) {
+        world.gravity.x = 0;
+        world.gravity.y = -tiltPower;
+      } else if (direction === 4) {
+        world.gravity.x = 0;
+        world.gravity.y = tiltPower + 0.3;
+      } else {
+        world.gravity.x = 0;
+        world.gravity.y = 0.35;
+      }
+      updateStatus();
+    }
+
+    function toCanvasCoords(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * canvas.width,
+        y: ((event.clientY - rect.top) / rect.height) * canvas.height,
+      };
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      const pos = toCanvasCoords(event);
+      spout.pouring = true;
+      spout.x = pos.x;
+      spout.y = pos.y;
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!spout.pouring) return;
+      const pos = toCanvasCoords(event);
+      spout.x = pos.x;
+      spout.y = pos.y;
+    });
+
+    canvas.addEventListener("pointerup", () => {
+      spout.pouring = false;
+    });
+
+    canvas.addEventListener("pointerleave", () => {
+      spout.pouring = false;
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") setTilt(1);
+      if (event.key === "ArrowRight") setTilt(2);
+      if (event.key === "ArrowUp") setTilt(3);
+      if (event.key === "ArrowDown") setTilt(4);
+      if (event.key === " ") setTilt(0);
+    });
+
+    resetBtn.addEventListener("click", resetGame);
+
+    resetGame();
+    update();
+  </script>
+</body>
+</html>
