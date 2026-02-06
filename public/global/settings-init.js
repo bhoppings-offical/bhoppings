@@ -72,6 +72,8 @@ async function injectRootStyle(settings) {
   const style = document.createElement("style");
   style.id = "theme-root-style";
 
+  const html = document.documentElement;
+
   // Cursor
   let cursorLine = "";
   if (settings.cursor !== "none") {
@@ -79,7 +81,12 @@ async function injectRootStyle(settings) {
     if (!svgContent) {
       svgContent = await fetch("/assets/images/cursor.svg").then(r => r.text());
     }
-    const coloredSvg = applyCursorColor(svgContent, settings.cacheCursor || defaultSettings.cacheCursor);
+
+    const coloredSvg = applyCursorColor(
+      svgContent,
+      settings.cacheCursor || defaultSettings.cacheCursor
+    );
+
     cursorLine = `--cursor: url("${svgToDataURL(coloredSvg)}");`;
   }
 
@@ -90,37 +97,54 @@ async function injectRootStyle(settings) {
     return url.replace(/["'()]/g, match => "\\" + match);
   }
 
-  // Background
-  let background = `linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")})`;
+  // Background (default = theme gradient)
+  let background = `linear-gradient(to right, ${
+    (settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")
+  })`;
+
+  let usingCustomBackground = false;
 
   if (settings.backgroundUrl) {
     const url = settings.backgroundUrl;
+
     try {
       // Only fetch if not already cached
       if (!imageCache[url]) {
         await fetch(url);
-        imageCache[url] = true; // mark as loaded
+        imageCache[url] = true;
       }
+
       background = `url("${safeCssUrl(url)}")`;
+      usingCustomBackground = true;
+
     } catch (err) {
       console.error("Background URL failed to load:", err);
-      background = `linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")})`;
     }
+  }
+
+  // Toggle html class
+  if (usingCustomBackground) {
+    html.classList.add("custom-background");
+  } else {
+    html.classList.remove("custom-background");
   }
 
   // Apply CSS
   style.innerHTML = `
     :root {
-      --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
+      --theme-color: linear-gradient(to right, ${
+        (settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")
+      });
       --background: ${background};
       --background-blur: ${settings.backgroundBlur}px;
       ${cursorLine}
     }
   `;
-  
+
   document.head.appendChild(style);
   return style;
 }
+
 
 
 
