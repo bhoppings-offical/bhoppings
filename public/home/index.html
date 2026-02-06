@@ -32,18 +32,19 @@
       <div id="grain"></div>
       <canvas id="effectCanvas"></canvas>
       <svg width="0" height="0" style="position: absolute; left: -9999px; top: -9999px;" aria-hidden="true" focusable="false">
-        <defs>
-          <filter id="goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
-            <feColorMatrix in="blur" mode="matrix" values="
-              1 0 0 0 0
-              0 1 0 0 0
-              0 0 1 0 0
-              0 0 0 18 -7" result="goo"/>
-            <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-          </filter>
-        </defs>
-      </svg>
+  <defs>
+    <filter id="goo" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feColorMatrix in="blur" mode="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 18 -7" result="goo"/>
+      <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      <feGaussianBlur stdDeviation="0.1" result="smoothed"/>
+    </filter>
+  </defs>
+</svg>
       <div id="home-left">
         <div id="bhop-big"><span id="bhop-big-glow">bhop</span>bh<span id="bhop-big-o-spacer">o</span>p<span id="bhop-big-goo"><span id="bhop-big-gear">o</span></span></div>
         <div id="subtitle">why is bhop so cool</div>
