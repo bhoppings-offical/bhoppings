@@ -1,4 +1,7 @@
 $(document).ready(function() {
+  $("#home-hover-hitbox").on("click", function(e) {
+    window.open("/home", "_self");
+  });
   $(".social-button").on("mousedown", function(e) {
     const href = $(this).attr("data-href");
     if (e.button === 1) {
