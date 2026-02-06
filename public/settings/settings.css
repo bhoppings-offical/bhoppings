@@ -383,3 +383,46 @@
 .settings-list-row-right .text-input {
   text-align: right;
 }
+
+.slidecontainer {
+  width: 100%; /* Width of the outside container */
+}
+
+/* The slider itself */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 6px; /* Specified height */
+  background: var(--theme-color); /* Grey background */
+  outline: none; /* Remove outline */
+  border-radius: 9999px;
+}
+
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 40px; /* Set a specific slider handle width */
+  height: 40px; /* Slider handle height */
+  background: #fff; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 9999px;
+}
+
+.slider::-moz-range-thumb {
+  width: 40px; /* Set a specific slider handle width */
+  height: 40px; /* Slider handle height */
+  background: #fff; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 9999px;
+}
+
+#blur-input {
+  flex: 1;
+}
+
+.settings-list-row-right:has(.slidecontainer) {
+  flex: 1;
+}

@@ -58,6 +58,18 @@ function settingsReady() {
   $(".switch").on("click", function(e) {
     $(this).toggleClass("enabled");
   });
+  $("#background-url").val(JSON.parse(localStorage.getItem("settings")).backgroundUrl)
+  $("#background-url").on("keydown", async function(e) {
+    if (e.key !== "Enter") return;
+    const val = $(this).val().trim();
+    setBackground(val);
+  })
+  $("#blurInput").on("input", function(e) {
+      const sett = JSON.parse(localStorage.getItem("settings"));
+      sett.backgroundBlur = $(this).val();
+      localStorage.setItem("settings", JSON.stringify(sett));
+      document.documentElement.style.setProperty("--background-blur", `${$(this).val()}px`)
+  })
   $(".sidebar-button").on("click", function(e) {
     const idTable = {
       "sidebar-button-cursor": "cursor-section",

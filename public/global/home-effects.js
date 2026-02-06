@@ -971,13 +971,13 @@ class NeuralEffect {
         vec2 res = vec2(0.);
         float scale = 8.;
 
-        for (int j = 0; j < 15; j++) {
+        for (int j = 0; j < 300; j++) {
             uv = rotate(uv, 1.);
             sine_acc = rotate(sine_acc, 1.);
             vec2 layer = uv * scale + float(j) + sine_acc - t;
-            sine_acc += sin(layer) + 2.4 * p;
+            sine_acc += sin(layer) + 4.4 * p;
             res += (.5 + .5 * cos(layer)) / scale;
-            scale *= (1.2);
+            scale *= (1.195);
         }
         return res.x + res.y;
     }
@@ -997,7 +997,7 @@ class NeuralEffect {
         float noise = neuro_shape(uv, t, p);
 
         noise = 1.2 * pow(noise, 3.);
-        noise += pow(noise, 10.);
+        noise += pow(noise, 20.);
         noise = max(.0, noise - .5);
         noise *= (1. - length(vUv - .5));
 

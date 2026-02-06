@@ -65,29 +65,64 @@ document.addEventListener("DOMContentLoaded", async () => {
     localStorage.setItem("settings", JSON.stringify(settings));
   }
 
-  async function injectRootStyle(settings) {
-    const style = document.createElement("style");
-    style.id = "theme-root-style";
-    const cursorLine = settings.cursor == "none" ? "" : `--cursor: url("${svgToDataURL(applyCursorColor(window.cursorSvg || (await fetch("/assets/images/cursor.svg").then(r => r.text())), settings.cacheCursor || defaultSettings.cacheCursor))}")`
-    function safeCssUrl(url) {
-  if (!url) return "";
-  return url.replace(/["')]/g, encodeURIComponent);
+// Simple cache object
+const imageCache = {};
+
+async function injectRootStyle(settings) {
+  const style = document.createElement("style");
+  style.id = "theme-root-style";
+
+  // Cursor
+  let cursorLine = "";
+  if (settings.cursor !== "none") {
+    let svgContent = window.cursorSvg;
+    if (!svgContent) {
+      svgContent = await fetch("/assets/images/cursor.svg").then(r => r.text());
+    }
+    const coloredSvg = applyCursorColor(svgContent, settings.cacheCursor || defaultSettings.cacheCursor);
+    cursorLine = `--cursor: url("${svgToDataURL(coloredSvg)}");`;
+  }
+
+  // Safe URL function
+  function safeCssUrl(url) {
+    if (!url) return "";
+    // escape quotes and parentheses only
+    return url.replace(/["'()]/g, match => "\\" + match);
+  }
+
+  // Background
+  let background = `linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")})`;
+
+  if (settings.backgroundUrl) {
+    const url = settings.backgroundUrl;
+    try {
+      // Only fetch if not already cached
+      if (!imageCache[url]) {
+        await fetch(url);
+        imageCache[url] = true; // mark as loaded
+      }
+      background = `url("${safeCssUrl(url)}")`;
+    } catch (err) {
+      console.error("Background URL failed to load:", err);
+      background = `linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")})`;
+    }
+  }
+
+  // Apply CSS
+  style.innerHTML = `
+    :root {
+      --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
+      --background: ${background};
+      --background-blur: ${settings.backgroundBlur}px;
+      ${cursorLine}
+    }
+  `;
+  
+  document.head.appendChild(style);
+  return style;
 }
 
-const background = settings.backgroundUrl
-  ? `url("${safeCssUrl(settings.backgroundUrl)}")`
-  : `linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).background.join(", ")})`;
-style.innerHTML = `
-      :root {
-        --theme-color: linear-gradient(to right, ${(settings.cacheTheme || defaultSettings.cacheTheme).primary.join(", ")});
-        --background: ${background};
-        --background-blur: ${settings.backgroundBlur}px;
-        ${cursorLine}
-      }
-    `;
-    document.head.appendChild(style);
-    return style;
-  }
+
 
   function removeRootStyle() {
     document.getElementById("theme-root-style")?.remove();
@@ -146,19 +181,37 @@ window.applyCursorColor = applyCursorColor;
 window.setCursor = setCursor;
 
 async function setBackground(url) {
-  const settings = JSON.parse(localStorage.getItem("settings"));
-  // If url is falsy (null, "", undefined, etc.), the theme gradient will be used instead
-  settings.backgroundUrl = url || null;
+  const settings = JSON.parse(localStorage.getItem("settings")) || {};
+
+  let validUrl = null;
+
+  if (url) {
+    try {
+      // HEAD = check existence without downloading the whole file
+      const res = await fetch(url, { method: "HEAD" });
+
+      if (res.ok) {
+        validUrl = url;
+      }
+    } catch (err) {
+      // Network / CORS / invalid URL = nope
+      validUrl = null;
+    }
+  }
+
+  // Save either valid URL or null
+  settings.backgroundUrl = validUrl;
   localStorage.setItem("settings", JSON.stringify(settings));
-  
-  // Remove and re-inject styles to apply changes immediately
+
+  // Re-apply styles
   removeRootStyle();
   await injectRootStyle(settings);
-  
-  if (typeof updateSidebar !== 'undefined') {
+
+  if (typeof updateSidebar !== "undefined") {
     updateSidebar();
   }
 }
+
 
 async function setBackgroundBlur(blurAmount) {
   const settings = JSON.parse(localStorage.getItem("settings"));

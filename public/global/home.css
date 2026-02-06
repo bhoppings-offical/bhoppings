@@ -10,7 +10,7 @@ html, body {
 }
 
 :root {
-  --background: linear-gradient(to right, #12151D, #12151D);
+  --background: linear-gradient(to right, #000);
   --theme-color: linear-gradient(to right, #D185FF, #51CBFF);
   /*cards*/
     --card-background: rgba(0, 0, 0, 0.2);
@@ -53,7 +53,8 @@ html, body {
 
 
 html {
-  background-image: var(--background);
+  background-color: #000;      /* black fallback */
+  background-image: var(--background); /* your gradient or URL */
   background-size: 120% 100%;
   background-repeat: repeat-x;
   background-position: 0% 0%;
