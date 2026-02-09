@@ -9,21 +9,21 @@
     --contrast: 1;
     --brightness: 2;
     --invert: 0%;
-
     --total-strength: calc(var(--base-strength) + var(--extra-blur));
     --edge-width: calc(0.3px + (var(--softness) * 0.1));
     --emboss-width: calc((var(--softness) * 0.38));
     --refraction-width: calc((var(--softness) * 0.3));
-
-    position: relative;
+    position: absolute;
     overflow: visible;
     /*! pointer-events: none; */
-    left: 639px;
-    top: 300px;
-    width: 400px;
+    left: 633px;
+    top: 265px;
+    width: 490px;
     height: 300px;
     z-index: 1;
     background-color: rgba(50, 50, 50, 0.2) !important;
+    backdrop-filter: url(#liquid-glass-filter);
+    border-radius: 48px;
 }
 .liquidGlassContent {
     position: relative;

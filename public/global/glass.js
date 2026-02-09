@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     if (settings.liquidGlass) {
         window.liquidGlassEnabled = true;
         applyGlass();
-        requestAnimationFrame(() => checkGlassBounding(true));
+        //requestAnimationFrame(() => checkGlassBounding(true));
     } else {
         window.liquidGlassEnabled = false;
     }

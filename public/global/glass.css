@@ -20,7 +20,7 @@
     /*! pointer-events: none; */
     z-index: 1;
     background-color: rgba(50, 50, 50, 0.2) !important;
-    backdrop-filter: none !important;
+    backdrop-filter: url("#liquid-glass-filter");
     border: none !important;
 }
 .liquidGlassMaterial {
@@ -34,13 +34,13 @@
 }
 .liquidGlassMaterial:after {
     content: '';
-    display: block;
+    display: none;
     position: absolute;
     inset: 0;
     z-index: 3;
     overflow: hidden;
     border-radius: inherit;
-    background-color: rgba(128, 128, 128, 0);
+    /* background-color: rgba(128, 128, 128, 0); */
 }
 .liquidGlassMaterial > div {
     position: absolute;
@@ -51,6 +51,7 @@
     overflow: hidden;
 }
 .liquidGlassMaterial .liquidGlassEdgeReflection {
+    display: none;
     z-index: 4;
     margin: calc(var(--total-strength) * -1);
     border-radius: calc(inherit + var(--total-strength));
@@ -70,6 +71,7 @@
         linear-gradient(white 0 0) padding-box,
         linear-gradient(white 0 0) content-box;
     mask-composite: exclude, exclude;
+    display: none;
 }
 .liquidGlassMaterial .liquidGlassRefraction {
     backdrop-filter: invert(0.1) brightness(1.2) contrast(1);
@@ -79,19 +81,24 @@
         linear-gradient(white 0 0) padding-box,
         linear-gradient(white 0 0) content-box;
     mask-composite: exclude, exclude;
+    display: none;
 }
 .liquidGlassMaterial .liquidGlassBlur {
     backdrop-filter: blur(calc(var(--extra-blur) * 4)) brightness(1.25);
     border-radius: calc(inherit - (var(--emboss-width) + var(--refraction-width)));
     margin: calc(var(--emboss-width) + var(--refraction-width));
+    display: none;
+    display: none;
 }
 .liquidGlassMaterial .BlendLayers {
     z-index: 3;
     backdrop-filter: blur(calc((var(--softness) * 0.2) + (var(--extra-blur) * 0.2)));
+    display: none;
 }
 .liquidGlassMaterial .BlendEdge {
     z-index: 8;
     backdrop-filter: blur(calc(var(--edge-width) * 4)) contrast(1) saturate(1.2);
+    display: none;
 }
 
 .liquidGlassMaterial:before {
@@ -99,12 +106,11 @@
     position: absolute;
     inset: 0;
     z-index: 11;
-    display: block;
+    display: none;
     border-radius: inherit;
     padding: 1px;
     border: 0 solid transparent;
-    background: linear-gradient(155deg, hsla(0, 0%, 100%, 0.15) 0%, hsla(0, 0%, 0%, 0.2) 50%, hsla(0, 0%, 100%, 0.15) 100%);
-    backdrop-filter: invert(0.15) opacity(1);
+    /* background: linear-gradient(155deg, hsla(0, 0%, 100%, 0.15) 0%, hsla(0, 0%, 0%, 0.2) 50%, hsla(0, 0%, 100%, 0.15) 100%); */
     mask: 
         linear-gradient(white 0 0) padding-box,
         linear-gradient(white 0 0) content-box;
