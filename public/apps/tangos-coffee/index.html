@@ -53,6 +53,23 @@
             </section>
 
             <section class="workspace">
+                <div class="shop-visuals" aria-hidden="true">
+                    <div class="shop-visual kettle">
+                        <span class="visual-emoji">🫖</span>
+                        <span class="steam s1"></span>
+                        <span class="steam s2"></span>
+                        <span class="steam s3"></span>
+                    </div>
+                    <div class="shop-visual cutting-board">
+                        <span class="visual-emoji">🔪</span>
+                    </div>
+                    <div class="shop-visual oven">
+                        <span class="visual-emoji">🔥</span>
+                    </div>
+                    <div class="shop-visual press">
+                        <span class="visual-emoji">🥪</span>
+                    </div>
+                </div>
                 <div class="tango-station">
                     <div class="tango-character" id="tango">🐱</div>
                     <p class="tango-status" id="tango-status">Ready to serve!</p>
@@ -74,6 +91,11 @@
                     <div id="upgrades-tab" class="tab-pane active">
                         <h4>🛠️ Shop Upgrades</h4>
                         <div id="upgrades-list" class="upgrades-list"></div>
+                        <div class="difficulty-box">
+                            <h4>⏱️ Difficulty</h4>
+                            <p class="difficulty-desc">Controls how much time customers give you.</p>
+                            <div class="difficulty-buttons" id="difficulty-buttons"></div>
+                        </div>
                     </div>
                     <div id="prestige-tab" class="tab-pane">
                         <h4>✨ Prestige</h4>
@@ -127,6 +149,34 @@
                 <h4>🧊 Fridge — Grab what you need</h4>
                 <p class="minigame-hint" id="fridge-hint">Select the item for this order</p>
                 <div class="fridge-shelves" id="fridge-shelves"></div>
+            </div>
+        </div>
+
+        <div id="action-modal" class="minigame-modal hidden">
+            <div class="minigame-box action-box">
+                <h4 id="action-title">Do the step</h4>
+                <p class="minigame-hint" id="action-hint">Complete the task</p>
+                <div class="action-area" id="action-area">
+                    <div class="action-element" id="action-element">✨</div>
+                </div>
+                <div class="minigame-progress">
+                    <div id="action-progress" class="minigame-progress-fill"></div>
+                </div>
+                <span id="action-count">0 / 3</span>
+            </div>
+        </div>
+
+        <div id="cutting-modal" class="minigame-modal hidden">
+            <div class="minigame-box action-box">
+                <h4>Slice into 5 even portions</h4>
+                <p class="minigame-hint">Click to place 4 cut lines</p>
+                <div class="action-area">
+                    <div class="cut-board" id="cut-board"></div>
+                </div>
+                <div class="minigame-progress">
+                    <div id="cut-progress" class="minigame-progress-fill"></div>
+                </div>
+                <span id="cut-count">0 / 4</span>
             </div>
         </div>
 
