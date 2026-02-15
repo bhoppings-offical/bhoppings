@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <aside id="ad-billboard-left" class="ad-billboard left hidden" aria-hidden="true"></aside>
+    <aside id="ad-billboard-right" class="ad-billboard right hidden" aria-hidden="true"></aside>
     <div class="game-container">
         <header class="shop-header">
             <div class="tango-banner">
@@ -39,9 +41,8 @@
 
         <main class="main-area">
             <section class="customer-zone">
-                <h3>Waiting Customers</h3>
-                <div id="customer-queue" class="customer-queue"></div>
-                <div id="active-customer" class="active-customer hidden">
+                <h3>Coffee Shop Floor</h3>
+                <div id="customer-queue" class="customer-queue"></div><div id="active-customer" class="active-customer hidden">
                     <div class="customer-speech">
                         <span id="customer-order-text"></span>
                         <span class="customer-tip" id="customer-tip"></span>
@@ -69,6 +70,12 @@
                     <div class="shop-visual press">
                         <span class="visual-emoji">🥪</span>
                     </div>
+                    <span class="kitchen-cat-accent yarn y1">🧶</span>
+                    <span class="kitchen-cat-accent yarn y2">🧶</span>
+                    <span class="kitchen-cat-accent paw p1">🐾</span>
+                    <span class="kitchen-cat-accent paw p2">🐾</span>
+                    <span class="kitchen-cat-accent fish f1">🐟</span>
+                    <span class="kitchen-cat-accent treat t1">🦴</span>
                 </div>
                 <div class="tango-station">
                     <div class="tango-character" id="tango">🐱</div>
@@ -84,6 +91,9 @@
             <aside class="side-panel">
                 <div class="panel-tabs">
                     <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
+                    <button class="tab-btn" data-tab="decor">Decor</button>
+                    <button class="tab-btn" data-tab="design">Designs</button>
+                    <button class="tab-btn" data-tab="charity">Charity</button>
                     <button class="tab-btn" data-tab="prestige">Prestige</button>
                     <button class="tab-btn" data-tab="stats">Stats</button>
                 </div>
@@ -93,8 +103,70 @@
                         <div id="upgrades-list" class="upgrades-list"></div>
                         <div class="difficulty-box">
                             <h4>⏱️ Difficulty</h4>
-                            <p class="difficulty-desc">Controls how much time customers give you.</p>
+                            <p class="difficulty-desc">Each mode changes timer pressure and payout multiplier.</p>
                             <div class="difficulty-buttons" id="difficulty-buttons"></div>
+                        </div>
+                        <div class="marketing-box" id="marketing-box">
+                            <h4>📣 Marketing & Ads</h4>
+                            <p class="difficulty-desc">Run cheap ads to bring in more customers.</p>
+                            <div id="marketing-lock" class="marketing-lock">Buy the Marketing upgrade to unlock ads.</div>
+                            <div class="marketing-copy-row">
+                                <input id="text-ad-copy" class="marketing-copy-input" maxlength="70" placeholder="Write your ad text..." />
+                            </div>
+                            <div class="marketing-row">
+                                <button id="text-ad-btn" class="marketing-btn">$5 Text Ad</button>
+                                <button id="open-camera-btn" class="marketing-btn secondary">Use Camera</button>
+                                <button id="photo-ad-btn" class="marketing-btn" disabled>$8 Photo Ad</button>
+                            </div>
+                            <div id="ad-status" class="marketing-status">No active ad.</div>
+                            <img id="ad-photo-preview" class="marketing-preview" alt="Photo ad preview" />
+                            <div class="marketing-camera" id="marketing-camera">
+                                <video id="ad-camera-video" autoplay playsinline muted></video>
+                                <canvas id="ad-camera-canvas" width="320" height="180"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="decor-tab" class="tab-pane">
+                        <h4>🪴 Decor Shop</h4>
+                        <p class="decor-desc">Buy decorations and place them anywhere on the restaurant floor.</p>
+                        <div id="decor-list" class="decor-list"></div>
+                    </div>
+                    <div id="design-tab" class="tab-pane">
+                        <h4>🎨 Style Studio</h4>
+                        <p class="decor-desc">Unlock wall/floor themes with lifetime earnings and edit your table layout.</p>
+                        <div class="design-editor-row">
+                            <button id="toggle-layout-edit" class="design-toggle-btn">Layout Edit: Off</button>
+                        </div>
+                        <h5 class="design-subtitle">Floor Themes</h5>
+                        <div id="floor-theme-list" class="theme-list"></div>
+                        <h5 class="design-subtitle">Wall Themes</h5>
+                        <div id="wall-theme-list" class="theme-list"></div>
+                    </div>
+                    <div id="charity-tab" class="tab-pane">
+                        <h4>💝 Charity</h4>
+                        <p class="decor-desc">Donate to community causes for good karma and warm vibes.</p>
+                        <div id="charity-card" class="charity-card">
+                            <div class="charity-head">
+                                <span id="charity-emoji" class="charity-emoji">🐾</span>
+                                <div>
+                                    <div id="charity-name" class="charity-name">Loading cause…</div>
+                                    <div id="charity-meta" class="charity-meta"></div>
+                                </div>
+                            </div>
+                            <div class="charity-bar">
+                                <div id="charity-fill" class="charity-fill"></div>
+                            </div>
+                            <div class="charity-actions">
+                                <button class="charity-btn" data-donate="10">$10</button>
+                                <button class="charity-btn" data-donate="25">$25</button>
+                                <button class="charity-btn" data-donate="50">$50</button>
+                                <button class="charity-btn" data-donate="100">$100</button>
+                            </div>
+                            <div class="charity-custom">
+                                <input id="charity-custom-input" type="number" min="1" step="1" placeholder="Custom amount" />
+                                <button id="charity-custom-btn" class="charity-btn">Donate</button>
+                            </div>
+                            <div id="charity-stats" class="charity-stats"></div>
                         </div>
                     </div>
                     <div id="prestige-tab" class="tab-pane">
