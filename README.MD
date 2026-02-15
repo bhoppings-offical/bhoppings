@@ -22,7 +22,7 @@ A super cool amazing website that is made without any flaws 100%
 ㅤ
 ## Authors
 
-- [@bhxp](https://www.github.com/bhxp) - i do cool stuff
+- [@bhoppings-official](https://www.github.com/bhoppings-official) - i do cool stuff
 - [@ChezLinkZ](https://www.github.com/SnezLinkZ) - retarded developer
 
 
