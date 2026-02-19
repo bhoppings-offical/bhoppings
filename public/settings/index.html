@@ -31,23 +31,7 @@
 
   </head>
   <body>
-    <svg id="liquid-glass-svg" color-interpolation-filters="sRGB" style="position: absolute; left: 0px; top: 0px;">
-                                        <defs>
-                                            <filter id="liquid-glass-filter" filterUnits="objectBoundingBox">
-                                                <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blurred_source"></feGaussianBlur>
-                                                <feImage href="/assets/displacement-map-z1p3yi.png" x="0" y="0" width="1" height="2" result="displacement_map"></feImage>
-                                                <feDisplacementMap in="blurred_source" in2="displacement_map" scale="50" xChannelSelector="R" yChannelSelector="G" result="displaced"></feDisplacementMap>
-                                                <feColorMatrix in="displaced" type="saturate" result="displaced_saturated" values="10"></feColorMatrix>
-                                                <feImage href="/assets/specular-map-z1p3yi.png" x="0" y="0" width="1" height="1" result="specular_layer"></feImage>
-                                                <feComposite in="displaced_saturated" in2="specular_layer" operator="in" result="specular_saturated"></feComposite>
-                                                <feComponentTransfer in="specular_layer" result="specular_faded">
-                                                    <feFuncA type="linear" slope="0.5"></feFuncA>
-                                                </feComponentTransfer>
-                                                <feBlend in="specular_saturated" in2="displaced" mode="normal" result="withSaturation"></feBlend>
-                                                <feBlend in="specular_faded" in2="withSaturation" mode="normal"></feBlend>
-                                            </filter>
-                                        </defs>
-                                    </svg>
+
       <div id="grain"></div>
       <canvas id="effectCanvas"></canvas>
 
@@ -115,7 +99,6 @@
           </div>
         </div>
       </div>
-
   </body>
   <script src="/global/settings-init.js"></script>
   <script src="/global/glass.js"></script>

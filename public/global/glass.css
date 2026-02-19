@@ -9,19 +9,17 @@
     --contrast: 1;
     --brightness: 1;
     --invert: 0%;
-
     --total-strength: calc(var(--base-strength) + var(--extra-blur));
     --edge-width: calc(0.3px + (var(--softness) * 0.1));
     --emboss-width: calc((var(--softness) * 0.38));
     --refraction-width: calc((var(--softness) * 0.3));
-
     position: relative;
     overflow: visible;
     /*! pointer-events: none; */
     z-index: 1;
     background-color: rgba(50, 50, 50, 0.2) !important;
-    backdrop-filter: url("#liquid-glass-filter");
-    border: none !important;
+    backdrop-filter: none !important;
+    /* border: solid 1px rgba(255, 255, 255, 0.2); */
 }
 .liquidGlassMaterial {
     position: absolute;
@@ -31,6 +29,13 @@
     pointer-events: none;
     border-radius: inherit;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: url("#liquid-glass-filter") !important;
+}
+
+.liquidGlassMaterial * {
+    display: none !important;
 }
 .liquidGlassMaterial:after {
     content: '';

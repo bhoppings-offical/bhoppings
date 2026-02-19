@@ -102,13 +102,45 @@
     </div>
 
     <script>
+        "use strict";
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const startBtn = document.getElementById('startBtn');
         const scoreDisplay = document.getElementById('score');
         const highScoreDisplay = document.getElementById('highScore');
         const gameOverDisplay = document.getElementById('gameOver');
+        const jetParticles = [];
+        class JetParticle {
+            constructor(x, y, size, dSize, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.dSize = dSize;
+                this.maxSize = 20;
+                this.vel = [vx, vy];
+            }
+            grow() {
+                this.size += this.dSize;
+                this.x += this.vel[0];
+                this.y += this.vel[1];
+            }
+            checkKill() {
+                return this.size >= this.maxSize ||
+                    this.y + this.size/2 >= canvas.height ||
+                    this.y - this.size/2 <= 0 ||
+                    this.x + this.size/2 >= canvas.width ||
+                    this.x - this.size/2 <= 0;
+            }
 
+            draw(ctx) {
+                const color = "rgba(255, 255, 255, 0.2)";
+                ctx.beginPath();
+                ctx.fillStyle = color;
+                ctx.moveTo(this.x, this.y);
+                ctx.arc(this.x, this.y, this.size / 2, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
         // Game state
         let gameRunning = false;
         let score = 0;
@@ -121,7 +153,8 @@
             y: canvas.height - 80,
             width: 40,
             height: 40,
-            speed: 5,
+            speedY: 15,
+            speedX: 7.3,
             dx: 0,
             dy: 0
         };
@@ -154,21 +187,43 @@
 
         // Draw player (spaceship)
         function drawPlayer() {
-            ctx.fillStyle = '#4af2a1';
-            ctx.beginPath();
-            ctx.moveTo(player.x, player.y - player.height / 2);
-            ctx.lineTo(player.x - player.width / 2, player.y + player.height / 2);
-            ctx.lineTo(player.x, player.y + player.height / 4);
-            ctx.lineTo(player.x + player.width / 2, player.y + player.height / 2);
-            ctx.closePath();
-            ctx.fill();
+    const tiltAngle = 20 * Math.PI / 180; // 10 degrees in radians
+    let rotation = 0;
 
-            // Engine glow
-            ctx.fillStyle = '#ff6b6b';
-            ctx.beginPath();
-            ctx.arc(player.x, player.y + player.height / 2, 5, 0, Math.PI * 2);
-            ctx.fill();
-        }
+    const holdingD = keys['d'] || keys['D'];
+    const holdingA = keys['a'] || keys['A'];
+
+    if (holdingD && !holdingA) {
+        rotation = tiltAngle; // rotate right
+    } else if (holdingA && !holdingD) {
+        rotation = -tiltAngle; // rotate left
+    }
+    // if both pressed → rotation stays 0
+
+    ctx.save();
+
+    // Move origin to player center
+    ctx.translate(player.x, player.y);
+    ctx.rotate(rotation);
+
+    ctx.fillStyle = '#4af2a1';
+    ctx.beginPath();
+    ctx.moveTo(0, -player.height / 2);
+    ctx.lineTo(-player.width / 2, player.height / 2);
+    ctx.lineTo(0, player.height / 4);
+    ctx.lineTo(player.width / 2, player.height / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Engine glow
+    ctx.fillStyle = '#ff6b6b';
+    ctx.beginPath();
+    ctx.arc(0, player.height / 2, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
 
         // Draw asteroid
         function drawAsteroid(asteroid) {
@@ -213,10 +268,27 @@
             player.dx = 0;
             player.dy = 0;
 
-            if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.dx = -player.speed;
-            if (keys['ArrowRight'] || keys['d'] || keys['D']) player.dx = player.speed;
-            if (keys['ArrowUp'] || keys['w'] || keys['W']) player.dy = -player.speed;
-            if (keys['ArrowDown'] || keys['s'] || keys['S']) player.dy = player.speed;
+            const avgSpeed = (player.speedX + player.speedY) / 2;
+const angle45 = Math.PI / 4; // 45 degrees in radians
+const sin45 = Math.sin(angle45); // ≈ 0.7071
+const cos45 = Math.cos(angle45); // ≈ 0.7071
+
+player.dx = 0;
+player.dy = 0;
+
+if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+    player.dx -= avgSpeed * cos45;
+}
+if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+    player.dx += avgSpeed * cos45;
+}
+if (keys['ArrowUp'] || keys['w'] || keys['W']) {
+    player.dy -= avgSpeed * sin45;
+}
+if (keys['ArrowDown'] || keys['s'] || keys['S']) {
+    player.dy += avgSpeed * sin45;
+}
+
 
             player.x += player.dx;
             player.y += player.dy;
@@ -229,16 +301,19 @@
         }
 
         // Spawn asteroids
-        function spawnAsteroid() {
+        function spawnAsteroid(big = false) {
+            const radius = big ? 200 : Math.random() * 20 + 15;
             const asteroid = {
-                x: Math.random() * canvas.width,
-                y: -30,
-                radius: Math.random() * 20 + 15,
+                x: big ? (1 + (Math.random() * canvas.width)) / 2 : Math.random() * canvas.width,
+                y: - radius,
+                radius,
                 speed: asteroidSpeed + Math.random() * 2
             };
             asteroids.push(asteroid);
         }
 
+        var bigSpawned = true;
+        const bigScoreInterval = 400;
         // Update asteroids
         function updateAsteroids() {
             asteroids.forEach((asteroid, index) => {
@@ -253,8 +328,14 @@
             });
 
             // Spawn new asteroids
-            if (frameCount % asteroidSpawnRate === 0) {
+            if ((frameCount % asteroidSpawnRate === 0) && (score % bigScoreInterval !== 0 || score === 0)) {
                 spawnAsteroid();
+            }
+            if (score % bigScoreInterval === 0 && score !== 0) {
+                if (!bigSpawned) spawnAsteroid(true);
+                bigSpawned = true;
+            } else {
+                bigSpawned = false;
             }
 
             // Increase difficulty over time
@@ -296,7 +377,25 @@
                 endGame();
                 return;
             }
+            for (let i = 0; i < 5; i ++) {
+                const particleAngle = (Math.random() + 0.5) * Math.PI * 0.5;
+            const [dx, dy] = [Math.cos(particleAngle), Math.sin(particleAngle)]
+            jetParticles.push(new JetParticle(player.x + (Math.random() - 0.5) * 10, player.y + (Math.random()) * 10, Math.random() * 8, 0.1 * (1 + Math.random()), dx, dy));
+            }
+            for (const particle of jetParticles) {
+                if (particle.checkKill()) {
+                    const index = jetParticles.indexOf(particle);
+                    if (index > -1) {
+                        jetParticles.splice(index, 1);
+                        continue;
+                    } else {
+                        throw new Error("tangos jet particle didnt exist in the list")
+                    }
 
+                }
+                particle.draw(ctx);
+                particle.grow();
+            }
             frameCount++;
             requestAnimationFrame(gameLoop);
         }

@@ -1,3 +1,51 @@
+window.glassSvg = `<svg id="liquid-glass-svg" color-interpolation-filters="sRGB" style="position: absolute; left: 0px; top: 0px;">
+  <defs>
+      <filter id="liquid-glass-filter" filterUnits="objectBoundingBox">
+          
+          <!-- Use SourceGraphic directly for displacement -->
+          <feImage href="/assets/displacement-map-z1p3yi.png" x="0" y="0" width="1" height="2" result="displacement_map"></feImage>
+          <feDisplacementMap in="SourceGraphic" in2="displacement_map"
+              scale="50" xChannelSelector="R" yChannelSelector="G"
+              result="displaced_TL"></feDisplacementMap>
+
+          <feImage href="/assets/displacement-map-z1p3yi.png" x="0" y="0" width="1" height="2" result="displacement_map_BR"></feImage>
+          <feDisplacementMap in="SourceGraphic" in2="displacement_map_BR"
+              scale="-50" xChannelSelector="G" yChannelSelector="R"
+              result="displaced_BR"></feDisplacementMap>
+
+          <feBlend in="displaced_TL" in2="displaced_BR"
+              mode="screen" result="displaced"></feBlend>
+
+          <feColorMatrix in="displaced" type="saturate"
+              values="10" result="displaced_saturated"></feColorMatrix>
+
+          <feImage href="/assets/specular-map-z1p3yi.png"
+              x="0" y="0" width="1" height="1"
+              result="specular_layer"></feImage>
+
+          <feComposite in="displaced_saturated" in2="specular_layer"
+              operator="in" result="specular_saturated"></feComposite>
+
+          <feComponentTransfer in="specular_layer"
+              result="specular_faded">
+              <feFuncA type="linear" slope="0.5"></feFuncA>
+          </feComponentTransfer>
+
+          <feBlend in="specular_saturated" in2="displaced"
+              mode="normal" result="withSaturation"></feBlend>
+
+          <feBlend in="specular_faded" in2="withSaturation"
+              mode="normal" result="preBlur"></feBlend>
+
+          <!-- Blur applied AFTER displacement + blending -->
+          <feGaussianBlur in="preBlur"
+              stdDeviation="2"></feGaussianBlur>
+
+      </filter>
+  </defs>
+</svg>
+`;
+
 function applyGlass() {
     const elements = document.getElementsByClassName("liquid-glass");
     const glassMaterial = document.createElement("div");
@@ -48,6 +96,8 @@ function ensureGlassStyles() {
 }
 
 document.addEventListener("DOMContentLoaded", function(e) {
+    const $glassSvg = $(glassSvg);
+    $("body").prepend($glassSvg);
     const settings = JSON.parse(window.localStorage.getItem("settings"));
     if (settings.liquidGlass) {
         window.liquidGlassEnabled = true;
