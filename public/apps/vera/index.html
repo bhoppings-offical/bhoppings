@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -8,127 +7,127 @@
   <style>
     @import url('https://fonts.cdnfonts.com/css/samsung-sharp-sans-regular');
 
-```
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-:root {
-  --white: #ffffff;
-  --dim: rgba(255,255,255,0.45);
-  --subtle: rgba(255,255,255,0.1);
-  --border: rgba(255,255,255,0.15);
-}
+    :root {
+      --white: #ffffff;
+      --dim: rgba(255,255,255,0.45);
+      --subtle: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.15);
+    }
 
-body {
-  background: #000;
-  color: var(--white);
-  font-family: 'Samsung Sharp Sans Regular', 'Samsung Sharp Sans', sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
+    body {
+      background: #000;
+      color: var(--white);
+      font-family: 'Samsung Sharp Sans Regular', 'Samsung Sharp Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
 
-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-.container {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 28px;
-}
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
 
-h1 {
-  font-size: clamp(3rem, 10vw, 5.5rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--white);
-  line-height: 1;
-  user-select: none;
-}
+    h1 {
+      font-size: clamp(3rem, 10vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      line-height: 1;
+      user-select: none;
+    }
 
-.search-wrap {
-  position: relative;
-  width: min(480px, 90vw);
-}
+    .search-wrap {
+      position: relative;
+      width: min(480px, 90vw);
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 0.2s, background 0.2s;
+    }
 
-.search-wrap input {
-  width: 100%;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 46px 14px 20px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: var(--white);
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  letter-spacing: 0.01em;
-}
+    .search-wrap:focus-within {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.08);
+    }
 
-.search-wrap input::placeholder {
-  color: rgba(255,255,255,0.28);
-}
+    .search-wrap input {
+      flex: 1;
+      background: none;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 0 14px 20px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--white);
+      outline: none;
+      letter-spacing: 0.01em;
+    }
 
-.search-wrap input:focus {
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.08);
-}
+    .search-wrap input::placeholder {
+      color: rgba(255,255,255,0.28);
+    }
 
-.search-wrap button {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.45;
-  transition: opacity 0.2s;
-}
+    .search-wrap button {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.45;
+      transition: opacity 0.2s;
+      height: 100%;
+    }
 
-.search-wrap button:hover { opacity: 1; }
+    .search-wrap button:hover { opacity: 1; }
 
-.search-wrap button svg {
-  width: 17px;
-  height: 17px;
-  stroke: #fff;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+    .search-wrap button svg {
+      width: 17px;
+      height: 17px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-.credit {
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.28);
-  letter-spacing: 0.04em;
-  margin-top: -10px;
-  text-align: center;
-}
+    .credit {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.28);
+      letter-spacing: 0.04em;
+      margin-top: -10px;
+      text-align: center;
+    }
 
-.credit span {
-  color: rgba(255,255,255,0.55);
-}
-```
-
+    .credit span {
+      color: rgba(255,255,255,0.55);
+    }
   </style>
 </head>
 <body>
@@ -252,6 +251,5 @@ h1 {
     if (e.key === 'Enter') navigate();
   });
 </script>
-
 </body>
 </html>
