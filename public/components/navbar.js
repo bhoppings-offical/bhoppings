@@ -4,12 +4,12 @@ const navbarItems = [
   {
     text: "software",
     items: [
-      //{ text: "quill", href: "/downloads/quill" },
       { text: "tangox", href: "/downloads/TangoX.exe" },
       { text: "tango clicker", href: "/downloads/TangoClicker.exe" }
     ]
   },
-    { text: "lume", href: "/apps/lume" },
+  { text: "lume", href: "/apps/lume" },
+  { text: "vera", href: "/apps/vera" },
   { text: "apps", href: "/app-library" }
 ];
 
@@ -139,3 +139,4 @@ function moveNavbarShimmer() {
   t++;
   requestAnimationFrame(moveNavbarShimmer);
 }
+
