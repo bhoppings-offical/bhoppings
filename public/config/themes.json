@@ -11,7 +11,6 @@
     "primary": ["#FFFFFF", "#444444"],
     "background": ["#1E1E1E"]
   },
-
   "amethyst": {
     "primary": ["#A63AFF", "#B873F0"],
     "background": ["#2B0D43"]
@@ -111,5 +110,157 @@
   "inferno": {
     "primary": ["#FF3C00", "#FFC300", "#FF7700"],
     "background": ["#89400C", "#FFAE00", "#FF2600"]
+  },
+  "obsidian": {
+    "primary": ["#C0C0C0", "#808080"],
+    "background": ["#0A0A0A"]
+  },
+  "arctic": {
+    "primary": ["#E0F7FF", "#A8DFFF"],
+    "background": ["#0D1B2A", "#1A3A5C"]
+  },
+  "rose_gold": {
+    "primary": ["#FFD1DC", "#C9956C"],
+    "background": ["#2A1218", "#4A2030"]
+  },
+  "neon_noir": {
+    "primary": ["#FF2079", "#00FFB2"],
+    "background": ["#0A0010"]
+  },
+  "solar_flare": {
+    "primary": ["#FFD700", "#FF4500"],
+    "background": ["#1A0800", "#3D1200"]
+  },
+  "glacier": {
+    "primary": ["#B0E8FF", "#5FC8E8", "#FFFFFF"],
+    "background": ["#0C1E2E", "#1A3D52", "#2A5F78"]
+  },
+  "matcha": {
+    "primary": ["#A8D8A8", "#4CAF50"],
+    "background": ["#0D1F0D", "#1A3A1A"]
+  },
+  "cobalt": {
+    "primary": ["#6699FF", "#AACCFF"],
+    "background": ["#05112A"]
+  },
+  "tangerine": {
+    "primary": ["#FF8C00", "#FFB347"],
+    "background": ["#1A0D00", "#3A1F00"]
+  },
+  "deep_sea": {
+    "primary": ["#00CED1", "#20B2AA", "#7FFFD4"],
+    "background": ["#020B18", "#041E2E", "#073652"]
+  },
+  "peach_fuzz": {
+    "primary": ["#FFCBA4", "#FF8C69"],
+    "background": ["#FFCBA4", "#FF8C69"]
+  },
+  "shadow": {
+    "primary": ["#888888", "#AAAAAA"],
+    "background": ["#111111", "#1A1A1A"]
+  },
+  "candy_shop": {
+    "primary": ["#FF6EB4", "#FFD700", "#7FFFD4"],
+    "background": ["#FF6EB4", "#FFD700", "#7FFFD4"]
+  },
+  "volcanic": {
+    "primary": ["#FF4500", "#8B0000", "#FFD700"],
+    "background": ["#1A0000", "#2D0000", "#FF2200"]
+  },
+  "cyberpunk": {
+    "primary": ["#FFE600", "#FF00AA"],
+    "background": ["#0D0015", "#1A0030"]
+  },
+  "cotton_candy": {
+    "primary": ["#FFB3DE", "#B3CFFF", "#C8F7C5"],
+    "background": ["#FFB3DE", "#B3CFFF", "#C8F7C5"]
+  },
+  "forest_floor": {
+    "primary": ["#556B2F", "#8FBC8F", "#D2B48C"],
+    "background": ["#0D1A09", "#1A3312", "#2A5520"]
+  },
+  "twilight": {
+    "primary": ["#4A0080", "#FF6EC7", "#FFA07A"],
+    "background": ["#0A0015", "#1A0030", "#FF4088"]
+  },
+  "steel": {
+    "primary": ["#B0C4DE", "#708090"],
+    "background": ["#0F1923"]
+  },
+  "pumpkin": {
+    "primary": ["#FF7518", "#FFB347", "#FF4500"],
+    "background": ["#1A0800", "#2A1000", "#3D1800"]
+  },
+  "aurora": {
+    "primary": ["#00FF87", "#60EFFF", "#FF00C8"],
+    "background": ["#020C18", "#041828", "#062040"]
+  },
+  "dusty_rose": {
+    "primary": ["#C9A0A0", "#E8C4C4"],
+    "background": ["#1A0D0D", "#2E1818"]
+  },
+  "galactic": {
+    "primary": ["#7B2FFF", "#FF2FA0", "#00F0FF"],
+    "background": ["#04000F", "#0A001F", "#12003A"]
+  },
+  "harvest": {
+    "primary": ["#D2691E", "#F4A460", "#DAA520"],
+    "background": ["#1A0D00", "#2E1800", "#8B4513"]
+  },
+  "mint_chip": {
+    "primary": ["#98FF98", "#3EB489"],
+    "background": ["#041A0E", "#083018"]
+  },
+  "void": {
+    "primary": ["#6A0DAD", "#3D0070"],
+    "background": ["#030006"]
+  },
+  "cherry_blossom": {
+    "primary": ["#FFB7C5", "#FF85A1", "#C75D8A"],
+    "background": ["#FFB7C5", "#FF85A1", "#C75D8A"]
+  },
+  "thunder": {
+    "primary": ["#E8E8E8", "#F5D020"],
+    "background": ["#0A0A12", "#13131F"]
+  },
+  "catppuccin_mocha": {
+    "primary": ["#cba6f7", "#89b4fa"],
+    "background": ["#1e1e2e", "#181825", "#11111b"]
+  },
+  "catppuccin_macchiato": {
+    "primary": ["#c6a0f6", "#8aadf4"],
+    "background": ["#24273a", "#1e2030", "#181926"]
+  },
+  "catppuccin_frappe": {
+    "primary": ["#ca9ee6", "#8caaee"],
+    "background": ["#303446", "#292c3c", "#232634"]
+  },
+  "catppuccin_latte": {
+    "primary": ["#8839ef", "#1e66f5"],
+    "background": ["#eff1f5", "#e6e9ef", "#dce0e8"]
+  },
+  "catppuccin_mocha_pink": {
+    "primary": ["#f5c2e7", "#f38ba8"],
+    "background": ["#1e1e2e", "#181825"]
+  },
+  "catppuccin_mocha_green": {
+    "primary": ["#a6e3a1", "#94e2d5"],
+    "background": ["#1e1e2e", "#181825"]
+  },
+  "catppuccin_mocha_peach": {
+    "primary": ["#fab387", "#f9e2af"],
+    "background": ["#1e1e2e", "#181825"]
+  },
+  "catppuccin_frappe_teal": {
+    "primary": ["#81c8be", "#99d1db"],
+    "background": ["#303446", "#292c3c"]
+  },
+  "catppuccin_latte_rose": {
+    "primary": ["#ea76cb", "#dc8a78"],
+    "background": ["#eff1f5", "#dce0e8"]
+  },
+  "catppuccin_macchiato_sky": {
+    "primary": ["#91d7e3", "#7dc4e4"],
+    "background": ["#24273a", "#181926"]
   }
 }
