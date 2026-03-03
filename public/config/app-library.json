@@ -1,5 +1,10 @@
 [
     {
+        "name": "vera",
+        "url": "/vera",
+        "image": "vera.png"
+    },
+    {
         "name": "Space Dodge",
         "url": "/space-dodge",
         "image": "space-dodge.png"
@@ -752,3 +757,4 @@
         "image": "wtdjl.png"
     }
 ]
+
