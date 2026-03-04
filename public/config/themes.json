@@ -225,42 +225,42 @@
   },
   "catppuccin_mocha": {
     "primary": ["#cba6f7", "#89b4fa"],
-    "background": ["#1e1e2e", "#181825", "#11111b"]
+    "background": ["#1a1020", "#101828"]
   },
   "catppuccin_macchiato": {
     "primary": ["#c6a0f6", "#8aadf4"],
-    "background": ["#24273a", "#1e2030", "#181926"]
+    "background": ["#1c1228", "#101a2e"]
   },
   "catppuccin_frappe": {
     "primary": ["#ca9ee6", "#8caaee"],
-    "background": ["#303446", "#292c3c", "#232634"]
+    "background": ["#221530", "#101e32"]
   },
   "catppuccin_latte": {
     "primary": ["#8839ef", "#1e66f5"],
-    "background": ["#eff1f5", "#e6e9ef", "#dce0e8"]
+    "background": ["#e8daf5", "#d0dff7"]
   },
   "catppuccin_mocha_pink": {
     "primary": ["#f5c2e7", "#f38ba8"],
-    "background": ["#1e1e2e", "#181825"]
+    "background": ["#1f0e18", "#2a1020"]
   },
   "catppuccin_mocha_green": {
     "primary": ["#a6e3a1", "#94e2d5"],
-    "background": ["#1e1e2e", "#181825"]
+    "background": ["#0e1f12", "#0e1f1c"]
   },
   "catppuccin_mocha_peach": {
     "primary": ["#fab387", "#f9e2af"],
-    "background": ["#1e1e2e", "#181825"]
+    "background": ["#1f1008", "#1f1a08"]
   },
   "catppuccin_frappe_teal": {
     "primary": ["#81c8be", "#99d1db"],
-    "background": ["#303446", "#292c3c"]
+    "background": ["#0e1e1c", "#0e1820"]
   },
   "catppuccin_latte_rose": {
     "primary": ["#ea76cb", "#dc8a78"],
-    "background": ["#eff1f5", "#dce0e8"]
+    "background": ["#f0d8ec", "#f5ddd8"]
   },
   "catppuccin_macchiato_sky": {
     "primary": ["#91d7e3", "#7dc4e4"],
-    "background": ["#24273a", "#181926"]
+    "background": ["#0e1c22", "#0e1828"]
   }
 }
