@@ -435,3 +435,190 @@
 .settings-list-row-right:has(.settings-row-right-between-text) {
   flex-direction: column;
 }
+
+
+/* ─── Section Toolbar ──────────────────────────────────────────────────────── */
+
+.section-toolbar {
+  flex-basis: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: -12px;
+}
+
+/* ─── Filter Pills ─────────────────────────────────────────────────────────── */
+
+.filter-pills {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+}
+
+.filter-pill {
+  background: var(--card-background);
+  border: var(--card-border);
+  border-radius: 9999px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  backdrop-filter: blur(3px);
+  white-space: nowrap;
+}
+
+.filter-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.filter-pill.active {
+  background: var(--theme-color);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ─── Layout Buttons ───────────────────────────────────────────────────────── */
+
+.layout-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.layout-btn {
+  background: var(--card-background);
+  border: var(--card-border);
+  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  backdrop-filter: blur(3px);
+}
+
+.layout-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.layout-btn.active {
+  background: var(--theme-color);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ─── Hidden items (filtered out) ─────────────────────────────────────────── */
+
+.section-item-hidden {
+  display: none !important;
+}
+
+/* ─── Compact Layout ───────────────────────────────────────────────────────── */
+
+.settings-section.layout-compact {
+  gap: 24px;
+}
+
+.settings-section.layout-compact .settings-item {
+  width: calc(16.666% - 40px);
+  padding: 24px;
+  border-radius: 32px;
+  gap: 16px;
+}
+
+.settings-section.layout-compact .settings-item-button {
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 16px;
+}
+
+.settings-section.layout-compact .settings-item-icon {
+  border-radius: 16px;
+}
+
+/* ─── List Layout ──────────────────────────────────────────────────────────── */
+
+.settings-section.layout-list {
+  gap: 12px;
+}
+
+.settings-section.layout-list .settings-item {
+  width: calc(100% - 96px);
+  flex-direction: row;
+  align-items: center;
+  padding: 20px 48px;
+  border-radius: 24px;
+  gap: 32px;
+}
+
+.settings-section.layout-list .settings-item-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.settings-section.layout-list .settings-item-icon-masked-b {
+  -webkit-mask-size: 70% 70%;
+  mask-size: 70% 70%;
+}
+
+.settings-section.layout-list .settings-item-button {
+  flex: 1;
+  text-align: left;
+  justify-content: flex-start;
+  padding: 16px 24px;
+  font-size: 18px;
+  border-radius: 16px;
+}
+
+/* ─── Responsive overrides for toolbar ────────────────────────────────────── */
+
+@media screen and (max-width: 1200px) {
+  .section-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+
+  .layout-buttons {
+    display: none;
+  }
+
+  .settings-section.layout-compact .settings-item,
+  .settings-section.layout-list .settings-item {
+    width: calc(100vw - 144px);
+    flex-direction: column;
+    padding: 48px;
+    border-radius: 48px;
+    align-items: stretch;
+  }
+
+  .settings-section.layout-list .settings-item-icon {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    min-width: unset;
+  }
+
+  .settings-section.layout-list .settings-item-button {
+    text-align: center;
+    justify-content: center;
+  }
+}

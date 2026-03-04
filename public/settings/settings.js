@@ -8,6 +8,13 @@ $(document).ready(async () => {
     fetch("/config/cursors.json").then(r => r.json()),
     fetch("/config/themes.json").then(r => r.json())
   ]);
+
+  // Extract categories before rendering so they don't pollute the item lists
+  window.themeCategories = window.themes._categories || {};
+  window.cursorCategories = window.cursors._categories || {};
+  delete window.themes._categories;
+  delete window.cursors._categories;
+
   settingsReady();
 });
 
@@ -188,6 +195,114 @@ function applyCursorColor(svg, colors) {
     .replace(/stop-color="#EEEEEE"/, `stop-color="${colors[1] || colors[0]}"`);
 }
 
+// ─── Layout & Filter Icons ────────────────────────────────────────────────────
+
+const LAYOUT_ICONS = {
+  default: `<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="2" y="2" width="9" height="9" rx="1.5"/><rect x="13" y="2" width="9" height="9" rx="1.5"/><rect x="2" y="13" width="9" height="9" rx="1.5"/><rect x="13" y="13" width="9" height="9" rx="1.5"/></svg>`,
+  compact: `<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="17" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/><rect x="17" y="9" width="6" height="6" rx="1"/><rect x="1" y="17" width="6" height="6" rx="1"/><rect x="9" y="17" width="6" height="6" rx="1"/><rect x="17" y="17" width="6" height="6" rx="1"/></svg>`,
+  list: `<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><rect x="2" y="3" width="20" height="4" rx="1.5"/><rect x="2" y="10" width="20" height="4" rx="1.5"/><rect x="2" y="17" width="20" height="4" rx="1.5"/></svg>`
+};
+
+// ─── Toolbar Builder ──────────────────────────────────────────────────────────
+
+function buildToolbar(sectionId, categories, idAttr) {
+  const settings = JSON.parse(localStorage.getItem("settings")) || {};
+  const savedLayout = settings.layouts?.[sectionId] || "default";
+
+  const toolbar = document.createElement("div");
+  toolbar.className = "section-toolbar";
+
+  // Filter pills
+  const pillsWrapper = document.createElement("div");
+  pillsWrapper.className = "filter-pills";
+
+  const allPill = document.createElement("button");
+  allPill.className = "filter-pill active";
+  allPill.setAttribute("data-filter", "all");
+  allPill.textContent = "All";
+  pillsWrapper.appendChild(allPill);
+
+  for (const cat of Object.keys(categories)) {
+    const pill = document.createElement("button");
+    pill.className = "filter-pill";
+    pill.setAttribute("data-filter", cat);
+    pill.textContent = formatKey(cat);
+    pillsWrapper.appendChild(pill);
+  }
+
+  toolbar.appendChild(pillsWrapper);
+
+  // Layout buttons
+  const layoutWrapper = document.createElement("div");
+  layoutWrapper.className = "layout-buttons";
+
+  for (const [layout, icon] of Object.entries(LAYOUT_ICONS)) {
+    const btn = document.createElement("button");
+    btn.className = "layout-btn" + (layout === savedLayout ? " active" : "");
+    btn.setAttribute("data-layout", layout);
+    btn.setAttribute("title", formatKey(layout));
+    btn.innerHTML = icon;
+    layoutWrapper.appendChild(btn);
+  }
+
+  toolbar.appendChild(layoutWrapper);
+
+  // Wire up filter clicks
+  pillsWrapper.addEventListener("click", (e) => {
+    const pill = e.target.closest(".filter-pill");
+    if (!pill) return;
+    pillsWrapper.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    filterSection(sectionId, pill.getAttribute("data-filter"), categories, idAttr);
+  });
+
+  // Wire up layout clicks
+  layoutWrapper.addEventListener("click", (e) => {
+    const btn = e.target.closest(".layout-btn");
+    if (!btn) return;
+    layoutWrapper.querySelectorAll(".layout-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    setLayout(sectionId, btn.getAttribute("data-layout"));
+  });
+
+  return toolbar;
+}
+
+// ─── Filter Logic ─────────────────────────────────────────────────────────────
+
+function filterSection(sectionId, filter, categories, idAttr) {
+  const section = document.getElementById(sectionId);
+  const items = section.querySelectorAll(".settings-item");
+
+  items.forEach(item => {
+    const btn = item.querySelector(`[${idAttr}]`);
+    if (!btn) return;
+    const id = btn.getAttribute(idAttr);
+
+    if (filter === "all") {
+      item.classList.remove("section-item-hidden");
+      return;
+    }
+
+    const inCategory = categories[filter] && categories[filter].includes(id);
+    item.classList.toggle("section-item-hidden", !inCategory);
+  });
+}
+
+// ─── Layout Logic ─────────────────────────────────────────────────────────────
+
+function setLayout(sectionId, layout) {
+  const section = document.getElementById(sectionId);
+  section.classList.remove("layout-default", "layout-compact", "layout-list");
+  if (layout !== "default") section.classList.add(`layout-${layout}`);
+
+  const sett = JSON.parse(localStorage.getItem("settings")) || {};
+  if (!sett.layouts) sett.layouts = {};
+  sett.layouts[sectionId] = layout;
+  localStorage.setItem("settings", JSON.stringify(sett));
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
 
 function renderSettings() {
   const cursors = window.cursors;
@@ -195,10 +310,11 @@ function renderSettings() {
   const cursorSection = document.getElementById("cursor-section");
   const themeSection = document.getElementById("theme-section");
   const effectSection = document.getElementById("effect-section");
+  const settings = JSON.parse(localStorage.getItem("settings")) || {};
+
   cursorSection.innerHTML = "";
-  
-  for (let i = 0; i < Object.keys(cursors).length; i ++) {
-    
+
+  for (let i = 0; i < Object.keys(cursors).length; i++) {
     const key = Object.keys(cursors)[i];
     const cursor = cursors[key];
     const innerHTML = `<div class="settings-item-icon">${applyCursorColor(window.cursorSvg, cursor)}</div><div class="settings-item-button liquid-glass" data-cursor-id="${key}">${formatKey(key)}</div>`;
@@ -207,16 +323,17 @@ function renderSettings() {
     elem.innerHTML = innerHTML;
     cursorSection.appendChild(elem);
   }
-  /*(function() {
-    const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/icons/times-square.svg" /></div><div class="settings-item-button" data-cursor-id="none">Default</div>`;
-    const elem = document.createElement("div");
-    elem.classList.add("settings-item");
-    elem.innerHTML = innerHTML;
-    cursorSection.appendChild(elem);
-  })();*/
+
+  // Inject cursor toolbar
+  const cursorToolbar = buildToolbar("cursor-section", window.cursorCategories, "data-cursor-id");
+  cursorSection.insertBefore(cursorToolbar, cursorSection.firstChild);
+  // Apply saved layout
+  setLayout("cursor-section", settings.layouts?.["cursor-section"] || "default");
+
   themeSection.innerHTML = "";
-  for (let i = 0; i < Object.keys(themes).length; i ++) {
-      const key = Object.keys(themes)[i];
+
+  for (let i = 0; i < Object.keys(themes).length; i++) {
+    const key = Object.keys(themes)[i];
     const theme = themes[key];
     const innerHTML = `<div class="settings-item-icon settings-item-icon-masked-b" style='--bg: linear-gradient(to right, ${theme.primary.join(", ")}'></div><div class="settings-item-button liquid-glass" data-theme-id="${key}">${formatKey(key)}</div>`;
     const elem = document.createElement("div");
@@ -224,8 +341,15 @@ function renderSettings() {
     elem.innerHTML = innerHTML;
     themeSection.appendChild(elem);
   }
+
+  // Inject theme toolbar
+  const themeToolbar = buildToolbar("theme-section", window.themeCategories, "data-theme-id");
+  themeSection.insertBefore(themeToolbar, themeSection.firstChild);
+  // Apply saved layout
+  setLayout("theme-section", settings.layouts?.["theme-section"] || "default");
+
   effectSection.innerHTML = "";
-  for (let i = 0; i < Object.keys(window.effects).length; i ++) {
+  for (let i = 0; i < Object.keys(window.effects).length; i++) {
     const name = window.effects[i];
     const innerHTML = `<div class="settings-item-icon"><img src="/assets/images/effect-icons/${name}.svg" /></div><div class="settings-item-button liquid-glass" data-effect-id="${name}">${formatKey(name)}</div>`;
     const elem = document.createElement("div");
@@ -233,6 +357,7 @@ function renderSettings() {
     elem.innerHTML = innerHTML;
     effectSection.appendChild(elem);
   }
+
   document.getElementById("settings-content-container").scrollTop = 0;
 }
 
