@@ -1,4 +1,10 @@
 {
+  "_categories": {
+    "solid": ["snow", "rose", "amethyst", "ocean", "aquamarine", "emerald", "lemon", "sunset", "crimson", "gold", "coral", "mint", "lavender", "peach", "sky", "lilac", "tangerine", "cobalt", "sage", "blush", "steel"],
+    "neon": ["neon_green", "neon_pink", "neon_blue", "neon_orange", "neon_yellow", "neon_purple"],
+    "gradient": ["monochrome", "vaporwave", "twilight", "celestial", "ember", "festive", "waves", "aurora", "duskfire", "rose_gold", "galactic", "subzero", "cyberpunk", "neon_noir", "solar_flare", "mystic", "inferno", "bubblegum", "harvest", "deep_sea", "thunder"],
+    "catppuccin": ["catppuccin_mauve", "catppuccin_blue", "catppuccin_pink", "catppuccin_red", "catppuccin_peach", "catppuccin_green", "catppuccin_teal", "catppuccin_sky", "catppuccin_yellow", "catppuccin_lavender", "catppuccin_mocha", "catppuccin_macchiato", "catppuccin_frappe", "catppuccin_latte", "catppuccin_mocha_pink", "catppuccin_mocha_peach", "catppuccin_frappe_teal", "catppuccin_latte_rose", "catppuccin_macchiato_sky"]
+  },
   "snow": ["#FFFFFF"],
   "rose": ["#FF3AC1"],
   "amethyst": ["#A63AFF"],
@@ -15,7 +21,6 @@
   "ember": ["#FF3C00", "#520000"],
   "festive": ["#00FF37", "#FF0000"],
   "waves": ["#4AE8EF", "#3AC4FF"],
-
   "gold": ["#FFD700"],
   "coral": ["#FF6B6B"],
   "mint": ["#98FF98"],
@@ -28,14 +33,12 @@
   "sage": ["#8FBC8F"],
   "blush": ["#FF85A1"],
   "steel": ["#B0C4DE"],
-
   "neon_green": ["#39FF14"],
   "neon_pink": ["#FF2079"],
   "neon_blue": ["#00B3FF"],
   "neon_orange": ["#FF6600"],
   "neon_yellow": ["#FFF01F"],
   "neon_purple": ["#BF00FF"],
-
   "aurora": ["#00FF87", "#60EFFF"],
   "duskfire": ["#FF00EE", "#FF9000"],
   "rose_gold": ["#FFD1DC", "#C9956C"],
@@ -50,7 +53,6 @@
   "harvest": ["#F4A460", "#DAA520"],
   "deep_sea": ["#20B2AA", "#7FFFD4"],
   "thunder": ["#E8E8E8", "#F5D020"],
-
   "catppuccin_mauve": ["#cba6f7"],
   "catppuccin_blue": ["#89b4fa"],
   "catppuccin_pink": ["#f5c2e7"],

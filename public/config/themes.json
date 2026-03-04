@@ -1,4 +1,15 @@
 {
+  "_categories": {
+    "dark": ["obsidian", "void", "shadow", "ember", "thunder", "cobalt", "steel", "monochrome"],
+    "light": ["catppuccin_latte", "catppuccin_latte_rose", "everforest_light", "everforest_light_hard", "everforest_light_soft"],
+    "neon": ["vaporwave", "cyberpunk", "galactic", "aurora", "neon_noir", "duskfire", "mystic", "bubblegum"],
+    "warm": ["rose_gold", "solar_flare", "tangerine", "pumpkin", "harvest", "dusty_rose", "inferno", "volcanic"],
+    "cool": ["arctic", "glacier", "deep_sea", "subzero", "matcha", "mint_chip"],
+    "pastel": ["cotton_candy", "cherry_blossom", "dusty_rose", "peach_fuzz"],
+    "nature": ["matcha", "forest_floor", "mint_chip", "emerald_mist", "everforest_dark", "everforest_dark_hard", "everforest_dark_soft", "everforest_light", "everforest_aqua", "everforest_orange", "everforest_red", "everforest_purple", "everforest_yellow", "everforest_blue"],
+    "catppuccin": ["catppuccin_mocha", "catppuccin_macchiato", "catppuccin_frappe", "catppuccin_latte", "catppuccin_mocha_pink", "catppuccin_mocha_green", "catppuccin_mocha_peach", "catppuccin_frappe_teal", "catppuccin_latte_rose", "catppuccin_macchiato_sky"],
+    "everforest": ["everforest_dark", "everforest_dark_hard", "everforest_dark_soft", "everforest_light", "everforest_light_hard", "everforest_light_soft", "everforest_aqua", "everforest_orange", "everforest_red", "everforest_purple", "everforest_yellow", "everforest_blue"]
+  },
   "default": {
     "primary": ["#D185FF", "#51CBFF"],
     "background": ["#12151D"]
@@ -263,7 +274,6 @@
     "primary": ["#91d7e3", "#7dc4e4"],
     "background": ["#0e1c22", "#0e1828"]
   },
-
   "everforest_dark": {
     "primary": ["#a7c080", "#83c092"],
     "background": ["#1a2117", "#222b1e"]
