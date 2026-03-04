@@ -262,5 +262,54 @@
   "catppuccin_macchiato_sky": {
     "primary": ["#91d7e3", "#7dc4e4"],
     "background": ["#0e1c22", "#0e1828"]
+  },
+
+  "everforest_dark": {
+    "primary": ["#a7c080", "#83c092"],
+    "background": ["#1a2117", "#222b1e"]
+  },
+  "everforest_dark_hard": {
+    "primary": ["#a7c080", "#dbbc7f"],
+    "background": ["#141b12", "#1e2718"]
+  },
+  "everforest_dark_soft": {
+    "primary": ["#a7c080", "#7fbbb3"],
+    "background": ["#232b20", "#2d3528"]
+  },
+  "everforest_light": {
+    "primary": ["#5a7a4a", "#3d8072"],
+    "background": ["#f0ead6", "#e8dfc8"]
+  },
+  "everforest_light_hard": {
+    "primary": ["#4e6e38", "#357065"],
+    "background": ["#f9f4e8", "#f0e9d4"]
+  },
+  "everforest_light_soft": {
+    "primary": ["#667c56", "#4a8878"],
+    "background": ["#ede8d4", "#e4ddc4"]
+  },
+  "everforest_aqua": {
+    "primary": ["#83c092", "#7fbbb3"],
+    "background": ["#16211e", "#1e2d28"]
+  },
+  "everforest_orange": {
+    "primary": ["#e69875", "#dbbc7f"],
+    "background": ["#201610", "#2a1e14"]
+  },
+  "everforest_red": {
+    "primary": ["#e67e80", "#e69875"],
+    "background": ["#20100f", "#2a1614"]
+  },
+  "everforest_purple": {
+    "primary": ["#d699b6", "#a7c080"],
+    "background": ["#1e1620", "#261e2a"]
+  },
+  "everforest_yellow": {
+    "primary": ["#dbbc7f", "#a7c080"],
+    "background": ["#1e1a10", "#282412"]
+  },
+  "everforest_blue": {
+    "primary": ["#7fbbb3", "#83c092"],
+    "background": ["#101e20", "#162628"]
   }
 }
