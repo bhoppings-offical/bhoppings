@@ -41,7 +41,7 @@ function rotateTitle() {
 
 setInterval(rotateTitle, 200);
 
-var audio = new Audio("/assets/audio/lit_since_birth_2.mp3");
+var audio = new Audio("/assets/audio/swish.mp3");
 audio.volume = 0.5;
 
 document.body.onclick = function () {
@@ -131,4 +131,5 @@ $(document).ready(function(e) {
   if (JSON.parse(localStorage.getItem("visitedBio"))) return;
   localStorage.setItem("visitedBio", "true");
   fetch("/api/views/up");
+
 })
