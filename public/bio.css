@@ -50,6 +50,48 @@ html, body {
   border: solid 1.6px rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
   backdrop-filter: blur(32px);
+  position: relative;
+}
+
+.widget::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(255, 255, 255, 0.055) 0%,
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+.widget::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1.6px;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(255, 255, 255, 0.6) 0%,
+    transparent 55%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 2;
+}
+
+.widget.glow-active::before,
+.widget.glow-active::after {
+  opacity: 1;
 }
 
 #center {
@@ -153,8 +195,6 @@ html, body {
 
   height: 25.6px;
   width: 25.6px;
-  /*! transform: translateY(+0px) scale(1); */
-  /*! transition: transform 0.1s ease-in; */
   cursor: pointer;
 }
 
@@ -170,7 +210,6 @@ html, body {
 
 
 .social-button:hover {
-  /*! transform: translateY(-6px) scale(1.05); */
 }
 .social-button:hover img {
   transform: translateY(-4.8px) scale(1.05);
@@ -186,10 +225,10 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  pointer-events: none; /* so it doesn't block clicks */
+  pointer-events: none;
   filter: url(#dither);
-  background: rgba(255, 255, 255, 0); /* transparent but still takes the filter */
-  mix-blend-mode: multiply; /* optional: blends with underlying content */
+  background: rgba(255, 255, 255, 0);
+  mix-blend-mode: multiply;
 }
 
 
@@ -261,7 +300,6 @@ html, body {
 #activity-icon {
   height: 100%;
   border-radius: 12.8px;
-  /*margin-top: -0.9090909%;*/
 }
 #activity-active {
   display: none;
@@ -281,7 +319,6 @@ html, body {
   flex: 1;
   flex-direction: column;
   gap: 0.7em;
-  /*! justify-content: space-between; */
   filter: blur(0.48px);
 }
 #activity-title {
