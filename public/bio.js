@@ -5,8 +5,7 @@ $(document).ready(function() {
   let targetRX = 0, targetRY = 0;
   let currentRX = 0, currentRY = 0;
   const MAX_TILT = 8; // degrees
-  
-  // vibed because no one likes math 📏📏📏
+
   function animateTilt() {
     currentRX += (targetRX - currentRX) * 0.04;
     currentRY += (targetRY - currentRY) * 0.04;
@@ -36,6 +35,17 @@ $(document).ready(function() {
     targetRX = 0;
     targetRY = 0;
     if (!tiltRAF) tiltRAF = requestAnimationFrame(animateTilt);
+  });
+
+  $(".widget").on("mousemove", function(e) {
+    const rect = this.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(2) + "%";
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(2) + "%";
+    this.style.setProperty("--glow-x", x);
+    this.style.setProperty("--glow-y", y);
+    $(this).addClass("glow-active");
+  }).on("mouseleave", function() {
+    $(this).removeClass("glow-active");
   });
 
   $("#home-hover-hitbox").on("click", function(e) {
