@@ -14,7 +14,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-
 <meta name="format-detection" content="telephone=no">
 <meta name="format-detection" content="email=no">
 <meta name="format-detection" content="address=no">
@@ -27,6 +26,52 @@
       media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
     <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <script>
+      (function () {
+        const TICKER    = "bhoppings // ";
+        const TICKER3   = TICKER.repeat(3);
+        const WIN       = 14;
+
+        const HOME      = "H O M E";
+
+        const ROTATE_SPEED  = 75;
+        const ROTATE_CYCLES = 2;
+        const TYPE_SPEED    = 140;
+        const FLASH_SPEED   = 180;
+        const FLASH_COUNT   = 3;
+        const REST_DURATION = 1200;
+
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        async function run() {
+          while (true) {
+
+            const totalFrames = TICKER.length * ROTATE_CYCLES;
+            for (let i = 0; i < totalFrames; i++) {
+              document.title = TICKER3.slice(i % TICKER.length, i % TICKER.length + WIN);
+              await sleep(ROTATE_SPEED);
+            }
+
+            const letters = HOME.split(" "); // ["H","O","M","E"]
+            for (let i = 1; i <= letters.length; i++) {
+              document.title = letters.slice(0, i).join(" ");
+              await sleep(TYPE_SPEED);
+            }
+
+            for (let f = 0; f < FLASH_COUNT; f++) {
+              document.title = "\u00a0";
+              await sleep(FLASH_SPEED);
+              document.title = HOME;
+              await sleep(FLASH_SPEED);
+            }
+
+            await sleep(REST_DURATION);
+          }
+        }
+        run();
+      })();
+    </script>
   </head>
   <body>
       <div id="grain"></div>
@@ -75,10 +120,4 @@
   <script src="/components/carousel.js"></script>
   <script src="/global/home-effects.js"></script>
   <script src="/components/navbar.js"></script>
-
 </html>
-
-
-
-
-
