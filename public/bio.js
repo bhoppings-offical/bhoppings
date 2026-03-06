@@ -1,4 +1,42 @@
 $(document).ready(function() {
+  // Subtle 3D tilt effect on #center
+  const $center = $("#center-container");
+  let tiltRAF = null;
+  let targetRX = 0, targetRY = 0;
+  let currentRX = 0, currentRY = 0;
+  const MAX_TILT = 8; // degrees
+
+  function animateTilt() {
+    currentRX += (targetRX - currentRX) * 0.08;
+    currentRY += (targetRY - currentRY) * 0.08;
+
+    $center.css("transform", `perspective(800px) rotateX(${currentRX}deg) rotateY(${currentRY}deg)`);
+
+    if (Math.abs(targetRX - currentRX) + Math.abs(targetRY - currentRY) > 0.01) {
+      tiltRAF = requestAnimationFrame(animateTilt);
+    } else {
+      currentRX = targetRX;
+      currentRY = targetRY;
+      $center.css("transform", `perspective(800px) rotateX(${currentRX}deg) rotateY(${currentRY}deg)`);
+      tiltRAF = null;
+    }
+  }
+
+  $center.on("mousemove", function(e) {
+    const rect = this.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    targetRY = ((x - rect.width / 2) / (rect.width / 2)) * MAX_TILT;
+    targetRX = -((y - rect.height / 2) / (rect.height / 2)) * MAX_TILT;
+    if (!tiltRAF) tiltRAF = requestAnimationFrame(animateTilt);
+  });
+
+  $center.on("mouseleave", function() {
+    targetRX = 0;
+    targetRY = 0;
+    if (!tiltRAF) tiltRAF = requestAnimationFrame(animateTilt);
+  });
+
   $("#home-hover-hitbox").on("click", function(e) {
     window.open("/home", "_self");
   });
