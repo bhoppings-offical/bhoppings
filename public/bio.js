@@ -5,10 +5,11 @@ $(document).ready(function() {
   let targetRX = 0, targetRY = 0;
   let currentRX = 0, currentRY = 0;
   const MAX_TILT = 8; // degrees
-
+  
+  // vibed because no one likes math 📏📏📏
   function animateTilt() {
-    currentRX += (targetRX - currentRX) * 0.08;
-    currentRY += (targetRY - currentRY) * 0.08;
+    currentRX += (targetRX - currentRX) * 0.04;
+    currentRY += (targetRY - currentRY) * 0.04;
 
     $center.css("transform", `perspective(800px) rotateX(${currentRX}deg) rotateY(${currentRY}deg)`);
 
