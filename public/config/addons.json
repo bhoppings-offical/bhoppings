@@ -1,0 +1,12 @@
+[
+  {
+    "id": "vera",
+    "name": "Vera",
+    "description": "Adds an 'Open in Vera' button to every app in the App Library, letting you run any app through the Vera proxy.",
+    "version": "1.0.0",
+    "author": "bhoppings",
+    "icon": "/assets/images/app-icons/vera.png",
+    "script": "/addons/vera/addon.js",
+    "tags": ["app-library", "utility"]
+  }
+]

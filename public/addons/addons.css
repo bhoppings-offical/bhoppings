@@ -1,0 +1,212 @@
+/* ── Addons Page ──────────────────────────────────────────────── */
+
+body {
+  min-height: 100vh;
+  padding-top: 80px;
+}
+
+#addons-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* Header */
+.addons-header {
+  margin-bottom: 36px;
+}
+
+.addons-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--theme-color, #fff);
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+
+.addons-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+/* Grid */
+.addons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card */
+.addon-card {
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.addon-card:hover {
+  transform: translateY(-2px);
+}
+
+.addon-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.addon-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.06);
+}
+
+.addon-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.addon-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.addon-meta {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+
+/* Install / Uninstall button */
+.addon-btn {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  letter-spacing: 0.01em;
+}
+
+.addon-btn:hover {
+  opacity: 0.85;
+  transform: scale(1.04);
+}
+
+.addon-btn.install {
+  background: var(--theme-color, #7b8fff);
+  color: #fff;
+}
+
+.addon-btn.installed {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Description */
+.addon-description {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.6);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Tags */
+.addon-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.addon-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.4);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Skeleton */
+.addon-card.skeleton {
+  height: 120px;
+  background: rgba(255,255,255,0.04);
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.7; }
+}
+
+/* Toast */
+.addon-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(20,20,25,0.95);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 12px 22px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 9999;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+
+.addon-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.addons-error {
+  color: rgba(255,100,100,0.8);
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* ── Vera Button (injected into app-library cards) ──────────── */
+
+.app-vera-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  white-space: nowrap;
+}
+
+.app-vera-button:hover {
+  opacity: 0.85;
+  transform: scale(1.04);
+  color: #fff;
+}
