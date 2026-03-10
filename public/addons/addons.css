@@ -188,20 +188,24 @@ body {
 /* ── Vera Button (injected into app-library cards) ──────────── */
 
 .addon-button-container {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 100%;
   opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
   pointer-events: none;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  z-index: 2;
+  width: max-content;
 }
 
-.app-card:hover .addon-button-container {
+.app-icon:hover .addon-button-container {
   opacity: 1;
-  transform: translateY(0px);
+  transform: translateX(-50%) translateY(0px);
   pointer-events: all;
 }
 
@@ -210,18 +214,18 @@ body {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 7px 16px;
+  padding: 6px 14px;
   border-radius: 9999px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.9);
   cursor: pointer;
   text-decoration: none;
   transition: opacity 0.15s ease, transform 0.15s ease;
-  background: rgba(0,0,0,0.35);
-  border: solid 2px rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0,0,0,0.45);
+  border: solid 2px rgba(255,255,255,0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   white-space: nowrap;
 }
 

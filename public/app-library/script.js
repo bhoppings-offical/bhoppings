@@ -24,9 +24,9 @@ function appCard(app) {
   });
  const title = $("<div></div>").html(`<span>${app.name}</span>`).addClass("app-title").addClass("liquid-glass");
  const titleBackground = $("<img>").prop("src", "/assets/images/app-icons/" + app.image).addClass("title-bg");
- icon.append(iconImg, button, favorite);
+ icon.append(iconImg, button, addonButtons, favorite);
  title.append(titleBackground);
-  card.append(icon, icon, title, addonButtons);
+  card.append(icon, icon, title);
   return card;
 }
 // #apps-container > .app
