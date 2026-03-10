@@ -187,26 +187,45 @@ body {
 
 /* ── Vera Button (injected into app-library cards) ──────────── */
 
+.addon-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.app-card:hover .addon-button-container {
+  opacity: 1;
+  transform: translateY(0px);
+  pointer-events: all;
+}
+
 .app-vera-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  margin-top: 6px;
-  padding: 5px 14px;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.85);
   cursor: pointer;
+  text-decoration: none;
   transition: opacity 0.15s ease, transform 0.15s ease;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.35);
+  border: solid 2px rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   white-space: nowrap;
 }
 
 .app-vera-button:hover {
-  opacity: 0.85;
-  transform: scale(1.04);
-  color: #fff;
+  opacity: 0.8;
+  transform: translateY(-2px);
 }
