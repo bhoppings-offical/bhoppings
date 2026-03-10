@@ -16,10 +16,15 @@ function appCard(app) {
   }
   const button = $("<div></div>").html("<span>Open</span>").addClass("app-button").addClass("liquid-glass").click(function(e) {
     window.open($(this).parent().parent().data("href"), "_blank");
-  })
+  });
+  const addonButtons = $("<div></div>").addClass("addon-button-container");
+  window.AddonManager.applyHook("appCardButtons", {
+    app: { ...app, cardHref: ((app.fromRoot ? "" : "/apps/") + app.url).replace(/\/\//, "/") },
+    buttonContainer: addonButtons[0]
+  });
  const title = $("<div></div>").html(`<span>${app.name}</span>`).addClass("app-title").addClass("liquid-glass");
  const titleBackground = $("<img>").prop("src", "/assets/images/app-icons/" + app.image).addClass("title-bg");
- icon.append(iconImg, button, favorite);
+ icon.append(iconImg, button, addonButtons, favorite);
  title.append(titleBackground);
   card.append(icon, icon, title);
   return card;
@@ -58,6 +63,8 @@ window.apps.sort((a, b) => {
 
 $(document).ready(async function () {
   window.apps = await fetch("/config/app-library.json").then(r => r.json());
+  const availableAddons = await fetch("/config/addons.json").then(r => r.json()).catch(() => []);
+  await window.AddonManager.loadInstalledAddons(availableAddons);
   renderApps();
 
   $("#apps-container").on("click", function (e) {

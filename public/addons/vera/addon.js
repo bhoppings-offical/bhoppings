@@ -5,9 +5,10 @@
   // Hook: called for each app card after render.
   // Expects { app: { url, name, ... }, buttonContainer: HTMLElement }
   window.AddonManager.registerHook("appCardButtons", function ({ app, buttonContainer }) {
-    if (!app.url) return;
+    const href = app.cardHref || app.url;
+    if (!href) return;
 
-    const veraUrl = VERA_BASE + app.url;
+    const veraUrl = VERA_BASE + "https://bhoppings.de" + href;
 
     const btn = document.createElement("a");
     btn.className = "app-vera-button";

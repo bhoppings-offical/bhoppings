@@ -10,7 +10,8 @@ const navbarItems = [
   },
   { text: "lume", href: "/apps/lume" },
   { text: "vera", href: "/apps/vera" },
-  { text: "apps", href: "/app-library" }
+  { text: "apps", href: "/app-library" },
+  { text: "addons", href: "/addons" }
 ];
 
 let navbarGlowShimmer;
