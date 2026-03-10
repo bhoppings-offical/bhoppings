@@ -2,13 +2,13 @@
 
 body {
   min-height: 100vh;
-  padding-top: 80px;
+  padding-top: 120px;
 }
 
 #addons-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 40px 24px 80px;
+  padding: 70px 24px 80px;
 }
 
 /* Header */
@@ -189,9 +189,9 @@ body {
 
 .addon-button-container {
   position: absolute;
-  bottom: 14px;
+  top: 14px;
   left: 50%;
-  transform: translateX(-50%) translateY(6px);
+  transform: translateX(-50%) translateY(-6px);
   display: flex;
   flex-direction: column;
   align-items: center;
