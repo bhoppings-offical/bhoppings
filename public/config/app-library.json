@@ -645,7 +645,7 @@
     { "name": "Scrollbar", "url": "/scrollbar", "image": "scrollbar.png" },
     {
         "name": "Sell Your Soul",
-        "url": "/sellyoursoul",
+        "url": "/sell-your-soul",
         "image": "sellyoursoul.png"
     },
     { "name": "Shader Test", "url": "/shadertest", "image": "shadertest.png" },
@@ -757,4 +757,5 @@
         "image": "wtdjl.png"
     }
 ]
+
 
