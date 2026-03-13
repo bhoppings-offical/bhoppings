@@ -13,14 +13,20 @@ app.set("trust proxy", true)
 app.use(/^\/auth(\/.*)?$/, ExpressAuth(authConfig))
 
 app.use(async (req, res, next) => {
-  res.locals.session = await getSession(req, authConfig)
+  if (req.path.startsWith("/auth")) return next()
+  try {
+    res.locals.session = await getSession(req, authConfig)
+  } catch (err) {
+    console.error("[auth] getSession failed:", err)
+    res.locals.session = null
+  }
   next()
 })
 
-app.get("/", (req, res) => {
+/*app.get("/", (req, res) => {
   const { session } = res.locals
   res.json({ user: session?.user ?? null })
-})
+})*/
 
 const publicPath = (p = "") => path.join(import.meta.dirname, "public", p);
 
