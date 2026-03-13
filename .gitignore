@@ -1,7 +1,3 @@
-<<<<<<< HEAD
 .env
 bhoppings-old/
-=======
-bhoppings-old/
-.env
->>>>>>> 3f1d0b6cbc5430a5c8f3f949be40053441036c16
+node_modules/

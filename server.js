@@ -1,15 +1,35 @@
-const express = require("express");
+import "dotenv/config";
+import express from "express";
 const app = express();
-const fs = require("fs");
-const path = require("path");
-
+import fs from "fs";
+import path from "path";
+import { ExpressAuth, getSession } from "@auth/express";
+import { authConfig } from "./auth.js";
 
 const port = 3000;
 
-const publicPath = (p = "") => path.join(__dirname, "public", p);
+app.set("trust proxy", true)
+
+app.use(/^\/auth(\/.*)?$/, ExpressAuth(authConfig))
+
+app.use(async (req, res, next) => {
+  res.locals.session = await getSession(req, authConfig)
+  next()
+})
+
+app.get("/", (req, res) => {
+  const { session } = res.locals
+  res.json({ user: session?.user ?? null })
+})
+
+const publicPath = (p = "") => path.join(import.meta.dirname, "public", p);
 
 app.get("/favicon.ico", (req, res) => {
   res.sendFile(publicPath("assets/images/icons/favicon.ico"));
+})
+
+app.get("/login", (req, res) => {
+  res.redirect("/auth/signin");
 })
 
 app.use(express.static(publicPath()));
