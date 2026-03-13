@@ -154,6 +154,8 @@ body {
   /*! box-shadow: inset 0px 0px 12px #fff; */
   overflow: visible;
   z-index: 9999;
+  --glass-frost: 3px;
+  --glass-strength: 40;
 }
 
 .navbar-item {
@@ -164,7 +166,7 @@ body {
   display: flex;
   flex-direction: row;
   text-wrap: nowrap;
-  text-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6);
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.7);
   z-index: 1;
 }
 
@@ -343,9 +345,13 @@ body {
     width: 100vw !important;
     border-radius: 0px;
     overflow-y: hidden;
+    backdrop-filter: none !important;
   }
   #navbar:has(.navbar-item:focus) {
     padding-bottom: 100vh;
+  }
+  #navbar::after {
+    backdrop-filter: none !important;
   }
 }
 

@@ -45,6 +45,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   }
+  (() => {
+    
+    const settings = JSON.parse(localStorage.getItem("settings")) || defaultSettings;
+  })();
 
   mergeSettings();
   

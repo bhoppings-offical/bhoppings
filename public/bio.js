@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  LiquidGlass.smoothCoefficient = 0.5;
+  LiquidGlass.mapElements();
   // Subtle 3D tilt effect on #center
   const $center = $("#center-container");
   let tiltRAF = null;

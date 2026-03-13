@@ -22,7 +22,7 @@ function appCard(app) {
     app: { ...app, cardHref: ((app.fromRoot ? "" : "/apps/") + app.url).replace(/\/\//, "/") },
     buttonContainer: addonButtons[0]
   });
- const title = $("<div></div>").html(`<span>${app.name}</span>`).addClass("app-title").addClass("liquid-glass");
+ const title = $("<div></div>").html(`<span class="liquid-glass">${app.name}</span>`).addClass("app-title").addClass("liquid-glass");
  const titleBackground = $("<img>").prop("src", "/assets/images/app-icons/" + app.image).addClass("title-bg");
  icon.append(iconImg, button, addonButtons, favorite);
  title.append(titleBackground);
@@ -58,7 +58,7 @@ window.apps.sort((a, b) => {
     const card = appCard(app);
     container.append(card);
   }
-  if (JSON.parse(window.localStorage.getItem("settings")).liquidGlass) applyGlass();
+  if (JSON.parse(window.localStorage.getItem("settings")).liquidGlass) showGlass();
 }
 
 $(document).ready(async function () {
@@ -86,7 +86,7 @@ $(document).ready(async function () {
     }
   });
   const settings = JSON.parse(window.localStorage.getItem("settings"));
-    if (settings.liquidGlass) applyGlass();
+    if (settings.liquidGlass) showGlass();
 });
 
 

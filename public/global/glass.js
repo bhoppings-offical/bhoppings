@@ -1,4 +1,4 @@
-window.glassSvg = `<svg id="liquid-glass-svg" color-interpolation-filters="sRGB" style="position: absolute; left: 0px; top: 0px;">
+/*window.glassSvg = `<svg id="liquid-glass-svg" color-interpolation-filters="sRGB" style="position: absolute; left: 0px; top: 0px;">
   <defs>
       <filter id="liquid-glass-filter" filterUnits="objectBoundingBox">
           
@@ -107,25 +107,18 @@ document.addEventListener("DOMContentLoaded", function(e) {
         window.liquidGlassEnabled = false;
     }
 })
-
+*/
 function showGlass() {
-    console.log("showing glass")
-        window.liquidGlassEnabled = true;
-        applyGlass();
-        ensureGlassStyles().then(() => {
-            $(".liquid-glass .liquidGlassMaterial").removeClass("hidden").each(function() {
-                this.style.removeProperty("display");
-            });
-            requestAnimationFrame(() => checkGlassBounding());
-        });
+    LiquidGlass.mapElements();
 }
 function hideGlass() {
-    console.log("hidden glass")
-        window.liquidGlassEnabled = false;
-        $(".liquid-glass .liquidGlassMaterial").addClass("hidden");
-        $('link[href="/global/glass.css"]').prop('disabled', true);
+    const glass = document.querySelectorAll("liquid-glass");
+    for (let i = 0; i < glass.length; i ++) {
+        const elem = glass[i];
+        elem.style.setProperty("backdrop-filter", "auto");
+    }
 }
-
+/*
 function checkGlassBounding(loop = false) {
     if (window.liquidGlassEnabled === false) return;
     const glass = document.getElementsByClassName("liquid-glass");
@@ -149,3 +142,4 @@ function checkGlassBounding(loop = false) {
     }
     if (loop) requestAnimationFrame(() => checkGlassBounding(true));
 }
+*/

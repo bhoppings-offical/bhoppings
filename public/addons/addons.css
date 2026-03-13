@@ -2,7 +2,7 @@
 
 body {
   min-height: 100vh;
-  padding-top: 120px;
+  padding-top: 120px !important;
 }
 
 #addons-container {

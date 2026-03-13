@@ -27,15 +27,7 @@ function settingsReady() {
   const settings = JSON.parse(window.localStorage.getItem("settings")) || {};
   updateSidebar();
   renderSettings();
-  applyGlass();
-  if (settings.liquidGlass) {
-    showGlass();
-    $("#glass-switch").addClass("enabled");
-  } else {
-    hideGlass();
-    handleGlassSwitch();
-    setTimeout(handleGlassSwitch, 1);
-  }
+  
   if (settings.legacyNavbar) {
     $("#navbar-switch").addClass("enabled")
   }
@@ -94,7 +86,7 @@ function handleGlassSwitch() {
       if (settings.liquidGlass) {
         settings.liquidGlass = false;
         $(this).removeClass("enabled");
-        hideGlass();
+        setTimeout(hideGlass, 1);
       }
       else {
         $(this).addClass("enabled");
@@ -176,6 +168,16 @@ $container.on("scroll", function() {
   $(`#${buttonId}`).addClass("active");
   activeButton = buttonId;
 });
+if (settings.liquidGlass) {
+    showGlass();
+    $("#glass-switch").addClass("enabled");
+  } else {
+    handleGlassSwitch();
+    setTimeout(function() {
+      handleGlassSwitch();
+    hideGlass();
+    }, 1);
+  }
 }
 
 function formatKey(key) {
@@ -400,7 +402,3 @@ function scrollToElement(element, duration = 400) {
     duration
   );
 }
-
-$("#settings-content-container").on("scroll", function(e) {
-  checkGlassBounding();
-})

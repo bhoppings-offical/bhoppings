@@ -43,7 +43,6 @@ function navbarItem(item) {
 function navbar() {
   const nav = document.createElement("div");
   nav.setAttribute("id", "navbar");
-  nav.classList.add("liquid-glass")
   const logo = document.createElement("div");
   logo.setAttribute("id", "navbar-logo");
   logo.innerText = "bhop";
@@ -57,6 +56,7 @@ function navbar() {
   }
   const glow = document.createElement("div");
   glow.id = "navbar-glow";
+  nav.classList.add("liquid-glass")
   glow.innerHTML = `<div id="navbar-glow-shimmer"></div>`;
   const glowCover = document.createElement("div");
   glowCover.id = "navbar-shimmer-cover";

@@ -154,7 +154,6 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.66);
-    backdrop-filter: blur(24px);
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
@@ -169,7 +168,7 @@ body {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%) scale(1);
-  background: var(--card-background);
+  background: #0000;
   padding: var(--card-spacing) calc(var(--card-spacing) * 1) var(--card-spacing) calc(var(--card-spacing) * 2);
   font-size: 2em;
   border-radius: calc((1em + 3 * var(--card-spacing)) / 2.7);

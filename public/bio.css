@@ -49,8 +49,10 @@ html, body {
   background-color: #0D0D0D88;
   border: solid 1.6px rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
-  backdrop-filter: blur(32px);
   position: relative;
+  --glass-frost: 2px;
+  --glass-strength: 20;
+  --glass-depth: 96px;
 }
 
 .widget::before {

@@ -1,3 +1,8 @@
+:root {
+  
+  --glass-strength: 50;
+  --glass-frost: 2px;
+}
 
 #container {
   width: 100vw;
@@ -469,9 +474,11 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
   backdrop-filter: blur(3px);
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
 }
 
 .filter-pill:hover {
@@ -480,10 +487,11 @@
 }
 
 .filter-pill.active {
-  background: var(--theme-color);
   color: #fff;
   border-color: transparent;
 }
+
+
 
 /* ─── Layout Buttons ───────────────────────────────────────────────────────── */
 
@@ -505,8 +513,25 @@
   justify-content: center;
   color: rgba(255, 255, 255, 0.45);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: color 0.2s ease;
   backdrop-filter: blur(3px);
+  overflow: hidden;
+}
+
+.layout-btn::after {
+  transition: opacity 0.2s ease;
+  opacity: 0;
+  background: var(--theme-color);
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+.layout-btn.active::after {
+  opacity: 1;
 }
 
 .layout-btn:hover {
@@ -515,7 +540,7 @@
 }
 
 .layout-btn.active {
-  background: var(--theme-color);
+  /* background: var(--theme-color); */
   color: #fff;
   border-color: transparent;
 }
@@ -579,12 +604,12 @@
 }
 
 .settings-section.layout-list .settings-item-button {
-  flex: 1;
-  text-align: left;
+  text-align: right;
   justify-content: flex-start;
   padding: 16px 24px;
   font-size: 18px;
   border-radius: 16px;
+  width: fit-content;
 }
 
 /* ─── Responsive overrides for toolbar ────────────────────────────────────── */

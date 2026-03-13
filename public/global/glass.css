@@ -1,4 +1,4 @@
-.liquid-glass:has(.liquidGlassMaterial:not(.hidden)) {
+/*.liquid-glass:has(.liquidGlassMaterial:not(.hidden)) {
     --corner-radius: 48px;
     --base-strength: 48px;
     --extra-blur: 0px;
@@ -15,11 +15,9 @@
     --refraction-width: calc((var(--softness) * 0.3));
     position: relative;
     overflow: visible;
-    /*! pointer-events: none; */
     z-index: 1;
     background-color: rgba(50, 50, 50, 0.2) !important;
     backdrop-filter: none !important;
-    /* border: solid 1px rgba(255, 255, 255, 0.2); */
 }
 .liquidGlassMaterial {
     position: absolute;
@@ -45,7 +43,6 @@
     z-index: 3;
     overflow: hidden;
     border-radius: inherit;
-    /* background-color: rgba(128, 128, 128, 0); */
 }
 .liquidGlassMaterial > div {
     position: absolute;
@@ -115,8 +112,7 @@
     border-radius: inherit;
     padding: 1px;
     border: 0 solid transparent;
-    /* background: linear-gradient(155deg, hsla(0, 0%, 100%, 0.15) 0%, hsla(0, 0%, 0%, 0.2) 50%, hsla(0, 0%, 100%, 0.15) 100%); */
-    mask: 
+     mask: 
         linear-gradient(white 0 0) padding-box,
         linear-gradient(white 0 0) content-box;
     mask-composite: exclude, exclude;
@@ -140,4 +136,11 @@
 
 .hidden {
     display: none;
+}
+
+*/
+
+.liquid-glass {
+    --glass-strength: 20;
+    --glass-depth: 50px;
 }

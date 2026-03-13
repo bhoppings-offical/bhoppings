@@ -3,6 +3,7 @@ body {
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
+  padding-top: 0px !important;
 }
 
 #apps-container {
@@ -133,7 +134,7 @@ body {
   border: solid 6px rgba(0, 0, 0, 0.3) !important;
   font-size: 24px;
   border-radius: 9999px;
-  backdrop-filter: blur(32px) !important;
+  backdrop-filter: blur(32px);
   display: flex;
   flex-direction: row;
   gap: 24px;
@@ -175,7 +176,7 @@ body {
   border-radius: 9999px;
   box-sizing: border-box;
   transition: all 0.2s ease-in-out;
-  backdrop-filter: blur(46px) !important;
+  backdrop-filter: blur(46px);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -266,9 +267,14 @@ body {
   width: min(calc(100vw - 96px), 480px);
   box-sizing: border-box;
   z-index: 9999;
+  --glass-frost: 6px;
+  --glass-strength: 10;
 }
 
-
+.app-button, .app-favorite {
+  --glass-strength: 10px;
+  --glass-frost: 6px;
+}
 
 #search-bar:has(.liquidGlassMaterial) {
   border: none !important;
