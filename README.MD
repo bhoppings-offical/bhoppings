@@ -1,9 +1,5 @@
-
-![Logo](https://i.imgur.com/xxg3McV.png)
-
-
-
-A super cool amazing website that is made without any flaws 100%
+![Logo](https://i.imgur.com/s9wT13q.jpeg)
+![SubLogo](https://i.imgur.com/jRD07aY.png)
 
 ㅤ
 
@@ -22,8 +18,8 @@ A super cool amazing website that is made without any flaws 100%
 ㅤ
 ## Authors
 
-- [@bhoppings-official](https://www.github.com/bhoppings-official) - i do cool stuff
-- [@ChezLinkZ](https://www.github.com/SnezLinkZ) - retarded developer
+- [@bhoppings-official](https://www.github.com/bhoppings-official) - Project Manager
+- [@SnezLinkZ](https://www.github.com/SnezLinkZ) - Lead Developer
 
 
 ## Features
