@@ -1,4 +1,4 @@
-![Logo](https://i.imgur.com/s9wT13q.jpeg)
+++![Logo](https://i.imgur.com/s9wT13q.jpeg)
 ![SubLogo](https://i.imgur.com/jRD07aY.png)
 
 ㅤ
@@ -10,7 +10,7 @@
 ㅤ
 ㅤ
 
-![Uses](https://i.imgur.com/Lao8bUJ.png)
+![Uses](https://i.imgur.com/0yJvhYb.png)
 ㅤ
 ㅤ
 ㅤ
