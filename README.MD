@@ -25,7 +25,7 @@
 ## Features
 
 - AI Powered tools & games
-- Custom bios for signed in usewrs
+- Custom bios for signed in users
 - The prettiest paste site to exist
 - And more! Check it out yourself
 
@@ -36,9 +36,9 @@
 
 A: Absolutely! Hover over the "o" in bhop to access the settings, many themes and features await you
 
-#### Q: Is my info secure?
+#### Q: How useful is bhoppings?
 
-A: We can guarantee the safety of your info, as we do not request any senstive details when making an account on bhoppings.
+A: New tools are constantly being added to bhoppings, if you have any additions feel free to make a pull request
 
 #### Q: What games are there?
 
