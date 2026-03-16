@@ -24,29 +24,29 @@
 
 ## Features
 
-- retarded
-- tango!
-- cool
-- and other things
+- AI Powered tools & games
+- Custom bios for signed in usewrs
+- The prettiest paste site to exist
+- And more! Check it out yourself
 
 
 ## FAQ
 
-#### Q: Is your website professional?
+#### Q: Is bhoppings customizable?
 
-A: yes
+A: Absolutely! Hover over the "o" in bhop to access the settings, many themes and features await you
 
-#### Q: Is SnezLinkZ retarded?
+#### Q: Is my info secure?
 
-A: yes
+A: We can guarantee the safety of your info, as we do not request any senstive details when making an account on bhoppings.
 
-#### Q: Yes?
+#### Q: What games are there?
 
-A: yes
+A: That's for you to explore.
 
-#### Q: Is the website very professionally made without mistakes?
+#### Q: Why should I use bhoppings?
 
-A: yes
+A: because its fun, and fun is fun.
 
 ## Visiting
 
