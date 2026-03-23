@@ -50,8 +50,8 @@ class LiquidGlass {
       if (x * x + y * y > 1.0) return vec2(0.0);
 
       float isNegCoeff = (x <= 0.0 && y <= 0.0) ? -1.0 : 1.0;
-      float xt = isNegCoeff * x;
-      float yt = isNegCoeff * y;
+      float xt = isNegCoeff * (x / 2 + 0.5f);
+      float yt = isNegCoeff * (y / 2 + 0.5f);
       if (sqrt(xt * xt + yt * yt) < 0.00001) return vec2(0.0);
 
       float e = easing(xt, yt);

@@ -1,102 +1,81 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
     <style>
-      :root {
-        --bg-1: #f8f3e8;
-        --bg-2: #dfe9f7;
-        --ink: #121212;
-        --muted: #4b4b4b;
-        --accent: #0f4c81;
-        --accent-2: #ff6b35;
-      }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: "Cormorant Garamond", "Times New Roman", serif;
-        color: var(--ink);
-        background:
-          radial-gradient(1200px 800px at 10% 10%, var(--bg-2), transparent 60%),
-          radial-gradient(1000px 700px at 90% 20%, #ffe8cc, transparent 60%),
-          linear-gradient(135deg, var(--bg-1), #ffffff 60%);
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        padding: 32px 16px;
-      }
-      .card {
-        width: min(520px, 92vw);
-        background: rgba(255, 255, 255, 0.85);
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        border-radius: 18px;
-        padding: 36px 32px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-        backdrop-filter: blur(6px);
-      }
-      h1 {
-        margin: 0 0 12px;
-        font-size: 40px;
-        letter-spacing: 0.02em;
-      }
-      p {
-        margin: 0 0 24px;
-        color: var(--muted);
-        font-size: 18px;
-        line-height: 1.4;
-      }
-      .cta {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 18px;
-        border-radius: 10px;
-        text-decoration: none;
-        background: var(--accent);
-        color: #fff;
-        font-size: 18px;
-        font-weight: 600;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        transition: transform 160ms ease, box-shadow 160ms ease;
-      }
-      .cta:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(15, 76, 129, 0.25);
-      }
-      .meta {
-        margin-top: 20px;
-        font-size: 14px;
-        color: #6a6a6a;
-      }
-      .meta a { color: var(--accent-2); text-decoration: none; }
+      body { font-family: sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+      h1 { margin-bottom: 8px; }
+      p { color: #555; }
+      .stack { display: grid; gap: 10px; margin-top: 20px; }
+      button { padding: 12px 14px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; }
     </style>
   </head>
   <body>
-    <main class="card">
-      <h1>Sign in</h1>
-      <p>Use your GitHub account to continue. We only read basic profile info.</p>
-      <form id="signin-form" method="post" action="/auth/signin/github">
-        <input type="hidden" name="csrfToken" value="" />
-        <input type="hidden" name="callbackUrl" value="/" />
-        <button class="cta" type="submit">Continue with GitHub</button>
-      </form>
-      <div class="meta">Need help? <a href="/">Return home</a></div>
-    </main>
+    <h1>Sign in</h1>
+    <p>Choose a provider:</p>
+
+    <div class="stack">
+      <button data-provider="google">Sign in with Google</button>
+      <button data-provider="github">Sign in with GitHub</button>
+      <button data-provider="discord">Sign in with Discord</button>
+    </div>
+
     <script>
-      async function hydrateCsrf() {
-        try {
-          const res = await fetch("/auth/csrf");
-          if (!res.ok) return;
-          const data = await res.json();
-          const input = document.querySelector('input[name="csrfToken"]');
-          if (input && data.csrfToken) input.value = data.csrfToken;
-        } catch (_) {
-          // No-op: the POST will fail without a token, but the page stays usable.
-        }
+      const AUTH_BASE = "http://localhost:3001"; // change this
+      const CALLBACK_URL = window.location.origin + "/auth-done"; // change if needed
+
+      async function getCsrfToken() {
+        const res = await fetch(`${AUTH_BASE}/auth/csrf`, {
+          method: "GET",
+          credentials: "include",
+          headers: { Accept: "application/json" }
+        });
+        if (!res.ok) throw new Error("Failed to fetch CSRF token");
+        const data = await res.json();
+        if (!data.csrfToken) throw new Error("Missing csrfToken");
+        return data.csrfToken;
       }
-      hydrateCsrf();
+
+      function submitSignIn(provider, csrfToken) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = `${AUTH_BASE}/auth/signin/${provider}`;
+
+        const csrf = document.createElement("input");
+        csrf.type = "hidden";
+        csrf.name = "csrfToken";
+        csrf.value = csrfToken;
+        form.appendChild(csrf);
+
+        const callback = document.createElement("input");
+        callback.type = "hidden";
+        callback.name = "callbackUrl";
+        callback.value = CALLBACK_URL;
+        form.appendChild(callback);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+
+      async function start(provider) {
+        const csrfToken = await getCsrfToken();
+        submitSignIn(provider, csrfToken);
+      }
+
+      document.querySelectorAll("[data-provider]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          try {
+            await start(btn.dataset.provider);
+          } catch (e) {
+            console.error(e);
+            alert("Could not start sign-in.");
+            btn.disabled = false;
+          }
+        });
+      });
     </script>
   </body>
 </html>
