@@ -87,5 +87,28 @@
      <script src="/global/glass-script.js"></script>
      <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
      <script src="./bio.js"></script>
+
+    <img id="bio-cursor" src="/assets/images/animated/bio_cursor.gif" style="
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      width: 32px;
+      height: 32px;
+      transform: translate(-4px, -4px);
+      display: none;
+    " />
+    <script>
+      (function() {
+        const cur = document.getElementById('bio-cursor');
+        document.addEventListener('mousemove', function(e) {
+          cur.style.display = 'block';
+          cur.style.left = e.clientX + 'px';
+          cur.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', function() {
+          cur.style.display = 'none';
+        });
+      })();
+    </script>
   </body>
 </html>
