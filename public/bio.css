@@ -20,7 +20,7 @@ html, body {
   user-select: none;
   -webkit-user-drag: none;
   -moz-user-select: none;
-  cursor: var(--cursor), auto !important;
+  cursor: url('/assets/images/animated/bio_cursor.gif'), auto !important;
 }
 
 #background-video {
@@ -197,7 +197,7 @@ html, body {
 
   height: 25.6px;
   width: 25.6px;
-  cursor: pointer;
+  cursor: url('/assets/images/animated/bio_cursor.gif'), pointer !important;
 }
 
 .social-button img {
