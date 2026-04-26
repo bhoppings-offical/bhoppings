@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
       img.style.transition = "transform 1s cubic-bezier(0.25, 0.1, 0.25, 1)";
     }
   }, autoScrollPollInterval)
-  if (JSON.parse(localStorage.getItem("settings")).liquidGlass) {
+  if (User.getData("settings").liquidGlass) {
     LiquidGlass?.mapElements();
   }
 });

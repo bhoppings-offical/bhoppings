@@ -1356,6 +1356,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 window.effects = Object.keys(effects);
 window.effectClasses = effects;
-    const effect = JSON.parse(localStorage.getItem("settings")).effect;
+    const effect = User.getData("settings").effect;
     setEffect(effect);
 });

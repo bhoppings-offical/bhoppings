@@ -19,12 +19,12 @@ $(document).ready(async () => {
 });
 
 function updateSidebar() {
-  $("#sidebar-button-cursor").empty().append($(applyCursorColor(cursorSvg, window.cursors[JSON.parse(localStorage.getItem("settings")).cursor] || ["#fff", "#fff"])));
+  $("#sidebar-button-cursor").empty().append($(applyCursorColor(cursorSvg, window.cursors[User.getData("settings").cursor] || ["#fff", "#fff"])));
 }
 
 
 function settingsReady() {
-  const settings = JSON.parse(window.localStorage.getItem("settings")) || {};
+  const settings = User.getData("settings") || {};
   updateSidebar();
   renderSettings();
   
@@ -52,24 +52,24 @@ function settingsReady() {
     if (e.target.parentElement.parentElement.id === "effect-section" && e.target.classList.contains("settings-item-button")) {
       const id = e.target.getAttribute("data-effect-id");
       setEffect(id);
-      const sett = JSON.parse(localStorage.getItem("settings"));
+      const sett = User.getData("settings");
       sett.effect = id;
-      localStorage.setItem("settings", JSON.stringify(sett));
+      User.set("settings", sett);
     }
   });
   $(".switch").not("#glass-switch, #navbar-switch, #bio-switch").on("click", function(e) {
     $(this).toggleClass("enabled");
   });
-  $("#background-url").val(JSON.parse(localStorage.getItem("settings")).backgroundUrl)
+  $("#background-url").val(User.getData("settings").backgroundUrl)
   $("#background-url").on("keydown", async function(e) {
     if (e.key !== "Enter") return;
     const val = $(this).val().trim();
     setBackground(val);
   })
   $("#blurInput").on("input", function(e) {
-      const sett = JSON.parse(localStorage.getItem("settings"));
+      const sett = User.getData("settings");
       sett.backgroundBlur = $(this).val();
-      localStorage.setItem("settings", JSON.stringify(sett));
+      User.setItem("settings", sett)
       document.documentElement.style.setProperty("--background-blur", `${$(this).val()}px`)
   })
   $(".sidebar-button").on("click", function(e) {
@@ -82,7 +82,7 @@ function settingsReady() {
     scrollToElement($(`#${id}`))
   })
 function handleGlassSwitch() {
-      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      const settings = User.getData("settings");
       if (settings.liquidGlass) {
         settings.liquidGlass = false;
         $(this).removeClass("enabled");
@@ -93,11 +93,11 @@ function handleGlassSwitch() {
         settings.liquidGlass = true;
         showGlass();
       }
-      window.localStorage.setItem("settings", JSON.stringify(settings));
+      User.setData("settings", settings)
     }
   $("#glass-switch").on("click", handleGlassSwitch)
     $("#navbar-switch").on("click", function(e) {
-      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      const settings = User.getData("settings");
       if (settings.legacyNavbar) {
         settings.legacyNavbar = false;
         $(this).removeClass("enabled");
@@ -110,10 +110,10 @@ function handleGlassSwitch() {
         $("#navbar").addClass("legacy");
 
       }
-      window.localStorage.setItem("settings", JSON.stringify(settings));
+      User.setData("settings", settings);
     })
     $("#bio-switch").on("click", function(e) {
-      const settings = JSON.parse(window.localStorage.getItem("settings"));
+      const settings = User.getData("settings");
       if (settings.skipBio) {
         settings.skipBio = false;
         $(this).removeClass("enabled");
@@ -123,7 +123,7 @@ function handleGlassSwitch() {
         settings.skipBio = true;
 
       }
-      window.localStorage.setItem("settings", JSON.stringify(settings));
+      User.setData("settings", settings);
     })
 //chatgpt nerd scrolling
 const idTable = {
@@ -208,7 +208,7 @@ const LAYOUT_ICONS = {
 // ─── Toolbar Builder ──────────────────────────────────────────────────────────
 
 function buildToolbar(sectionId, categories, idAttr) {
-  const settings = JSON.parse(localStorage.getItem("settings")) || {};
+  const settings = User.getData("settings") || {};
   const savedLayout = settings.layouts?.[sectionId] || "default";
 
   const toolbar = document.createElement("div");
@@ -298,10 +298,10 @@ function setLayout(sectionId, layout) {
   section.classList.remove("layout-default", "layout-compact", "layout-list");
   if (layout !== "default") section.classList.add(`layout-${layout}`);
 
-  const sett = JSON.parse(localStorage.getItem("settings")) || {};
+  const sett = User.getData("settings") || {};
   if (!sett.layouts) sett.layouts = {};
   sett.layouts[sectionId] = layout;
-  localStorage.setItem("settings", JSON.stringify(sett));
+  User.setData("settings", sett);
 }
 
 // ─── Render ───────────────────────────────────────────────────────────────────
@@ -312,7 +312,7 @@ function renderSettings() {
   const cursorSection = document.getElementById("cursor-section");
   const themeSection = document.getElementById("theme-section");
   const effectSection = document.getElementById("effect-section");
-  const settings = JSON.parse(localStorage.getItem("settings")) || {};
+  const settings = User.getData("settings") || {};
 
   cursorSection.innerHTML = "";
 

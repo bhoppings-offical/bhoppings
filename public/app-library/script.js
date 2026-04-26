@@ -5,7 +5,7 @@ function appCard(app) {
   const favoriteOutline = $("<img>").attr("src", "/assets/images/shapes/favorite-border.svg").addClass("favorite-border");
   const favorite = $("<div></div>").addClass("app-favorite").data("name", app.name).append(favoriteOutline).addClass("liquid-glass");
   
-  const favorites = JSON.parse(localStorage.getItem("app-favorites"));
+  const favorites = User.getData("app-favorites");
   if (favorites.includes(app.name)) {
     favorite.addClass("favorited");
   }
@@ -33,7 +33,7 @@ function appCard(app) {
 function renderApps() {
   const container = $("#apps-container");
   container.empty();
-  const favorites = JSON.parse(window.localStorage.getItem("app-favorites"));
+  const favorites = User.getData("app-favorites");
   
 window.apps.sort((a, b) => {
   return (a.tags ? a.tags.includes("broken") : 0) - (b.tags ? b.tags.includes("broken") : 0)
@@ -58,7 +58,7 @@ window.apps.sort((a, b) => {
     const card = appCard(app);
     container.append(card);
   }
-  if (JSON.parse(window.localStorage.getItem("settings")).liquidGlass) showGlass();
+  if (User.getData("settings").liquidGlass) showGlass();
 }
 
 $(document).ready(async function () {
@@ -85,19 +85,19 @@ $(document).ready(async function () {
       search();
     }
   });
-  const settings = JSON.parse(window.localStorage.getItem("settings"));
+  const settings = User.getData("settings");
     if (settings.liquidGlass) showGlass();
 });
 
 
 function favoriteApp(name) {
-  const favorites = JSON.parse(localStorage.getItem("app-favorites"));
+  const favorites = User.getData("app-favorites");
   if (favorites.includes(name)) {
     favorites.splice(favorites.indexOf(name), 1);
   } else {
     favorites.push(name);
   }
-  localStorage.setItem("app-favorites", JSON.stringify(favorites));
+  User.setData("app-favorites", favorites)
   $(".app-favorite").filter(function () {
   return $(this).data("name") === name;
 }).toggleClass("favorited");

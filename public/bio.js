@@ -182,5 +182,4 @@ $(document).ready(function(e) {
   if (JSON.parse(localStorage.getItem("visitedBio"))) return;
   localStorage.setItem("visitedBio", "true");
   fetch("/api/views/up");
-
 })

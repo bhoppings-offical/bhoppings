@@ -17,8 +17,12 @@ function svgToDataURL(svgString) {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-  if (!localStorage.getItem("app-favorites")) {
-    localStorage.setItem("app-favorites", JSON.stringify([]));
+  function setSettings(settings) {
+    User.setData("settings", settings)
+  }
+
+  if (!User.getData("app-favorites")) {
+    User.setData("app-favorites", []);
   }
 
   const defaultSettings = {
@@ -38,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   function mergeSettings() {
-    const settings = JSON.parse(localStorage.getItem("settings")) || defaultSettings;
+    const settings = User.getData("settings") || defaultSettings;
     for (const key in defaultSettings) {
       if (!settings[key]) {
         settings[key] = defaultSettings[key];
@@ -47,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   (() => {
     
-    const settings = JSON.parse(localStorage.getItem("settings")) || defaultSettings;
+    const settings = User.getData("settings") || defaultSettings;
   })();
 
   mergeSettings();
@@ -56,17 +60,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     fetch("/config/cursors.json").then(r => r.json()).then(d => {window.cursors = d});
     fetch("/assets/images/cursor.svg").then(r => r.json()).then(d => {window.cursorSvg = d});
 
-  if (!localStorage.getItem("settings")) {
-    localStorage.setItem("settings", JSON.stringify(defaultSettings));
+  if (!User.getData("settings")) {
+    setSettings(defaultSettings);
   }
   
 
   function getSettings() {
-    return JSON.parse(localStorage.getItem("settings"));
-  }
-
-  function setSettings(settings) {
-    localStorage.setItem("settings", JSON.stringify(settings));
+    return User.getData("settings");
   }
 
 // Simple cache object
@@ -192,12 +192,12 @@ async function injectRootStyle(settings) {
 }
 async function setCursor(key) {
   const cursors = window.cursors || await fetch("/config/cursors.json").then(r => r.json());
-  const settings = JSON.parse(localStorage.getItem("settings"));
+  const settings = User.getData("settings");
   settings.cursor = key;
   const cursorSvgOld = window.cursorSvg || await fetch("/assets/images/cursor.svg").then(r => r.json());
   const cursorColor = cursors[key];
   settings.cacheCursor = cursorColor;
-  localStorage.setItem("settings", JSON.stringify(settings));
+  setSettings(settings);
     removeRootStyle();
     injectRootStyle(settings);
     if (updateSidebar) {
@@ -209,7 +209,7 @@ window.applyCursorColor = applyCursorColor;
 window.setCursor = setCursor;
 
 async function setBackground(url) {
-  const settings = JSON.parse(localStorage.getItem("settings")) || {};
+  const settings = User.getData("settings") || {};
 
   let validUrl = null;
 
@@ -229,7 +229,7 @@ async function setBackground(url) {
 
   // Save either valid URL or null
   settings.backgroundUrl = validUrl;
-  localStorage.setItem("settings", JSON.stringify(settings));
+  setSettings(settings)
 
   // Re-apply styles
   removeRootStyle();
@@ -242,9 +242,9 @@ async function setBackground(url) {
 
 
 async function setBackgroundBlur(blurAmount) {
-  const settings = JSON.parse(localStorage.getItem("settings"));
+  const settings = User.getData("settings");
   settings.backgroundBlur = blurAmount;
-  localStorage.setItem("settings", JSON.stringify(settings));
+  setSettings(settings)
   
   // Remove and re-inject styles to apply changes immediately
   removeRootStyle();
