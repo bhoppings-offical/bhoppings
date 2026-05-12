@@ -177,6 +177,7 @@ return (
 
 });
 }
+
 // ── Tab switching ────────────────────────────────────
 let activeTab = “main”;
 
@@ -193,26 +194,28 @@ $(this).addClass("active");
 if (tab === "main") {
   $("#apps-container").show();
   $("#ugs-container").hide();
+  $("#search-input").val("");
+  renderApps();
 } else {
   $("#apps-container").hide();
   $("#ugs-container").show();
+  $("#search-input").val("");
   if (!window.ugsLoaded) loadUGS();
 }
-
-// clear search when switching tabs
-$("#search-input").val("");
-if (tab === "main") renderApps();
 ```
 
+});
+
+// UGS live search
+$(”#search-input”).on(“input”, function () {
+if (activeTab === “ugs”) searchUGS();
 });
 });
 
 // ── UGS loading & rendering ──────────────────────────
 window.ugsLoaded = false;
-window.ugsData = [];   // flat array of { letter, name, url }
 
 function stripCL(name) {
-// Remove leading “cl” (case-insensitive) if present
 return name.replace(/^cl/i, “”);
 }
 
@@ -222,21 +225,19 @@ container.empty();
 container.append(`<div class="ugs-status">Loading games…</div>`);
 
 try {
-// games.js from the UGS repo writes <input type="button"> elements into
-// a div with id=“sections-container”. We create a hidden one so the
-// script has a target to write into, then scrape it after load.
-let scratchpad = document.getElementById(“ugs-scratchpad”);
+// games.js writes into a div with id=“sections-container”.
+// Create a hidden one so it has somewhere to write.
+let scratchpad = document.getElementById(“sections-container”);
 if (!scratchpad) {
 scratchpad = document.createElement(“div”);
-scratchpad.id = “sections-container”; // must match what games.js expects
+scratchpad.id = “sections-container”;
 scratchpad.style.cssText = “display:none!important;position:absolute;pointer-events:none;”;
 document.body.appendChild(scratchpad);
 }
 
 ```
 await new Promise((resolve, reject) => {
-  const existingScript = document.getElementById("ugs-games-script");
-  if (existingScript) { resolve(); return; }
+  if (document.getElementById("ugs-games-script")) { resolve(); return; }
   const s = document.createElement("script");
   s.id = "ugs-games-script";
   s.src = "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/games.js";
@@ -245,35 +246,29 @@ await new Promise((resolve, reject) => {
   document.body.appendChild(s);
 });
 
-// Give the script a tick to finish any synchronous DOM writes
-await new Promise(r => setTimeout(r, 100));
+// Give script a tick to finish synchronous DOM writes
+await new Promise(r => setTimeout(r, 200));
 
-// Now scrape the populated scratchpad
+// Scrape the populated scratchpad
 const sections = {};
-const letterSections = scratchpad.querySelectorAll(".letter-section");
+scratchpad.querySelectorAll(".letter-section").forEach(sec => {
+  const letter = sec.querySelector(".letter-header")?.textContent?.trim() || "?";
+  const buttons = [...sec.querySelectorAll("input[type=button]")];
+  if (buttons.length) {
+    sections[letter] = buttons.map(btn => {
+      const onclickStr = btn.getAttribute("onclick") || "";
+      const urlMatch = onclickStr.match(/['"]([^'"]+)['"]/);
+      return { name: btn.value, url: urlMatch ? urlMatch[1] : "#" };
+    });
+  }
+});
 
-if (letterSections.length) {
-  // Structure: .letter-section > .letter-header + .buttons-container > input[type=button]
-  letterSections.forEach(sec => {
-    const letter = sec.querySelector(".letter-header")?.textContent?.trim() || "?";
-    const buttons = [...sec.querySelectorAll("input[type=button]")];
-    if (buttons.length) {
-      sections[letter] = buttons.map(btn => {
-        // onclick is typically: location.href='url'  or  window.open('url')
-        const onclickStr = btn.getAttribute("onclick") || "";
-        const urlMatch = onclickStr.match(/['"]([^'"]+)['"]/);
-        return { name: btn.value, url: urlMatch ? urlMatch[1] : "#" };
-      });
-    }
-  });
-}
-
-// Fallback: maybe games.js set window.sections directly
+// Fallback: window.sections
 if (!Object.keys(sections).length && window.sections) {
   Object.assign(sections, window.sections);
 }
 
-if (!Object.keys(sections).length) throw new Error("No game data found in sections-container.");
+if (!Object.keys(sections).length) throw new Error("No game data found.");
 
 window.ugsLoaded = true;
 renderUGS(sections);
@@ -289,11 +284,9 @@ function renderUGS(sections) {
 const container = $(”#ugs-container”);
 container.empty();
 
-// Page header
 container.append(`<div class="ugs-page-header"> <h1>Ultimate Game Stash</h1> <p> Source: <a href="https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/" target="_blank">UGS Google Doc</a> &nbsp;·&nbsp; Discord: <a href="https://discord.gg/rmVsAqkpkA" target="_blank">discord.gg/rmVsAqkpkA</a> </p> </div>`);
 
 const letters = Object.keys(sections).sort();
-window.ugsData = [];
 
 for (const letter of letters) {
 const games = sections[letter];
@@ -302,12 +295,10 @@ if (!games || games.length === 0) continue;
 ```
 const section = $(`<div class="ugs-section" data-letter="${letter}"></div>`);
 section.append(`<div class="ugs-letter-header">${letter}</div>`);
-
 const list = $(`<div class="ugs-list"></div>`);
+
 for (const game of games) {
   const cleanName = stripCL(game.name);
-  window.ugsData.push({ letter, name: cleanName, url: game.url });
-
   const item = $(`
     <div class="ugs-item liquid-glass" data-name="${cleanName.toLowerCase()}" data-url="${game.url}">
       <span class="ugs-game-name">${cleanName}</span>
@@ -320,6 +311,7 @@ for (const game of games) {
   });
   list.append(item);
 }
+
 section.append(list);
 container.append(section);
 ```
@@ -329,53 +321,16 @@ container.append(section);
 if (User.getData(“settings”).liquidGlass) showGlass();
 }
 
-// ── Unified search (handles both tabs) ───────────────
-// Override the original search() with a tab-aware version
-const _origSearch = search;
-window.search = function () {
-if (activeTab === “main”) {
-_origSearch();
-} else {
-searchUGS();
-}
-};
-
 function searchUGS() {
 const query = $(”#search-input”).val().trim().toLowerCase();
 $(”.ugs-section”).each(function () {
 let anyVisible = false;
 $(this).find(”.ugs-item”).each(function () {
 const name = $(this).data(“name”) || “”;
-const matches = !query || name.includes(query) ||
-levenshteinDistance(query, name.substring(0, query.length)) <= 1;
-if (matches) {
-$(this).removeClass(“ugs-hidden”);
-anyVisible = true;
-} else {
-$(this).addClass(“ugs-hidden”);
-}
+const matches = !query || name.includes(query);
+$(this).toggleClass(“ugs-hidden”, !matches);
+if (matches) anyVisible = true;
 });
-if (anyVisible) $(this).removeClass(“ugs-section-hidden”);
-else $(this).addClass(“ugs-section-hidden”);
+$(this).toggleClass(“ugs-section-hidden”, !anyVisible);
 });
 }
-
-function levenshteinDistance(a, b) {
-const m = a.length, n = b.length;
-const dp = Array.from({ length: m + 1 }, (*, i) =>
-Array.from({ length: n + 1 }, (*, j) => (i === 0 ? j : j === 0 ? i : 0))
-);
-for (let i = 1; i <= m; i++)
-for (let j = 1; j <= n; j++)
-dp[i][j] = a[i-1] === b[j-1]
-? dp[i-1][j-1]
-: 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
-return dp[m][n];
-}
-
-// Wire search input to the unified handler
-$(document).ready(function () {
-$(”#search-input”).on(“input”, function () {
-if (activeTab === “ugs”) searchUGS();
-});
-});
