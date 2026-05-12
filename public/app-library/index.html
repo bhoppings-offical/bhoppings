@@ -33,10 +33,19 @@
   <body>
       <div id="grain"></div>
       <canvas id="effectCanvas"></canvas>
-      <div id="apps-container">
-        
+
+      <div id="tab-bar">
+        <button class="tab-btn active liquid-glass" data-tab="main">Main</button>
+        <button class="tab-btn liquid-glass" data-tab="ugs">UGS</button>
       </div>
-      <div id="search-bar" class="liquid-glass"><img src="/assets/images/icons/search.svg" /><input type="search" id="search-input" placeholder="Search your favorites..." autocomplete="off" /></div>
+
+      <div id="apps-container"></div>
+      <div id="ugs-container" style="display:none;"></div>
+
+      <div id="search-bar" class="liquid-glass">
+        <img src="/assets/images/icons/search.svg" />
+        <input type="search" id="search-input" placeholder="Search your favorites..." autocomplete="off" />
+      </div>
   </body>
   
   <script src="/global/addons.js"></script>

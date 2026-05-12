@@ -168,3 +168,193 @@ function fuzzySuggest(query, items, maxDistance = 3) {
     );
   });
 }
+// ── Tab switching ────────────────────────────────────
+let activeTab = "main";
+
+$(document).ready(function () {
+  $(".tab-btn").on("click", function () {
+    const tab = $(this).data("tab");
+    if (tab === activeTab) return;
+    activeTab = tab;
+
+    $(".tab-btn").removeClass("active");
+    $(this).addClass("active");
+
+    if (tab === "main") {
+      $("#apps-container").show();
+      $("#ugs-container").hide();
+    } else {
+      $("#apps-container").hide();
+      $("#ugs-container").show();
+      if (!window.ugsLoaded) loadUGS();
+    }
+
+    // clear search when switching tabs
+    $("#search-input").val("");
+    if (tab === "main") renderApps();
+  });
+});
+
+// ── UGS loading & rendering ──────────────────────────
+window.ugsLoaded = false;
+window.ugsData = [];   // flat array of { letter, name, url }
+
+function stripCL(name) {
+  // Remove leading "cl" (case-insensitive) if present
+  return name.replace(/^cl/i, "");
+}
+
+async function loadUGS() {
+  const container = $("#ugs-container");
+  container.empty();
+  container.append(`<div class="ugs-status">Loading games…</div>`);
+
+  try {
+    // Fetch the games.js from jsdelivr via a dynamic script tag so the
+    // external script can populate its own globals, then we read them.
+    await new Promise((resolve, reject) => {
+      const existingScript = document.getElementById("ugs-games-script");
+      if (existingScript) { resolve(); return; }
+      const s = document.createElement("script");
+      s.id = "ugs-games-script";
+      s.src = "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/games.js";
+      s.onload = resolve;
+      s.onerror = reject;
+      document.body.appendChild(s);
+    });
+
+    // The UGS games.js populates window.sections (an object keyed A-Z)
+    // each value being an array of { name, url } objects.
+    // If it uses a different shape, we fall back to scraping the DOM.
+    let sections = window.sections || null;
+
+    if (!sections) {
+      // Fallback: the script may have written buttons into #sections-container
+      // (as the original HTML did). We read them from there if present.
+      const raw = document.getElementById("sections-container");
+      if (raw && raw.children.length) {
+        sections = {};
+        [...raw.children].forEach(sec => {
+          const letter = sec.querySelector(".letter-header")?.textContent?.trim() || "?";
+          sections[letter] = [...sec.querySelectorAll("input[type=button]")].map(btn => ({
+            name: btn.value,
+            url: btn.onclick?.toString().match(/href='([^']+)'/)?.[1] || "#"
+          }));
+        });
+      }
+    }
+
+    if (!sections) throw new Error("Could not parse UGS data.");
+
+    window.ugsLoaded = true;
+    renderUGS(sections);
+  } catch (err) {
+    console.error("UGS load error:", err);
+    $("#ugs-container").html(`
+      <div class="ugs-status">
+        Failed to load UGS games.<br>
+        <a href="https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/" target="_blank" style="color:rgba(255,255,255,0.6);">Open the Google Doc directly ↗</a>
+      </div>`);
+  }
+}
+
+function renderUGS(sections) {
+  const container = $("#ugs-container");
+  container.empty();
+
+  // Page header
+  container.append(`
+    <div class="ugs-page-header">
+      <h1>Ultimate Game Stash</h1>
+      <p>
+        Source: <a href="https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/" target="_blank">UGS Google Doc</a>
+        &nbsp;·&nbsp;
+        Discord: <a href="https://discord.gg/rmVsAqkpkA" target="_blank">discord.gg/rmVsAqkpkA</a>
+      </p>
+    </div>
+  `);
+
+  const letters = Object.keys(sections).sort();
+  window.ugsData = [];
+
+  for (const letter of letters) {
+    const games = sections[letter];
+    if (!games || games.length === 0) continue;
+
+    const section = $(`<div class="ugs-section" data-letter="${letter}"></div>`);
+    section.append(`<div class="ugs-letter-header">${letter}</div>`);
+
+    const list = $(`<div class="ugs-list"></div>`);
+    for (const game of games) {
+      const cleanName = stripCL(game.name);
+      window.ugsData.push({ letter, name: cleanName, url: game.url });
+
+      const item = $(`
+        <div class="ugs-item liquid-glass" data-name="${cleanName.toLowerCase()}" data-url="${game.url}">
+          <span class="ugs-game-name">${cleanName}</span>
+          <span class="ugs-open-icon">↗</span>
+        </div>
+      `);
+      item.on("click", function () {
+        const url = $(this).data("url");
+        if (url && url !== "#") window.open(url, "_blank");
+      });
+      list.append(item);
+    }
+    section.append(list);
+    container.append(section);
+  }
+
+  if (User.getData("settings").liquidGlass) showGlass();
+}
+
+// ── Unified search (handles both tabs) ───────────────
+// Override the original search() with a tab-aware version
+const _origSearch = search;
+window.search = function () {
+  if (activeTab === "main") {
+    _origSearch();
+  } else {
+    searchUGS();
+  }
+};
+
+function searchUGS() {
+  const query = $("#search-input").val().trim().toLowerCase();
+  $(".ugs-section").each(function () {
+    let anyVisible = false;
+    $(this).find(".ugs-item").each(function () {
+      const name = $(this).data("name") || "";
+      const matches = !query || name.includes(query) ||
+        levenshteinDistance(query, name.substring(0, query.length)) <= 1;
+      if (matches) {
+        $(this).removeClass("ugs-hidden");
+        anyVisible = true;
+      } else {
+        $(this).addClass("ugs-hidden");
+      }
+    });
+    if (anyVisible) $(this).removeClass("ugs-section-hidden");
+    else $(this).addClass("ugs-section-hidden");
+  });
+}
+
+function levenshteinDistance(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i-1] === b[j-1]
+        ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// Wire search input to the unified handler
+$(document).ready(function () {
+  $("#search-input").on("input", function () {
+    if (activeTab === "ugs") searchUGS();
+  });
+});
