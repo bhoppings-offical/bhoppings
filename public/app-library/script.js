@@ -178,7 +178,7 @@ return (
 });
 }
 
-// ── Tab switching ────────────────────────────────────
+// – Tab switching –
 let activeTab = “main”;
 
 $(document).ready(function () {
@@ -206,13 +206,12 @@ if (tab === "main") {
 
 });
 
-// UGS live search
 $(”#search-input”).on(“input”, function () {
 if (activeTab === “ugs”) searchUGS();
 });
 });
 
-// ── UGS loading & rendering ──────────────────────────
+// – UGS loading & rendering –
 window.ugsLoaded = false;
 
 function stripCL(name) {
@@ -220,14 +219,12 @@ return name.replace(/^cl/i, “”);
 }
 
 async function loadUGS() {
-const container = $(”#ugs-container”);
+var container = $(”#ugs-container”);
 container.empty();
-container.append(`<div class="ugs-status">Loading games…</div>`);
+container.append(’<div class="ugs-status">Loading games…</div>’);
 
 try {
-// games.js writes into a div with id=“sections-container”.
-// Create a hidden one so it has somewhere to write.
-let scratchpad = document.getElementById(“sections-container”);
+var scratchpad = document.getElementById(“sections-container”);
 if (!scratchpad) {
 scratchpad = document.createElement(“div”);
 scratchpad.id = “sections-container”;
@@ -236,9 +233,9 @@ document.body.appendChild(scratchpad);
 }
 
 ```
-await new Promise((resolve, reject) => {
+await new Promise(function(resolve, reject) {
   if (document.getElementById("ugs-games-script")) { resolve(); return; }
-  const s = document.createElement("script");
+  var s = document.createElement("script");
   s.id = "ugs-games-script";
   s.src = "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/games.js";
   s.onload = resolve;
@@ -246,24 +243,23 @@ await new Promise((resolve, reject) => {
   document.body.appendChild(s);
 });
 
-// Give script a tick to finish synchronous DOM writes
-await new Promise(r => setTimeout(r, 200));
+await new Promise(function(r) { setTimeout(r, 200); });
 
-// Scrape the populated scratchpad
-const sections = {};
-scratchpad.querySelectorAll(".letter-section").forEach(sec => {
-  const letter = sec.querySelector(".letter-header")?.textContent?.trim() || "?";
-  const buttons = [...sec.querySelectorAll("input[type=button]")];
+var sections = {};
+scratchpad.querySelectorAll(".letter-section").forEach(function(sec) {
+  var letter = (sec.querySelector(".letter-header") || {}).textContent;
+  if (!letter) return;
+  letter = letter.trim();
+  var buttons = Array.from(sec.querySelectorAll("input[type=button]"));
   if (buttons.length) {
-    sections[letter] = buttons.map(btn => {
-      const onclickStr = btn.getAttribute("onclick") || "";
-      const urlMatch = onclickStr.match(/['"]([^'"]+)['"]/);
+    sections[letter] = buttons.map(function(btn) {
+      var onclickStr = btn.getAttribute("onclick") || "";
+      var urlMatch = onclickStr.match(/['"]([^'"]+)['"]/);
       return { name: btn.value, url: urlMatch ? urlMatch[1] : "#" };
     });
   }
 });
 
-// Fallback: window.sections
 if (!Object.keys(sections).length && window.sections) {
   Object.assign(sections, window.sections);
 }
@@ -276,39 +272,52 @@ renderUGS(sections);
 
 } catch (err) {
 console.error(“UGS load error:”, err);
-$(”#ugs-container”).html(` <div class="ugs-status"> Failed to load UGS games.<br> <a href="https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/" target="_blank" style="color:rgba(255,255,255,0.6);">Open the Google Doc directly ↗</a> </div>`);
+$(”#ugs-container”).html(
+‘<div class="ugs-status">Failed to load UGS games.<br>’ +
+’<a href=“https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/” ’ +
+‘target=”_blank” style=“color:rgba(255,255,255,0.6);”>Open the Google Doc directly</a></div>’
+);
 }
 }
 
 function renderUGS(sections) {
-const container = $(”#ugs-container”);
+var container = $(”#ugs-container”);
 container.empty();
 
-container.append(`<div class="ugs-page-header"> <h1>Ultimate Game Stash</h1> <p> Source: <a href="https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/" target="_blank">UGS Google Doc</a> &nbsp;·&nbsp; Discord: <a href="https://discord.gg/rmVsAqkpkA" target="_blank">discord.gg/rmVsAqkpkA</a> </p> </div>`);
+container.append(
+‘<div class="ugs-page-header">’ +
+‘<h1>Ultimate Game Stash</h1>’ +
+‘<p>Source: <a href="https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/" target="_blank">UGS Google Doc</a>’ +
+’ · Discord: <a href="https://discord.gg/rmVsAqkpkA" target="_blank">discord.gg/rmVsAqkpkA</a></p>’ +
+‘</div>’
+);
 
-const letters = Object.keys(sections).sort();
+var letters = Object.keys(sections).sort();
 
-for (const letter of letters) {
-const games = sections[letter];
+for (var i = 0; i < letters.length; i++) {
+var letter = letters[i];
+var games = sections[letter];
 if (!games || games.length === 0) continue;
 
 ```
-const section = $(`<div class="ugs-section" data-letter="${letter}"></div>`);
-section.append(`<div class="ugs-letter-header">${letter}</div>`);
-const list = $(`<div class="ugs-list"></div>`);
+var section = $('<div class="ugs-section" data-letter="' + letter + '"></div>');
+section.append('<div class="ugs-letter-header">' + letter + '</div>');
+var list = $('<div class="ugs-list"></div>');
 
-for (const game of games) {
-  const cleanName = stripCL(game.name);
-  const item = $(`
-    <div class="ugs-item liquid-glass" data-name="${cleanName.toLowerCase()}" data-url="${game.url}">
-      <span class="ugs-game-name">${cleanName}</span>
-      <span class="ugs-open-icon">↗</span>
-    </div>
-  `);
-  item.on("click", function () {
-    const url = $(this).data("url");
-    if (url && url !== "#") window.open(url, "_blank");
-  });
+for (var j = 0; j < games.length; j++) {
+  var game = games[j];
+  var cleanName = stripCL(game.name);
+  var item = $(
+    '<div class="ugs-item liquid-glass" data-name="' + cleanName.toLowerCase() + '" data-url="' + game.url + '">' +
+    '<span class="ugs-game-name">' + cleanName + '</span>' +
+    '<span class="ugs-open-icon">&#8599;</span>' +
+    '</div>'
+  );
+  (function(url) {
+    item.on("click", function() {
+      if (url && url !== "#") window.open(url, "_blank");
+    });
+  })(game.url);
   list.append(item);
 }
 
@@ -318,16 +327,18 @@ container.append(section);
 
 }
 
+try {
 if (User.getData(“settings”).liquidGlass) showGlass();
+} catch(e) {}
 }
 
 function searchUGS() {
-const query = $(”#search-input”).val().trim().toLowerCase();
-$(”.ugs-section”).each(function () {
-let anyVisible = false;
-$(this).find(”.ugs-item”).each(function () {
-const name = $(this).data(“name”) || “”;
-const matches = !query || name.includes(query);
+var query = $(”#search-input”).val().trim().toLowerCase();
+$(”.ugs-section”).each(function() {
+var anyVisible = false;
+$(this).find(”.ugs-item”).each(function() {
+var name = $(this).data(“name”) || “”;
+var matches = !query || name.indexOf(query) !== -1;
 $(this).toggleClass(“ugs-hidden”, !matches);
 if (matches) anyVisible = true;
 });
