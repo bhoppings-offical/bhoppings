@@ -321,11 +321,10 @@ input[type="search"]::-webkit-search-cancel-button {
   font-family: "Instrument Sans", sans-serif;
   color: rgba(255, 255, 255, 0.7);
 }
-
-/* -- Tab Bar -- */
+/* ---- Tab Bar ---- */
 #tab-bar {
   position: fixed;
-  top: 100px;
+  top: 96px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -333,11 +332,10 @@ input[type="search"]::-webkit-search-cancel-button {
   gap: 8px;
   z-index: 9998;
 }
-
 .tab-btn {
-  background: rgba(0, 0, 0, 0.45);
-  border: solid 2px rgba(255, 255, 255, 0.15) !important;
-  color: rgba(255, 255, 255, 0.65);
+  background: rgba(0,0,0,0.45);
+  border: solid 2px rgba(255,255,255,0.15) !important;
+  color: rgba(255,255,255,0.6);
   padding: 8px 36px;
   border-radius: 9999px;
   font-size: 15px;
@@ -345,28 +343,24 @@ input[type="search"]::-webkit-search-cancel-button {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  letter-spacing: 0.04em;
   backdrop-filter: blur(4px);
   --glass-frost: 4px;
   --glass-strength: 10;
 }
-
 .tab-btn.active {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
+  background: rgba(255,255,255,0.18) !important;
+  border-color: rgba(255,255,255,0.35) !important;
   color: #fff;
 }
-
 .tab-btn:not(.active):hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.85);
 }
-
+/* Push search bar down to make room for tabs */
 #search-bar {
-  top: 158px !important;
+  top: 152px !important;
 }
-
-/* -- UGS Container -- */
+/* ---- UGS Container ---- */
 #ugs-container {
   width: 100vw;
   height: 100vh;
@@ -377,68 +371,53 @@ input[type="search"]::-webkit-search-cancel-button {
   flex-direction: column;
   align-items: center;
 }
-
 #ugs-container::before {
   content: "";
   height: 220px;
   width: 100%;
   flex-shrink: 0;
 }
-
 .ugs-page-header {
   width: 100%;
   max-width: 760px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
-
 .ugs-page-header h1 {
   font-family: "Kumbh Sans", sans-serif;
   font-size: 2rem;
   margin: 0 0 6px 0;
 }
-
 .ugs-page-header p {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255,255,255,0.5);
   margin: 0;
   font-family: "Instrument Sans", sans-serif;
 }
-
 .ugs-page-header a {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255,255,255,0.7);
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  transition: color 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
 }
-
-.ugs-page-header a:hover {
-  color: #fff;
-}
-
-/* -- UGS Alphabetical Sections -- */
+.ugs-page-header a:hover { color: #fff; }
 .ugs-section {
   width: 100%;
   max-width: 760px;
   margin-bottom: 32px;
 }
-
 .ugs-letter-header {
   font-family: "Kumbh Sans", sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255,255,255,0.9);
   margin: 0 0 10px 4px;
   padding-bottom: 8px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.12);
-  width: 100%;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
 }
-
 .ugs-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-
 .ugs-item {
   display: flex;
   flex-direction: row;
@@ -446,57 +425,35 @@ input[type="search"]::-webkit-search-cancel-button {
   justify-content: space-between;
   padding: 14px 20px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  border: solid 1.5px rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.07);
+  border: solid 1.5px rgba(255,255,255,0.1);
   cursor: pointer;
   transition: all 0.18s ease-in-out;
   box-sizing: border-box;
-  --glass-frost: 3px;
-  --glass-strength: 6;
 }
-
 .ugs-item:hover {
-  background: rgba(255, 255, 255, 0.13);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255,255,255,0.13);
+  border-color: rgba(255,255,255,0.22);
   transform: translateX(4px);
 }
-
-.ugs-item:active {
-  transform: translateX(2px) scale(0.995);
-}
-
 .ugs-game-name {
   font-family: "Instrument Sans", sans-serif;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255,255,255,0.9);
   font-weight: 500;
 }
-
 .ugs-open-icon {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.35);
-  transition: color 0.15s, transform 0.15s;
-  flex-shrink: 0;
+  color: rgba(255,255,255,0.35);
+  transition: color 0.15s;
 }
-
-.ugs-item:hover .ugs-open-icon {
-  color: rgba(255, 255, 255, 0.7);
-  transform: translate(2px, -2px);
-}
-
+.ugs-item:hover .ugs-open-icon { color: rgba(255,255,255,0.7); }
 .ugs-status {
   font-family: "Instrument Sans", sans-serif;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255,255,255,0.5);
   padding: 48px;
   text-align: center;
-  width: 100%;
 }
-
-.ugs-item.ugs-hidden {
-  display: none;
-}
-
-.ugs-section.ugs-section-hidden {
-  display: none;
-}
+.ugs-item.ugs-hidden { display: none; }
+.ugs-section.ugs-section-hidden { display: none; }
