@@ -253,18 +253,13 @@ function parseAndRenderUGS(scratch, container) {
     buttons.forEach(function(btn) {
       var rawName = btn.value || "";
       var cleanName = rawName.replace(/^cl/i, "");
-      var onclick = btn.getAttribute("onclick") || "";
-      var urlMatch = onclick.match(/['"]([^'"]+)['"]/);
-      var url = urlMatch ? urlMatch[1] : "#";
 
       var item = $('<div class="ugs-item"></div>');
       item.attr("data-name", cleanName.toLowerCase());
-      item.attr("data-url", url);
       item.append('<span class="ugs-game-name">' + cleanName + '</span>');
       item.append('<span class="ugs-open-icon">&#8599;</span>');
       item.on("click", function() {
-        var u = $(this).attr("data-url");
-        if (u && u !== "#") window.open(u, "_blank");
+        btn.click();
       });
       list.append(item);
     });
