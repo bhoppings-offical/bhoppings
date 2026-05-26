@@ -61,6 +61,9 @@ app.get('/api/views/up', async (req, res) => {
   }
 });
 
+app.get("/distance", (req, res) => {
+  res.sendFile(publicPath("distance/index.html"));
+});
 
 app.use((req, res) => {
   res.status(404).sendFile(publicPath("404/index.html"));
