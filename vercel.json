@@ -8,16 +8,6 @@
   ],
   "rewrites": [
     {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "distance.bhoppings.de"
-        }
-      ],
-      "destination": "/distance"
-    },
-    {
       "source": "/(.*)",
       "destination": "/server.js"
     }
