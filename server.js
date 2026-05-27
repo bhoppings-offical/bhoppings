@@ -12,6 +12,14 @@ app.get("/favicon.ico", (req, res) => {
   res.sendFile(publicPath("assets/images/icons/favicon.ico"));
 })
 
+// Handle subdomain routing — must be BEFORE static middleware
+app.use((req, res, next) => {
+  if (req.hostname === 'distance.bhoppings.de' && req.path === '/') {
+    return res.sendFile(publicPath("distance/index.html"));
+  }
+  next();
+});
+
 app.use(express.static(publicPath()));
 
 app.get("/", (req, res) => {
