@@ -92,7 +92,7 @@ function rotateTitle() {
 
 setInterval(rotateTitle, 200);
 
-var audio = new Audio("/assets/audio/death_threats.mp3");
+var audio = new Audio("/assets/audio/pizza_box.mp3");
 audio.volume = 0.5;
 
 document.body.onclick = function () {
