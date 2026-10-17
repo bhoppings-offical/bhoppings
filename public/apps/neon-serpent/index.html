@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Serpent • 3D Snake</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            background: #030308;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        canvas { display: block; }
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ui-overlay > * { pointer-events: auto; }
+
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00f5ff 0%, #7b2ff7 50%, #f107a3 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(0, 245, 255, 0.4);
+            letter-spacing: 4px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-box {
+            background: rgba(0, 245, 255, 0.08);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #00f5ff;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
+        }
+
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(7, 0, 20, 0.95) 0%, rgba(0, 0, 0, 0.98) 70%);
+            z-index: 20;
+            transition: opacity 0.6s ease;
+        }
+
+        .start-screen.hidden { opacity: 0; pointer-events: none; }
+
+        .start-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #00f5ff 0%, #7b2ff7 50%, #f107a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.5)); }
+            50% { filter: drop-shadow(0 0 60px rgba(123, 47, 247, 0.8)); }
+        }
+
+        .start-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 48px;
+            letter-spacing: 8px;
+        }
+
+        .start-btn {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 18px 48px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.3) 0%, rgba(123, 47, 247, 0.3) 100%);
+            border: 2px solid #00f5ff;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            letter-spacing: 4px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
+        }
+
+        .start-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.5) 0%, rgba(123, 47, 247, 0.5) 100%);
+            box-shadow: 0 0 60px rgba(0, 245, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .controls-hint {
+            position: absolute;
+            bottom: 48px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 25;
+        }
+
+        .game-over-overlay.visible {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .game-over-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            color: #f107a3;
+            margin-bottom: 16px;
+            text-shadow: 0 0 40px rgba(241, 7, 163, 0.8);
+        }
+
+        .final-score {
+            font-size: 2rem;
+            color: #00f5ff;
+            margin-bottom: 32px;
+        }
+
+        .restart-btn {
+            font-family: 'Orbitron', monospace;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #7b2ff7, #f107a3);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(241, 7, 163, 0.6);
+        }
+
+        .pause-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: rgba(0, 245, 255, 0.9);
+            text-shadow: 0 0 40px rgba(0, 245, 255, 0.6);
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pause-overlay.visible { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+
+    <div class="ui-overlay">
+        <div class="header">
+            <div class="logo">NEON SERPENT</div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Length</div>
+                    <div class="stat-value" id="length">3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="start-screen" id="startScreen">
+        <h1 class="start-title">NEON SERPENT</h1>
+        <p class="start-subtitle">3D SNAKE EXPERIENCE</p>
+        <button class="start-btn" id="startBtn">PLAY</button>
+        <p class="controls-hint">Arrow Keys or WASD • Space to Pause</p>
+    </div>
+
+    <div class="pause-overlay" id="pauseOverlay">PAUSED</div>
+
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <h2 class="game-over-title">GAME OVER</h2>
+        <p class="final-score">Score: <span id="finalScore">0</span></p>
+        <button class="restart-btn" id="restartBtn">PLAY AGAIN</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // NEON SERPENT - 3D Snake with Shaders, Glow & Bloom
+        // ═══════════════════════════════════════════════════════════════
+
+        const GRID_SIZE = 20;
+        const CELL_SIZE = 1.2;
+        const INITIAL_SPEED = 160; // ms per move
+
+        let scene, camera, renderer;
+        let snake = [], direction = { x: 1, z: 0 }, nextDirection = { x: 1, z: 0 };
+        let food = null, foodMesh = null;
+        let score = 0, lastMoveTime = 0;
+        let isPaused = false, isGameOver = false, gameStarted = false;
+        let snakeMeshes = [];
+        let gridCenter;
+        let clock = new THREE.Clock();
+
+        // Glow vertex shader - world space for fresnel
+        const glowVert = `
+            varying vec3 vPosition;
+            varying vec3 vNormal;
+            void main() {
+                vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                vPosition = worldPos.xyz;
+                vNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        // Glow fragment shader - emissive neon with edge glow
+        const glowFrag = `
+            uniform vec3 uColor;
+            uniform float uTime;
+            uniform float uIntensity;
+            varying vec3 vPosition;
+            varying vec3 vNormal;
+            void main() {
+                float pulse = 0.92 + 0.08 * sin(uTime * 4.0);
+                vec3 glow = uColor * uIntensity * pulse;
+                vec3 viewDir = normalize(cameraPosition - vPosition);
+                float fresnel = pow(1.0 - max(dot(normalize(vNormal), viewDir), 0.0), 2.5);
+                glow += uColor * fresnel * 1.2;
+                gl_FragColor = vec4(glow, 0.98);
+            }
+        `;
+
+        // Background shader - animated nebula
+        const bgVert = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const bgFrag = `
+            uniform float uTime;
+            uniform vec2 uResolution;
+            varying vec2 vUv;
+            void main() {
+                vec2 uv = vUv * 2.0 - 1.0;
+                uv.x *= uResolution.x / uResolution.y;
+                float t = uTime * 0.3;
+                float n1 = sin(uv.x * 3.0 + t) * sin(uv.y * 2.0 + t * 0.7);
+                float n2 = sin(length(uv) * 4.0 - t * 1.2) * 0.5 + 0.5;
+                vec3 col = mix(
+                    vec3(0.02, 0.01, 0.08),
+                    vec3(0.1, 0.02, 0.2),
+                    n1 * n2
+                );
+                col += vec3(0.05, 0.0, 0.15) * (0.5 + 0.5 * sin(uv.y * 5.0 + t));
+                col += vec3(0.02, 0.01, 0.05) * (0.5 + 0.5 * sin(length(uv) * 3.0 - t));
+                gl_FragColor = vec4(col, 1.0);
+            }
+        `;
+
+        function init() {
+            const container = document.getElementById('game-container');
+            scene = new THREE.Scene();
+
+            gridCenter = GRID_SIZE * CELL_SIZE / 2;
+            camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(gridCenter, GRID_SIZE * 1.5, gridCenter + GRID_SIZE * 1.2);
+            camera.lookAt(gridCenter, 0, gridCenter);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.setClearColor(0x030308, 1);
+            container.appendChild(renderer.domElement);
+
+            // Background plane with shader
+            const bgGeo = new THREE.PlaneGeometry(2, 2);
+            const bgMat = new THREE.ShaderMaterial({
+                vertexShader: bgVert,
+                fragmentShader: bgFrag,
+                uniforms: {
+                    uTime: { value: 0 },
+                    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+                },
+                depthWrite: false
+            });
+            const bgMesh = new THREE.Mesh(bgGeo, bgMat);
+            bgMesh.frustumCulled = false;
+            scene.add(bgMesh);
+
+            // Grid floor - dark glass
+            const gridGeo = new THREE.PlaneGeometry(GRID_SIZE * CELL_SIZE + 2, GRID_SIZE * CELL_SIZE + 2);
+            const gridMat = new THREE.MeshBasicMaterial({
+                color: 0x050510,
+                transparent: true,
+                opacity: 0.95
+            });
+            const grid = new THREE.Mesh(gridGeo, gridMat);
+            grid.rotation.x = -Math.PI / 2;
+            grid.position.set(gridCenter, -0.02, gridCenter);
+            scene.add(grid);
+
+            // Grid lines - neon wireframe
+            const lineVerts = [];
+            for (let i = 0; i <= GRID_SIZE; i++) {
+                lineVerts.push(i * CELL_SIZE, 0, 0, i * CELL_SIZE, 0, GRID_SIZE * CELL_SIZE);
+                lineVerts.push(0, 0, i * CELL_SIZE, GRID_SIZE * CELL_SIZE, 0, i * CELL_SIZE);
+            }
+            const lineGeo = new THREE.BufferGeometry();
+            lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lineVerts, 3));
+            const gridLines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ 
+                color: 0x00f5ff, transparent: true, opacity: 0.2 
+            }));
+            gridLines.position.set(0, 0.01, 0);
+            scene.add(gridLines);
+
+            // Ambient glow
+            const ambient = new THREE.AmbientLight(0x222244, 0.4);
+            scene.add(ambient);
+            const pointLight = new THREE.PointLight(0x00f5ff, 2, GRID_SIZE * 3);
+            pointLight.position.set(GRID_SIZE * CELL_SIZE / 2, GRID_SIZE, GRID_SIZE * CELL_SIZE / 2);
+            scene.add(pointLight);
+
+            // Init snake
+            resetGame();
+
+            window.addEventListener('resize', onResize);
+            window.addEventListener('keydown', onKeyDown);
+
+            document.getElementById('startBtn').addEventListener('click', startGame);
+            document.getElementById('restartBtn').addEventListener('click', () => {
+                document.getElementById('gameOverOverlay').classList.remove('visible');
+                resetGame();
+                startGame();
+            });
+
+            animate();
+        }
+
+        function createSnakeSegment(x, z, isHead = false) {
+            const geo = new THREE.SphereGeometry(0.45, 24, 24);
+            const mat = new THREE.ShaderMaterial({
+                vertexShader: glowVert,
+                fragmentShader: glowFrag,
+                uniforms: {
+                    uColor: { value: new THREE.Color(isHead ? 0x00f5ff : 0x7b2ff7) },
+                    uTime: { value: 0 },
+                    uIntensity: { value: isHead ? 1.5 : 1.0 }
+                },
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x * CELL_SIZE + CELL_SIZE / 2, 0.5, z * CELL_SIZE + CELL_SIZE / 2);
+            mesh.userData.isHead = isHead;
+            scene.add(mesh);
+            return mesh;
+        }
+
+        function createFoodMesh(x, z) {
+            const geo = new THREE.OctahedronGeometry(0.5, 0);
+            const mat = new THREE.ShaderMaterial({
+                vertexShader: glowVert,
+                fragmentShader: glowFrag,
+                uniforms: {
+                    uColor: { value: new THREE.Color(0xf107a3) },
+                    uTime: { value: 0 },
+                    uIntensity: { value: 1.8 }
+                },
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x * CELL_SIZE + CELL_SIZE / 2, 0.5, z * CELL_SIZE + CELL_SIZE / 2);
+            scene.add(mesh);
+            return mesh;
+        }
+
+        function resetGame() {
+            snake.forEach((_, i) => {
+                if (snakeMeshes[i]) {
+                    scene.remove(snakeMeshes[i]);
+                    snakeMeshes[i].geometry.dispose();
+                    snakeMeshes[i].material.dispose();
+                }
+            });
+            if (foodMesh) {
+                scene.remove(foodMesh);
+                foodMesh.geometry.dispose();
+                foodMesh.material.dispose();
+            }
+
+            snake = [
+                { x: Math.floor(GRID_SIZE / 2) - 1, z: Math.floor(GRID_SIZE / 2) },
+                { x: Math.floor(GRID_SIZE / 2) - 2, z: Math.floor(GRID_SIZE / 2) },
+                { x: Math.floor(GRID_SIZE / 2) - 3, z: Math.floor(GRID_SIZE / 2) }
+            ];
+            direction = { x: 1, z: 0 };
+            nextDirection = { x: 1, z: 0 };
+            score = 0;
+            isPaused = false;
+            isGameOver = false;
+
+            snakeMeshes = snake.map((seg, i) => createSnakeSegment(seg.x, seg.z, i === 0));
+            spawnFood();
+            updateUI();
+        }
+
+        function spawnFood() {
+            let x, z;
+            do {
+                x = Math.floor(Math.random() * GRID_SIZE);
+                z = Math.floor(Math.random() * GRID_SIZE);
+            } while (snake.some(s => s.x === x && s.z === z));
+
+            food = { x, z };
+            if (foodMesh) {
+                scene.remove(foodMesh);
+                foodMesh.geometry.dispose();
+                foodMesh.material.dispose();
+            }
+            foodMesh = createFoodMesh(x, z);
+        }
+
+        function moveSnake() {
+            if (isPaused || isGameOver) return;
+
+            direction = { ...nextDirection };
+
+            const head = snake[0];
+            const newHead = {
+                x: (head.x + direction.x + GRID_SIZE) % GRID_SIZE,
+                z: (head.z + direction.z + GRID_SIZE) % GRID_SIZE
+            };
+
+            if (snake.some(s => s.x === newHead.x && s.z === newHead.z)) {
+                gameOver();
+                return;
+            }
+
+            snake.unshift(newHead);
+
+            if (newHead.x === food.x && newHead.z === food.z) {
+                score += 10;
+                spawnFood();
+            } else {
+                snake.pop();
+                const oldMesh = snakeMeshes.pop();
+                if (oldMesh) {
+                    scene.remove(oldMesh);
+                    oldMesh.geometry.dispose();
+                    oldMesh.material.dispose();
+                }
+            }
+
+            const newHeadMesh = createSnakeSegment(newHead.x, newHead.z, true);
+            snakeMeshes.forEach((m, i) => {
+                m.userData.isHead = false;
+                m.material.uniforms.uColor.value.setHex(0x7b2ff7);
+                m.material.uniforms.uIntensity.value = 1.0;
+            });
+            newHeadMesh.userData.isHead = true;
+            newHeadMesh.material.uniforms.uColor.value.setHex(0x00f5ff);
+            newHeadMesh.material.uniforms.uIntensity.value = 1.5;
+            snakeMeshes.unshift(newHeadMesh);
+
+            updateUI();
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOverOverlay').classList.add('visible');
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('length').textContent = snake.length;
+        }
+
+        function onKeyDown(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (document.getElementById('startScreen').classList.contains('hidden') && !isGameOver) {
+                    isPaused = !isPaused;
+                    document.getElementById('pauseOverlay').classList.toggle('visible', isPaused);
+                }
+                return;
+            }
+
+            const keyMap = {
+                'ArrowUp': { x: 0, z: -1 }, 'KeyW': { x: 0, z: -1 },
+                'ArrowDown': { x: 0, z: 1 }, 'KeyS': { x: 0, z: 1 },
+                'ArrowLeft': { x: -1, z: 0 }, 'KeyA': { x: -1, z: 0 },
+                'ArrowRight': { x: 1, z: 0 }, 'KeyD': { x: 1, z: 0 }
+            };
+            const d = keyMap[e.code];
+            if (d && (d.x !== -direction.x || d.z !== -direction.z)) {
+                nextDirection = d;
+                e.preventDefault();
+            }
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            gameStarted = true;
+            lastMoveTime = performance.now();
+        }
+
+        function gameTick() {
+            if (!gameStarted || isPaused || isGameOver) return;
+            const now = performance.now();
+            const speed = Math.max(70, INITIAL_SPEED - score * 3);
+            if (now - lastMoveTime > speed) {
+                lastMoveTime = now;
+                moveSnake();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+
+            gameTick();
+
+            // Update shader uniforms
+            scene.traverse(obj => {
+                if (obj.material && obj.material.uniforms) {
+                    if (obj.material.uniforms.uTime) obj.material.uniforms.uTime.value = t;
+                }
+            });
+
+            const bgMesh = scene.children.find(c => c.material && c.material.uniforms && c.material.uniforms.uTime);
+            if (bgMesh) {
+                bgMesh.material.uniforms.uTime.value = t;
+                bgMesh.material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+            }
+
+            // Subtle camera sway - reduced for zoomed out view
+            const sway = Math.sin(t * 0.4) * 0.5;
+            camera.position.x = gridCenter + sway;
+            camera.position.z = gridCenter + GRID_SIZE * 1.2 + Math.cos(t * 0.25) * 0.5;
+            camera.lookAt(gridCenter, 0, gridCenter);
+
+            // Snake segment bobbing - wave effect
+            snakeMeshes.forEach((mesh, i) => {
+                const wave = Math.sin(t * 5 + i * 0.5) * 0.04;
+                mesh.position.y = 0.5 + wave;
+            });
+
+            // Food rotation & float
+            if (foodMesh) {
+                foodMesh.rotation.y += 0.03;
+                foodMesh.rotation.x = Math.sin(t * 0.8) * 0.2;
+                foodMesh.position.y = 0.5 + Math.sin(t * 2.5) * 0.08;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        init();
+    </script>
+</body>
+</html>

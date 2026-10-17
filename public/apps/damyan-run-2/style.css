@@ -1,0 +1,60 @@
+:root {
+  --bg: #0f172a;
+  --panel: #111827;
+  --text: #e5e7eb;
+  --accent: #22d3ee;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(1200px 600px at 50% -200px, #1e293b 0%, #0b1020 40%, var(--bg) 100%);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+}
+
+.container {
+  width: min(960px, 96vw);
+  padding: 20px 20px 28px;
+  background: linear-gradient(180deg, #0b1222 0%, var(--panel) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+canvas#game {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: linear-gradient(180deg, #0b1020 0%, #0d1b2a 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.help {
+  margin-top: 12px;
+  display: flex;
+  gap: 16px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+
+

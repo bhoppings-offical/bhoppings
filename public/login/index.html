@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
+    <style>
+      body { font-family: sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+      h1 { margin-bottom: 8px; }
+      p { color: #555; }
+      .stack { display: grid; gap: 10px; margin-top: 20px; }
+      button { padding: 12px 14px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>Sign in</h1>
+    <p>Choose a provider:</p>
+
+    <div class="stack">
+      <button data-provider="google">Sign in with Google</button>
+      <button data-provider="github">Sign in with GitHub</button>
+      <button data-provider="discord">Sign in with Discord</button>
+    </div>
+
+    <script>
+      const AUTH_BASE = "http://localhost:3001"; // change this
+      const CALLBACK_URL = window.location.origin + "/auth-done"; // change if needed
+
+      async function getCsrfToken() {
+        const res = await fetch(`${AUTH_BASE}/auth/csrf`, {
+          method: "GET",
+          credentials: "include",
+          headers: { Accept: "application/json" }
+        });
+        if (!res.ok) throw new Error("Failed to fetch CSRF token");
+        const data = await res.json();
+        if (!data.csrfToken) throw new Error("Missing csrfToken");
+        return data.csrfToken;
+      }
+
+      function submitSignIn(provider, csrfToken) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = `${AUTH_BASE}/auth/signin/${provider}`;
+
+        const csrf = document.createElement("input");
+        csrf.type = "hidden";
+        csrf.name = "csrfToken";
+        csrf.value = csrfToken;
+        form.appendChild(csrf);
+
+        const callback = document.createElement("input");
+        callback.type = "hidden";
+        callback.name = "callbackUrl";
+        callback.value = CALLBACK_URL;
+        form.appendChild(callback);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+
+      async function start(provider) {
+        const csrfToken = await getCsrfToken();
+        submitSignIn(provider, csrfToken);
+      }
+
+      document.querySelectorAll("[data-provider]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          try {
+            await start(btn.dataset.provider);
+          } catch (e) {
+            console.error(e);
+            alert("Could not start sign-in.");
+            btn.disabled = false;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

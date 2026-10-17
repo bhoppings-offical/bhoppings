@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Settings - Bhoppings</title>
+    <link rel="stylesheet" href="./settings.css" />
+    <link rel="stylesheet" href="/global/home.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="/user-data.js"></script>
+<meta name="apple-mobile-web-app-title" content="Settings - Bhoppings">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#000000">
+<meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+<meta name="format-detection" content="telephone=no">
+<meta name="format-detection" content="email=no">
+<meta name="format-detection" content="address=no">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/assets/images/icons/apple-touch.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/assets/images/icons/apple-touch.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/assets/images/icons/apple-touch.png">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-startup-image" href="/assets/images/icons/apple-touch.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="preload" href="/assets/images/cursor.svg" />
+
+  </head>
+  <body>
+
+      <div id="grain"></div>
+      <canvas id="effectCanvas"></canvas>
+
+      <div id="container">
+        <div id="sidebar-container">
+          <div id="settings-sidebar" class="box liquid-glass">
+            <div class="sidebar-button" id="sidebar-button-cursor"></div>
+            <div class="sidebar-button" id="sidebar-button-theme"><div class="sidebar-button-icon"></div></div>
+            <div class="sidebar-button" id="sidebar-button-effect"><div class="sidebar-button-icon"></div></div>
+          </div>
+        </div>
+        <div id="settings-content-container">
+          <div id="settings-content-loading">
+            <img src="/assets/images/shapes/loading-circle.svg" id="settings-content-loading-circle" />
+          </div>
+          <h1>Cursor</h1>
+          <div class="settings-section" id="cursor-section"></div>
+          <h1>Theme</h1>
+          <div class="settings-section" id="theme-section"></div>
+          <h1>Background Effect</h1>
+          <div class="settings-section" id="effect-section"></div>
+          <h1>Miscellaneous</h1>
+          <div class="settings-section" id="misc-section">
+            <div class="settings-list liquid-glass">
+              <div class="settings-list-row">
+                <div class="settings-list-row-left">
+                  <div class="settings-list-row-name"><span>Liquid Glass</span><div class="beta-tag"></div></div>
+                  <div class="settings-list-row-desc">Makes your glass liquid.</div>
+                </div>
+                <div class="settings-list-row-right">
+                  <div class="switch" id="glass-switch"></div>
+                </div>
+              </div>
+              <div class="settings-list-row">
+                <div class="settings-list-row-left">
+                  <div class="settings-list-row-name"><span>Legacy Navbar</span></div>
+                  <div class="settings-list-row-desc">Just like the old days!</div>
+                </div>
+                <div class="settings-list-row-right">
+                  <div class="switch" id="navbar-switch"></div>
+                </div>
+              </div>
+
+              <div class="settings-list-row">
+                <div class="settings-list-row-left">
+                  <div class="settings-list-row-name"><span>Custom Background</span></div>
+                  <div class="settings-list-row-desc">Veckround! Veckround!</div>
+                </div>
+                <div class="settings-list-row-right">
+                  <input class="text-input" id="background-url" type="search" placeholder="Enter a URL" />
+                </div>
+              </div>
+              <div class="settings-list-row">
+                <div class="settings-list-row-left">
+                  <div class="settings-list-row-name"><span>Background Blur</span></div>
+                  <div class="settings-list-row-desc">Frosty!</div>
+                </div>
+                <div class="settings-list-row-right">
+                  <div class="slidecontainer">
+                    <input type="range" min="0" max="96" value="48" class="slider" id="blurInput">
+                  </div><div class="settings-row-right-between-text"><span>No Blur</span><span>Max Blur</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+  <script src="/global/glass-script.js"></script>
+  <script src="/global/glass.js"></script>
+  <script src="/global/settings-init.js"></script>
+  
+  <script src="./settings.js"></script>
+  <script src="/global/home-effects.js"></script>
+  <script src="/components/navbar.js"></script>
+
+</html>

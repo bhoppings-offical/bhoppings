@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Abandoned Asylum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Courier New', monospace;
+        }
+
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #ff0000;
+            font-size: 18px;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+            z-index: 100;
+            pointer-events: none;
+            font-weight: bold;
+        }
+
+        #sanity-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff0000;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        #sanity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6600);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px #ff0000;
+        }
+
+        #instructions {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            text-align: center;
+            font-size: 20px;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 30px #ff0000;
+        }
+
+        #instructions h1 {
+            color: #ff0000;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ff0000;
+        }
+
+        #instructions p {
+            margin: 10px 0;
+            color: #ccc;
+        }
+
+        #instructions button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        #instructions button:hover {
+            background: #cc0000;
+            box-shadow: 0 0 20px #ff0000;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #jumpscare {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #jumpscare.active {
+            display: flex;
+            animation: flicker 0.1s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        #jumpscare-image {
+            max-width: 100%;
+            max-height: 100%;
+            filter: brightness(0.3) contrast(2);
+        }
+
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        #crosshair::before,
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        #crosshair::before {
+            width: 2px;
+            height: 20px;
+            left: 9px;
+        }
+
+        #crosshair::after {
+            width: 20px;
+            height: 2px;
+            top: 9px;
+        }
+
+        #vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">
+        <h1>THE ABANDONED ASYLUM</h1>
+        <p>You've entered a cursed asylum...</p>
+        <p>Find the 5 ritual candles to escape</p>
+        <p><strong>WASD</strong> - Move</p>
+        <p><strong>Mouse</strong> - Look Around</p>
+        <p><strong>SHIFT</strong> - Sprint (drains sanity)</p>
+        <p>Stay in the light... the darkness hunts you</p>
+        <button id="start-btn">ENTER IF YOU DARE</button>
+    </div>
+
+    <div id="hud" class="hidden">
+        <div>Candles Found: <span id="candles">0</span>/5</div>
+        <div>Sanity: <span id="sanity">100</span>%</div>
+    </div>
+
+    <div id="sanity-bar" class="hidden">
+        <div id="sanity-fill" style="width: 100%"></div>
+    </div>
+
+    <div id="crosshair" class="hidden"></div>
+    <div id="vignette" class="hidden"></div>
+    <div id="jumpscare"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        // Game variables
+        let scene, camera, renderer, clock;
+        let player = { velocity: new THREE.Vector3(), height: 2 };
+        let keys = {};
+        let candles = [];
+        let candlesFound = 0;
+        let sanity = 100;
+        let gameStarted = false;
+        let lights = [];
+        let entities = [];
+        let ghostTimer = 0;
+
+        // Shader materials
+        const flickerLightShader = {
+            uniforms: {
+                time: { value: 0 },
+                lightColor: { value: new THREE.Color(0xff6600) }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    vPosition = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                uniform vec3 lightColor;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                
+                void main() {
+                    float flicker = sin(time * 10.0) * 0.3 + 0.7;
+                    float pulse = sin(time * 3.0) * 0.2 + 0.8;
+                    vec3 glow = lightColor * flicker * pulse;
+                    float intensity = pow(max(0.0, vNormal.z), 2.0);
+                    gl_FragColor = vec4(glow * intensity, 1.0);
+                }
+            `
+        };
+
+        const ghostShader = {
+            uniforms: {
+                time: { value: 0 },
+                opacity: { value: 0.5 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vPosition;
+                uniform float time;
+                void main() {
+                    vUv = uv;
+                    vPosition = position;
+                    vec3 pos = position;
+                    pos.y += sin(time * 2.0 + position.x * 5.0) * 0.1;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                uniform float opacity;
+                varying vec2 vUv;
+                varying vec3 vPosition;
+                
+                void main() {
+                    float wave = sin(vUv.y * 10.0 + time * 3.0) * 0.5 + 0.5;
+                    vec3 color = vec3(0.7, 0.8, 1.0) * wave;
+                    float alpha = opacity * (sin(time * 2.0) * 0.3 + 0.7);
+                    gl_FragColor = vec4(color, alpha);
+                }
+            `
+        };
+
+        // Initialize
+        function init() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.05);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, player.height, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.body.appendChild(renderer.domElement);
+            
+            clock = new THREE.Clock();
+            
+            createEnvironment();
+            createCandles();
+            createGhosts();
+            
+            // Audio context for scary sounds
+            createAmbientSound();
+            
+            document.getElementById('start-btn').addEventListener('click', startGame);
+            window.addEventListener('resize', onResize);
+        }
+
+        function createEnvironment() {
+            // Floor
+            const floorGeo = new THREE.PlaneGeometry(50, 50, 20, 20);
+            const floorMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1a1a1a,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Add cracks to floor
+            for (let i = 0; i < 10; i++) {
+                const crack = new THREE.Mesh(
+                    new THREE.BoxGeometry(Math.random() * 5 + 2, 0.01, 0.1),
+                    new THREE.MeshBasicMaterial({ color: 0x000000 })
+                );
+                crack.position.set(
+                    (Math.random() - 0.5) * 40,
+                    0.01,
+                    (Math.random() - 0.5) * 40
+                );
+                crack.rotation.y = Math.random() * Math.PI;
+                scene.add(crack);
+            }
+
+            // Walls
+            const wallMat = new THREE.MeshStandardMaterial({ 
+                color: 0x2a2a2a,
+                roughness: 0.95
+            });
+            
+            const walls = [
+                { pos: [0, 3, -25], rot: [0, 0, 0], size: [50, 6, 0.5] },
+                { pos: [0, 3, 25], rot: [0, 0, 0], size: [50, 6, 0.5] },
+                { pos: [-25, 3, 0], rot: [0, Math.PI/2, 0], size: [50, 6, 0.5] },
+                { pos: [25, 3, 0], rot: [0, Math.PI/2, 0], size: [50, 6, 0.5] }
+            ];
+
+            walls.forEach(w => {
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(...w.size), wallMat);
+                wall.position.set(...w.pos);
+                wall.rotation.set(...w.rot);
+                wall.castShadow = true;
+                wall.receiveShadow = true;
+                scene.add(wall);
+            });
+
+            // Add pillars
+            for (let i = 0; i < 8; i++) {
+                const pillar = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.5, 0.5, 6, 8),
+                    new THREE.MeshStandardMaterial({ color: 0x1a1a1a })
+                );
+                const angle = (i / 8) * Math.PI * 2;
+                pillar.position.set(Math.cos(angle) * 15, 3, Math.sin(angle) * 15);
+                pillar.castShadow = true;
+                scene.add(pillar);
+            }
+
+            // Ambient light (very dim)
+            const ambientLight = new THREE.AmbientLight(0x0a0a0a, 0.2);
+            scene.add(ambientLight);
+        }
+
+        function createCandles() {
+            const positions = [
+                [10, 0.5, 10],
+                [-10, 0.5, 10],
+                [10, 0.5, -10],
+                [-10, 0.5, -10],
+                [0, 0.5, 15]
+            ];
+
+            positions.forEach((pos, i) => {
+                const candleGroup = new THREE.Group();
+                
+                // Candle body
+                const candleMesh = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.2, 0.25, 1, 8),
+                    new THREE.MeshStandardMaterial({ color: 0x8b0000 })
+                );
+                candleMesh.castShadow = true;
+                candleGroup.add(candleMesh);
+
+                // Flame with shader
+                const flameMat = new THREE.ShaderMaterial({
+                    uniforms: flickerLightShader.uniforms,
+                    vertexShader: flickerLightShader.vertexShader,
+                    fragmentShader: flickerLightShader.fragmentShader,
+                    transparent: true,
+                    side: THREE.DoubleSide
+                });
+                
+                const flame = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.15, 8, 8),
+                    flameMat
+                );
+                flame.position.y = 0.7;
+                candleGroup.add(flame);
+
+                // Point light
+                const light = new THREE.PointLight(0xff6600, 2, 8);
+                light.position.y = 0.7;
+                light.castShadow = true;
+                light.shadow.mapSize.width = 512;
+                light.shadow.mapSize.height = 512;
+                candleGroup.add(light);
+
+                candleGroup.position.set(...pos);
+                scene.add(candleGroup);
+
+                candles.push({ group: candleGroup, collected: false, light: light, flame: flame });
+                lights.push(light);
+            });
+        }
+
+        function createGhosts() {
+            for (let i = 0; i < 3; i++) {
+                const ghostMat = new THREE.ShaderMaterial({
+                    uniforms: ghostShader.uniforms,
+                    vertexShader: ghostShader.vertexShader,
+                    fragmentShader: ghostShader.fragmentShader,
+                    transparent: true,
+                    side: THREE.DoubleSide
+                });
+
+                const ghost = new THREE.Mesh(
+                    new THREE.SphereGeometry(1, 16, 16),
+                    ghostMat
+                );
+
+                ghost.position.set(
+                    (Math.random() - 0.5) * 40,
+                    2,
+                    (Math.random() - 0.5) * 40
+                );
+
+                ghost.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 2,
+                    0,
+                    (Math.random() - 0.5) * 2
+                );
+
+                scene.add(ghost);
+                entities.push(ghost);
+            }
+        }
+
+        function createAmbientSound() {
+            // Simple audio context for heartbeat when sanity is low
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (window.AudioContext) {
+                const audioCtx = new AudioContext();
+                window.playHeartbeat = () => {
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    oscillator.frequency.value = 50;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.5);
+                };
+            }
+        }
+
+        function startGame() {
+            gameStarted = true;
+            document.getElementById('instructions').classList.add('hidden');
+            document.getElementById('hud').classList.remove('hidden');
+            document.getElementById('sanity-bar').classList.remove('hidden');
+            document.getElementById('crosshair').classList.remove('hidden');
+            document.getElementById('vignette').classList.remove('hidden');
+            
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('click', () => {
+                document.body.requestPointerLock();
+            });
+            
+            animate();
+        }
+
+        function onKeyDown(e) {
+            keys[e.key.toLowerCase()] = true;
+        }
+
+        function onKeyUp(e) {
+            keys[e.key.toLowerCase()] = false;
+        }
+
+        let yaw = 0, pitch = 0;
+        function onMouseMove(e) {
+            if (document.pointerLockElement) {
+                yaw -= e.movementX * 0.002;
+                pitch -= e.movementY * 0.002;
+                pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+            }
+        }
+
+        function updatePlayer(delta) {
+            const speed = keys['shift'] ? 8 : 4;
+            const direction = new THREE.Vector3();
+
+            if (keys['w']) direction.z -= 1;
+            if (keys['s']) direction.z += 1;
+            if (keys['a']) direction.x -= 1;
+            if (keys['d']) direction.x += 1;
+
+            direction.normalize();
+            direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+
+            player.velocity.x = direction.x * speed * delta;
+            player.velocity.z = direction.z * speed * delta;
+
+            camera.position.add(player.velocity);
+
+            // Boundaries
+            camera.position.x = Math.max(-24, Math.min(24, camera.position.x));
+            camera.position.z = Math.max(-24, Math.min(24, camera.position.z));
+
+            // Fixed rotation - yaw (left/right) and pitch (up/down)
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = yaw;
+            camera.rotation.x = pitch;
+            camera.rotation.z = 0; // Prevent roll
+
+            // Sprinting drains sanity
+            if (keys['shift'] && (keys['w'] || keys['s'] || keys['a'] || keys['d'])) {
+                sanity -= delta * 5;
+            }
+        }
+
+        function updateCandles(delta) {
+            let nearLight = false;
+            const time = clock.getElapsedTime();
+
+            candles.forEach((candle, i) => {
+                if (!candle.collected) {
+                    const dist = camera.position.distanceTo(candle.group.position);
+                    
+                    if (dist < 2) {
+                        nearLight = true;
+                        if (dist < 1) {
+                            candle.collected = true;
+                            scene.remove(candle.group);
+                            candlesFound++;
+                            document.getElementById('candles').textContent = candlesFound;
+                            sanity = Math.min(100, sanity + 20);
+
+                            if (candlesFound >= 5) {
+                                winGame();
+                            }
+                        }
+                    }
+
+                    // Update shader time
+                    candle.flame.material.uniforms.time.value = time;
+                    
+                    // Flicker light intensity
+                    const flicker = Math.sin(time * 10 + i) * 0.3 + 1.7;
+                    candle.light.intensity = flicker;
+                }
+            });
+
+            // Darkness drains sanity
+            if (!nearLight) {
+                sanity -= delta * 3;
+            } else {
+                sanity = Math.min(100, sanity + delta * 5);
+            }
+
+            sanity = Math.max(0, sanity);
+            document.getElementById('sanity').textContent = Math.floor(sanity);
+            document.getElementById('sanity-fill').style.width = sanity + '%';
+
+            // Low sanity effects
+            if (sanity < 30 && window.playHeartbeat && Math.random() < 0.02) {
+                window.playHeartbeat();
+            }
+
+            if (sanity <= 0) {
+                gameOver();
+            }
+        }
+
+        function updateGhosts(delta) {
+            const time = clock.getElapsedTime();
+            
+            entities.forEach(ghost => {
+                // Update shader
+                ghost.material.uniforms.time.value = time;
+                
+                // Move towards player when sanity is low
+                if (sanity < 50) {
+                    const dir = new THREE.Vector3()
+                        .subVectors(camera.position, ghost.position)
+                        .normalize()
+                        .multiplyScalar(0.02);
+                    
+                    ghost.velocity.lerp(dir, 0.05);
+                } else {
+                    // Random movement
+                    if (Math.random() < 0.01) {
+                        ghost.velocity.set(
+                            (Math.random() - 0.5) * 2,
+                            0,
+                            (Math.random() - 0.5) * 2
+                        );
+                    }
+                }
+
+                ghost.position.add(ghost.velocity.clone().multiplyScalar(delta));
+                
+                // Boundaries
+                if (Math.abs(ghost.position.x) > 24) ghost.velocity.x *= -1;
+                if (Math.abs(ghost.position.z) > 24) ghost.velocity.z *= -1;
+
+                // Check proximity for jumpscare
+                const dist = camera.position.distanceTo(ghost.position);
+                if (dist < 2 && sanity < 40) {
+                    triggerJumpscare();
+                }
+
+                // Opacity based on sanity
+                ghost.material.uniforms.opacity.value = (100 - sanity) / 100 * 0.8;
+            });
+        }
+
+        function triggerJumpscare() {
+            const jumpscare = document.getElementById('jumpscare');
+            jumpscare.classList.add('active');
+            
+            sanity -= 30;
+            
+            setTimeout(() => {
+                jumpscare.classList.remove('active');
+            }, 500);
+        }
+
+        function gameOver() {
+            gameStarted = false;
+            alert('Your sanity has shattered... You are lost forever in the asylum.');
+            location.reload();
+        }
+
+        function winGame() {
+            gameStarted = false;
+            alert('You escaped the asylum! But the nightmares will follow you...');
+            location.reload();
+        }
+
+        function animate() {
+            if (!gameStarted) return;
+            
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            
+            updatePlayer(delta);
+            updateCandles(delta);
+            updateGhosts(delta);
+            
+            renderer.render(scene, camera);
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        init();
+    </script>
+</body>
+</html>

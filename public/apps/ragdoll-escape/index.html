@@ -1,0 +1,572 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ragdoll Escape</title>
+  <style>
+    :root {
+      --bg: #0b0e1b;
+      --bg-2: #151b2f;
+      --ink: #f7f1e8;
+      --accent: #ffcb6b;
+      --accent-2: #7cf6ff;
+      --danger: #ff5f6d;
+      --panel: rgba(13, 18, 36, 0.75);
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Gill Sans", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 10%, #2b3357, var(--bg) 55%),
+        linear-gradient(135deg, #0a0c16 0%, #161c32 60%, #241b2c 100%);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: clamp(1.4rem, 2.6vw, 2.3rem);
+      margin: 0;
+      letter-spacing: 0.06em;
+    }
+    header p {
+      margin: 0;
+      opacity: 0.7;
+      font-size: 0.95rem;
+    }
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel);
+      padding: 10px 14px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .hud span { font-weight: 600; }
+    .hud button {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #f77f00);
+      color: #1a1306;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(244, 185, 66, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .hud button:hover { transform: translateY(-1px) scale(1.02); }
+    .arena {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+    canvas {
+      width: min(96vw, 1200px);
+      height: min(72vh, 720px);
+      border-radius: 20px;
+      background: radial-gradient(circle at 30% 20%, #202849, #101321 60%);
+      box-shadow: 0 30px 60px var(--shadow);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      touch-action: none;
+    }
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(10, 13, 24, 0.7);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(8px);
+      max-width: 260px;
+    }
+    .legend strong { color: var(--accent-2); }
+    .status {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(124, 246, 255, 0.12);
+      color: #c8fbff;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 720px) {
+      body { padding: 10px; }
+      .legend, .status { position: static; margin-top: 10px; }
+      .arena { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>RAGDOLL ESCAPE</h1>
+      <p>Guide the ragdoll through trap corridors. Drag to grab, pull to fling, tilt to survive.</p>
+    </div>
+    <div class="hud">
+      <span id="time">Time: 0.0s</span>
+      <span id="hits">Hits: 0</span>
+      <button id="reset">Reset Maze</button>
+    </div>
+  </header>
+
+  <section class="arena">
+    <canvas id="game" width="1200" height="720"></canvas>
+    <div class="legend">
+      <strong>Drag</strong> the ragdoll to grab a limb · <strong>Flick</strong> to launch · <strong>Arrow keys</strong> tilt gravity.
+    </div>
+    <div class="status" id="status">Tilt: Neutral</div>
+  </section>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const timeEl = document.getElementById("time");
+    const hitsEl = document.getElementById("hits");
+    const statusEl = document.getElementById("status");
+    const resetBtn = document.getElementById("reset");
+
+    const world = {
+      bounds: { x: 60, y: 60, w: canvas.width - 120, h: canvas.height - 120 },
+      gravity: { x: 0, y: 0.3 },
+      tilt: 0,
+      drag: 0.985,
+    };
+
+    const traps = [];
+    const walls = [];
+    const particles = [];
+
+    const ragdoll = {
+      nodes: [],
+      links: [],
+      grabbed: null,
+      grabOffset: { x: 0, y: 0 },
+      start: { x: 200, y: 140 },
+      escaped: false,
+      hits: 0,
+    };
+
+    const state = {
+      startTime: performance.now(),
+    };
+
+    function addWall(x, y, w, h) {
+      walls.push({ x, y, w, h });
+    }
+
+    function addTrap(x, y, w, h) {
+      traps.push({ x, y, w, h, phase: Math.random() * Math.PI * 2 });
+    }
+
+    function buildMaze() {
+      walls.length = 0;
+      traps.length = 0;
+      const b = world.bounds;
+      addWall(b.x, b.y, b.w, 16);
+      addWall(b.x, b.y + b.h - 16, b.w, 16);
+      addWall(b.x, b.y, 16, b.h);
+      addWall(b.x + b.w - 16, b.y, 16, b.h);
+
+      addWall(200, 160, 360, 18);
+      addWall(160, 240, 18, 240);
+      addWall(260, 320, 260, 18);
+      addWall(420, 180, 18, 220);
+      addWall(520, 120, 18, 320);
+      addWall(640, 200, 320, 18);
+      addWall(760, 120, 18, 320);
+      addWall(860, 360, 18, 220);
+      addWall(960, 280, 180, 18);
+
+      addTrap(300, 220, 80, 18);
+      addTrap(480, 260, 80, 18);
+      addTrap(620, 320, 80, 18);
+      addTrap(760, 240, 80, 18);
+      addTrap(880, 420, 80, 18);
+    }
+
+    function buildRagdoll() {
+      ragdoll.nodes.length = 0;
+      ragdoll.links.length = 0;
+      const { x, y } = ragdoll.start;
+      const node = (dx, dy, mass = 1) => ({
+        x: x + dx,
+        y: y + dy,
+        vx: 0,
+        vy: 0,
+        mass,
+        r: 12,
+      });
+      const head = node(0, 0, 1.2);
+      const chest = node(0, 36, 1.4);
+      const hip = node(0, 76, 1.5);
+      const leftHand = node(-30, 40, 0.8);
+      const rightHand = node(30, 40, 0.8);
+      const leftFoot = node(-20, 112, 1);
+      const rightFoot = node(20, 112, 1);
+
+      ragdoll.nodes.push(head, chest, hip, leftHand, rightHand, leftFoot, rightFoot);
+
+      const link = (a, b, len, stiff = 0.25) => ragdoll.links.push({ a, b, len, stiff });
+      link(head, chest, 34);
+      link(chest, hip, 40);
+      link(chest, leftHand, 38);
+      link(chest, rightHand, 38);
+      link(hip, leftFoot, 42);
+      link(hip, rightFoot, 42);
+      link(leftHand, rightHand, 64, 0.15);
+      link(leftFoot, rightFoot, 52, 0.15);
+
+      ragdoll.escaped = false;
+      ragdoll.hits = 0;
+    }
+
+    function addParticles(x, y, color) {
+      for (let i = 0; i < 12; i += 1) {
+        particles.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.7) * 4,
+          life: 50 + Math.random() * 30,
+          color,
+        });
+      }
+    }
+
+    function handlePhysics() {
+      for (const node of ragdoll.nodes) {
+        if (node === ragdoll.grabbed) {
+          node.vx = 0;
+          node.vy = 0;
+          node.x = ragdoll.grabOffset.x;
+          node.y = ragdoll.grabOffset.y;
+          continue;
+        }
+        node.vx += world.gravity.x;
+        node.vy += world.gravity.y;
+        node.vx *= world.drag;
+        node.vy *= world.drag;
+        node.x += node.vx;
+        node.y += node.vy;
+      }
+
+      for (let i = 0; i < 4; i += 1) {
+        for (const link of ragdoll.links) {
+          const dx = link.b.x - link.a.x;
+          const dy = link.b.y - link.a.y;
+          const dist = Math.hypot(dx, dy) || 0.0001;
+          const diff = (dist - link.len) / dist;
+          const adjustX = dx * diff * link.stiff;
+          const adjustY = dy * diff * link.stiff;
+          link.a.x += adjustX;
+          link.a.y += adjustY;
+          link.b.x -= adjustX;
+          link.b.y -= adjustY;
+        }
+      }
+
+      handleCollisions();
+    }
+
+    function handleCollisions() {
+      const { x, y, w, h } = world.bounds;
+      for (const node of ragdoll.nodes) {
+        if (node.x - node.r < x) {
+          node.x = x + node.r;
+          node.vx *= -0.4;
+        }
+        if (node.x + node.r > x + w) {
+          node.x = x + w - node.r;
+          node.vx *= -0.4;
+        }
+        if (node.y - node.r < y) {
+          node.y = y + node.r;
+          node.vy *= -0.4;
+        }
+        if (node.y + node.r > y + h) {
+          node.y = y + h - node.r;
+          node.vy *= -0.4;
+        }
+      }
+
+      for (const wall of walls) {
+        for (const node of ragdoll.nodes) {
+          if (
+            node.x + node.r > wall.x &&
+            node.x - node.r < wall.x + wall.w &&
+            node.y + node.r > wall.y &&
+            node.y - node.r < wall.y + wall.h
+          ) {
+            const overlapX = Math.min(
+              wall.x + wall.w - (node.x - node.r),
+              node.x + node.r - wall.x
+            );
+            const overlapY = Math.min(
+              wall.y + wall.h - (node.y - node.r),
+              node.y + node.r - wall.y
+            );
+            if (overlapX < overlapY) {
+              if (node.x < wall.x + wall.w / 2) {
+                node.x = wall.x - node.r;
+              } else {
+                node.x = wall.x + wall.w + node.r;
+              }
+              node.vx *= -0.5;
+            } else {
+              if (node.y < wall.y + wall.h / 2) {
+                node.y = wall.y - node.r;
+              } else {
+                node.y = wall.y + wall.h + node.r;
+              }
+              node.vy *= -0.5;
+            }
+          }
+        }
+      }
+
+      for (const trap of traps) {
+        for (const node of ragdoll.nodes) {
+          if (
+            node.x + node.r > trap.x &&
+            node.x - node.r < trap.x + trap.w &&
+            node.y + node.r > trap.y &&
+            node.y - node.r < trap.y + trap.h
+          ) {
+            const pulse = 0.7 + Math.sin(performance.now() * 0.01 + trap.phase) * 0.5;
+            node.vx += (Math.random() - 0.5) * pulse;
+            node.vy -= 0.6 * pulse;
+            ragdoll.hits += 1;
+            addParticles(node.x, node.y, "#ff5f6d");
+          }
+        }
+      }
+    }
+
+    function drawMaze() {
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 6;
+      ctx.strokeRect(world.bounds.x, world.bounds.y, world.bounds.w, world.bounds.h);
+      ctx.restore();
+
+      for (const wall of walls) {
+        ctx.fillStyle = "rgba(124, 246, 255, 0.12)";
+        ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
+        ctx.strokeStyle = "rgba(124, 246, 255, 0.6)";
+        ctx.strokeRect(wall.x, wall.y, wall.w, wall.h);
+      }
+
+      for (const trap of traps) {
+        const pulse = 0.7 + Math.sin(performance.now() * 0.01 + trap.phase) * 0.3;
+        ctx.fillStyle = `rgba(255, 95, 109, ${0.18 + pulse * 0.2})`;
+        ctx.fillRect(trap.x, trap.y, trap.w, trap.h);
+        ctx.strokeStyle = "rgba(255, 95, 109, 0.7)";
+        ctx.strokeRect(trap.x, trap.y, trap.w, trap.h);
+      }
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(244, 203, 107, 0.7)";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([8, 8]);
+      ctx.strokeRect(980, 520, 140, 140);
+      ctx.restore();
+    }
+
+    function drawRagdoll() {
+      ctx.save();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "rgba(255, 203, 107, 0.7)";
+      for (const link of ragdoll.links) {
+        ctx.beginPath();
+        ctx.moveTo(link.a.x, link.a.y);
+        ctx.lineTo(link.b.x, link.b.y);
+        ctx.stroke();
+      }
+      for (const node of ragdoll.nodes) {
+        ctx.beginPath();
+        ctx.fillStyle = "#ffcb6b";
+        ctx.shadowColor = "rgba(255,203,107,0.5)";
+        ctx.shadowBlur = 12;
+        ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(p.life / 80, 0);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+        ctx.restore();
+      }
+    }
+
+    function updateParticles() {
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05;
+        p.life -= 1;
+      }
+      for (let i = particles.length - 1; i >= 0; i -= 1) {
+        if (particles[i].life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function checkEscape() {
+      if (ragdoll.escaped) return;
+      const inside = ragdoll.nodes.every(
+        (node) => node.x > 980 && node.x < 1120 && node.y > 520 && node.y < 660
+      );
+      if (inside) {
+        ragdoll.escaped = true;
+        addParticles(1050, 590, "#7cf6ff");
+      }
+    }
+
+    function updateHud() {
+      const elapsed = (performance.now() - state.startTime) / 1000;
+      timeEl.textContent = `Time: ${elapsed.toFixed(1)}s`;
+      hitsEl.textContent = `Hits: ${ragdoll.hits}`;
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawMaze();
+      drawParticles();
+      handlePhysics();
+      drawRagdoll();
+      updateParticles();
+      checkEscape();
+      updateHud();
+
+      if (ragdoll.escaped) {
+        ctx.save();
+        ctx.fillStyle = "rgba(124, 246, 255, 0.9)";
+        ctx.font = "700 42px Space Grotesk";
+        ctx.fillText("ESCAPED!", 930, 500);
+        ctx.restore();
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function findNode(pos) {
+      return ragdoll.nodes.find((node) => Math.hypot(node.x - pos.x, node.y - pos.y) < node.r + 8);
+    }
+
+    function resetGame() {
+      state.startTime = performance.now();
+      world.gravity.x = 0;
+      world.gravity.y = 0.3;
+      world.tilt = 0;
+      buildMaze();
+      buildRagdoll();
+      particles.length = 0;
+      updateTiltStatus();
+    }
+
+    function updateTiltStatus() {
+      const labels = ["Neutral", "Left", "Right", "Up", "Down"];
+      statusEl.textContent = `Tilt: ${labels[world.tilt]}`;
+    }
+
+    function setTilt(direction) {
+      world.tilt = direction;
+      const tiltPower = 0.28;
+      if (direction === 1) {
+        world.gravity.x = -tiltPower;
+        world.gravity.y = 0.15;
+      } else if (direction === 2) {
+        world.gravity.x = tiltPower;
+        world.gravity.y = 0.15;
+      } else if (direction === 3) {
+        world.gravity.x = 0;
+        world.gravity.y = -tiltPower;
+      } else if (direction === 4) {
+        world.gravity.x = 0;
+        world.gravity.y = tiltPower + 0.25;
+      } else {
+        world.gravity.x = 0;
+        world.gravity.y = 0.3;
+      }
+      updateTiltStatus();
+    }
+
+    function toCanvasCoords(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * canvas.width,
+        y: ((event.clientY - rect.top) / rect.height) * canvas.height,
+      };
+    }
+
+    let lastPointer = null;
+    canvas.addEventListener("pointerdown", (event) => {
+      const pos = toCanvasCoords(event);
+      const node = findNode(pos);
+      if (node) {
+        ragdoll.grabbed = node;
+        ragdoll.grabOffset.x = pos.x;
+        ragdoll.grabOffset.y = pos.y;
+      }
+      lastPointer = { ...pos, time: performance.now() };
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      const pos = toCanvasCoords(event);
+      if (ragdoll.grabbed) {
+        ragdoll.grabOffset.x = pos.x;
+        ragdoll.grabOffset.y = pos.y;
+      }
+      lastPointer = { ...pos, time: performance.now() };
+    });
+
+    canvas.addEventListener("pointerup", (event) => {
+      if (ragdoll.grabbed && lastPointer) {
+        const pos = toCanvasCoords(event);
+        const dt = Math.max(performance.now() - lastPointer.time, 16);
+        ragdoll.grabbed.vx = (pos.x - lastPointer.x) / dt * 16;
+        ragdoll.grabbed.vy = (pos.y - lastPointer.y) / dt * 16;
+      }
+      ragdoll.grabbed = null;
+    });
+
+    canvas.addEventListener("pointerleave", () => {
+      ragdoll.grabbed = null;
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") setTilt(1);
+      if (event.key === "ArrowRight") setTilt(2);
+      if (event.key === "ArrowUp") setTilt(3);
+      if (event.key === "ArrowDown") setTilt(4);
+      if (event.key === " ") setTilt(0);
+    });
+
+    resetBtn.addEventListener("click", resetGame);
+
+    resetGame();
+    update();
+  </script>
+</body>
+</html>

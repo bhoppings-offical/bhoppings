@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The World Is a Cursor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            cursor: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: background 0.5s ease;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #cursor {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #ffd700);
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+        }
+
+        #cursor.jittering {
+            animation: shake 0.2s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-2px, 2px); }
+            75% { transform: translate(2px, -2px); }
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform 0.15s ease;
+        }
+
+        .sticky-zone {
+            position: absolute;
+            border-radius: 15px;
+            background: rgba(255, 180, 100, 0.15);
+            border: 3px solid rgba(255, 180, 100, 0.5);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .sticky-zone.hovering {
+            background: rgba(255, 100, 100, 0.4);
+            border-color: rgba(255, 50, 50, 0.8);
+            border-width: 4px;
+            animation: pulse-angry 0.5s infinite;
+        }
+
+        @keyframes pulse-angry {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .hover-timer {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .sticky-zone.hovering .hover-timer {
+            display: block;
+        }
+
+        .obstacle {
+            position: absolute;
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #goal {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #4ade80, #22c55e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.6);
+            animation: goal-pulse 2s infinite;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes goal-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); }
+            50% { transform: scale(1.1); box-shadow: 0 0 50px rgba(34, 197, 94, 0.9); }
+        }
+
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 18px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-width: 280px;
+        }
+
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .hud-row:last-child {
+            margin-bottom: 0;
+        }
+
+        #annoyance-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            margin-top: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        #annoyance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #fbbf24, #f97316, #ef4444);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 13px;
+            position: relative;
+        }
+
+        #annoyance-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+
+        .threshold-marker {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            z-index: 2;
+        }
+
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 50px 70px;
+            border-radius: 25px;
+            font-size: 36px;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .message button {
+            margin-top: 25px;
+            padding: 18px 45px;
+            font-size: 22px;
+            background: #4ade80;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .message button:hover {
+            background: #22c55e;
+            transform: scale(1.05);
+        }
+
+        .warning-text {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 42px;
+            color: rgba(255, 100, 100, 0.9);
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        #instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            max-width: 300px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #instructions h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #fbbf24;
+        }
+
+        #instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        #instructions li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        #instructions li::before {
+            content: "⚠️";
+            position: absolute;
+            left: 0;
+        }
+
+        .speed-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .speed-bar {
+            width: 150px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-top: 8px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .speed-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #fbbf24, #ef4444);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="cursor"></div>
+        
+        <div id="hud">
+            <div class="hud-row">
+                <span>Mood:</span>
+                <span id="mood-text" style="font-weight: bold;">😊 Calm</span>
+            </div>
+            <div class="hud-row">
+                <span>Annoyance:</span>
+                <span id="annoyance-value" style="font-weight: bold;">0%</span>
+            </div>
+            <div id="annoyance-bar">
+                <div class="threshold-marker" style="left: 80%;"></div>
+                <div id="annoyance-text">0%</div>
+                <div id="annoyance-fill"></div>
+            </div>
+            <div style="font-size: 12px; margin-top: 8px; color: #fbbf24;">
+                ⚠️ Stay below 80% to win!
+            </div>
+        </div>
+
+        <div id="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li>Move smoothly to goal 🏁</li>
+                <li>Fast = wind pushes objects</li>
+                <li>Too fast = annoyance ⬆️</li>
+                <li>Hovering = annoyance ⬆️</li>
+                <li>Jittering = annoyance ⬆️</li>
+                <li>Stay calm, reach goal!</li>
+            </ul>
+        </div>
+
+        <div class="speed-indicator">
+            <div>Speed Level</div>
+            <div class="speed-bar">
+                <div class="speed-fill" id="speed-fill"></div>
+            </div>
+        </div>
+
+        <div id="goal">🏁</div>
+        
+        <div id="win-message" class="message">
+            <div>🎉 Perfect! 🎉</div>
+            <div style="font-size: 24px; margin-top: 15px;">You kept the environment happy!</div>
+            <div style="font-size: 18px; margin-top: 10px; color: #4ade80;">Final Annoyance: <span id="final-annoyance-win"></span></div>
+            <button onclick="location.reload()">Play Again</button>
+        </div>
+        
+        <div id="lose-message" class="message">
+            <div>😤 Too Annoying! 😤</div>
+            <div style="font-size: 24px; margin-top: 15px;">The environment couldn't take it!</div>
+            <div style="font-size: 18px; margin-top: 10px; color: #ef4444;">Final Annoyance: <span id="final-annoyance-lose"></span></div>
+            <button onclick="location.reload()">Try Again</button>
+        </div>
+
+        <div id="warning-text" class="warning-text"></div>
+    </div>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        const gameContainer = document.getElementById('game-container');
+        const annoyanceFill = document.getElementById('annoyance-fill');
+        const annoyanceText = document.getElementById('annoyance-text');
+        const annoyanceValue = document.getElementById('annoyance-value');
+        const moodText = document.getElementById('mood-text');
+        const goal = document.getElementById('goal');
+        const winMessage = document.getElementById('win-message');
+        const loseMessage = document.getElementById('lose-message');
+        const warningText = document.getElementById('warning-text');
+        const speedFill = document.getElementById('speed-fill');
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let prevMouseX = mouseX;
+        let prevMouseY = mouseY;
+        let annoyance = 0;
+        let gameOver = false;
+        let particles = [];
+        let stickyZones = [];
+        let obstacles = [];
+        let hoverTime = 0;
+        let lastMoveTime = Date.now();
+        let speedHistory = [];
+        let jitterCount = 0;
+        let lastJitterTime = 0;
+
+        const ANNOYANCE_THRESHOLD = 80; // Must stay below this to win
+        const SPEED_THRESHOLD = 15; // Speed above this increases annoyance
+        const JITTER_THRESHOLD = 25; // Sudden direction changes
+        const HOVER_PENALTY_START = 30; // Frames before hover penalty kicks in
+
+        // Initialize game elements
+        function init() {
+            // Position goal at the end
+            goal.style.right = '80px';
+            goal.style.top = '50%';
+            goal.style.transform = 'translateY(-50%)';
+
+            // Create particles
+            for (let i = 0; i < 25; i++) {
+                createParticle();
+            }
+
+            // Create sticky zones - clearly marked
+            createStickyZone(250, 200, 120, 120);
+            createStickyZone(450, 400, 100, 100);
+            createStickyZone(700, 250, 110, 110);
+            createStickyZone(900, 450, 100, 100);
+            createStickyZone(600, 100, 90, 90);
+
+            // Create obstacles
+            createObstacle(350, 100, 70, 70);
+            createObstacle(550, 300, 80, 60);
+            createObstacle(800, 150, 60, 80);
+            createObstacle(950, 350, 75, 75);
+            createObstacle(400, 500, 65, 65);
+            createObstacle(750, 500, 70, 70);
+        }
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 12 + 6;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = Math.random() * window.innerHeight + 'px';
+            particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            particle.style.opacity = '0.7';
+            gameContainer.appendChild(particle);
+            
+            particles.push({
+                element: particle,
+                x: parseFloat(particle.style.left),
+                y: parseFloat(particle.style.top),
+                vx: 0,
+                vy: 0
+            });
+        }
+
+        function createStickyZone(x, y, w, h) {
+            const zone = document.createElement('div');
+            zone.className = 'sticky-zone';
+            zone.style.width = w + 'px';
+            zone.style.height = h + 'px';
+            zone.style.left = x + 'px';
+            zone.style.top = y + 'px';
+            zone.innerHTML = '⚠️<div class="hover-timer">0s</div>';
+            gameContainer.appendChild(zone);
+            stickyZones.push({
+                element: zone,
+                hoverTime: 0
+            });
+        }
+
+        function createObstacle(x, y, w, h) {
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.style.width = w + 'px';
+            obstacle.style.height = h + 'px';
+            obstacle.style.left = x + 'px';
+            obstacle.style.top = y + 'px';
+            obstacle.textContent = '🪨';
+            gameContainer.appendChild(obstacle);
+            obstacles.push(obstacle);
+        }
+
+        // Mouse movement
+        document.addEventListener('mousemove', (e) => {
+            if (gameOver) return;
+            
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            lastMoveTime = Date.now();
+            
+            cursor.style.left = mouseX - 12 + 'px';
+            cursor.style.top = mouseY - 12 + 'px';
+        });
+
+        // Game loop
+        function gameLoop() {
+            if (gameOver) return;
+
+            const currentTime = Date.now();
+            const deltaX = mouseX - prevMouseX;
+            const deltaY = mouseY - prevMouseY;
+            const speed = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            // Track speed history for jitter detection
+            speedHistory.push({x: deltaX, y: deltaY, speed: speed});
+            if (speedHistory.length > 5) speedHistory.shift();
+
+            // Update speed indicator
+            const speedPercent = Math.min(100, (speed / 30) * 100);
+            speedFill.style.width = speedPercent + '%';
+
+            // Detect jittering (rapid direction changes)
+            if (speedHistory.length >= 3 && speed > 5) {
+                const recent = speedHistory.slice(-3);
+                let directionChanges = 0;
+                
+                for (let i = 1; i < recent.length; i++) {
+                    const dotProduct = recent[i].x * recent[i-1].x + recent[i].y * recent[i-1].y;
+                    const magnitudeProduct = recent[i].speed * recent[i-1].speed;
+                    
+                    if (magnitudeProduct > 0) {
+                        const cosAngle = dotProduct / magnitudeProduct;
+                        if (cosAngle < 0) { // Direction changed more than 90 degrees
+                            directionChanges++;
+                        }
+                    }
+                }
+
+                if (directionChanges >= 2 && speed > JITTER_THRESHOLD) {
+                    if (currentTime - lastJitterTime > 500) {
+                        increaseAnnoyance(3, "Stop jittering!");
+                        cursor.classList.add('jittering');
+                        lastJitterTime = currentTime;
+                        setTimeout(() => cursor.classList.remove('jittering'), 200);
+                    }
+                }
+            }
+
+            // Speed penalty - clear and predictable
+            if (speed > SPEED_THRESHOLD) {
+                const excessSpeed = speed - SPEED_THRESHOLD;
+                const penalty = excessSpeed * 0.15;
+                increaseAnnoyance(penalty, speed > 25 ? "Way too fast!" : "Moving too fast!");
+            }
+
+            // Wind effect on particles (visual feedback for speed)
+            if (speed > 8) {
+                particles.forEach(p => {
+                    const dx = p.x - mouseX;
+                    const dy = p.y - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 180) {
+                        const force = (180 - dist) / 180 * speed * 0.25;
+                        const angle = Math.atan2(dy, dx);
+                        p.vx += Math.cos(angle) * force;
+                        p.vy += Math.sin(angle) * force;
+                    }
+                });
+            }
+
+            // Update particles
+            particles.forEach(p => {
+                p.vx *= 0.92;
+                p.vy *= 0.92;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Bounce off edges
+                if (p.x < 0 || p.x > window.innerWidth) {
+                    p.vx *= -0.8;
+                    p.x = Math.max(0, Math.min(window.innerWidth, p.x));
+                }
+                if (p.y < 0 || p.y > window.innerHeight) {
+                    p.vy *= -0.8;
+                    p.y = Math.max(0, Math.min(window.innerHeight, p.y));
+                }
+
+                p.element.style.left = p.x + 'px';
+                p.element.style.top = p.y + 'px';
+            });
+
+            // Check sticky zones - clear visual feedback
+            let inAnyStickyZone = false;
+            stickyZones.forEach(zone => {
+                const rect = zone.element.getBoundingClientRect();
+                const inZone = mouseX >= rect.left && mouseX <= rect.right &&
+                              mouseY >= rect.top && mouseY <= rect.bottom;
+                
+                if (inZone) {
+                    inAnyStickyZone = true;
+                    zone.hoverTime++;
+                    zone.element.classList.add('hovering');
+                    
+                    const seconds = Math.floor(zone.hoverTime / 60);
+                    zone.element.querySelector('.hover-timer').textContent = seconds + 's';
+                    
+                    if (zone.hoverTime > HOVER_PENALTY_START) {
+                        const penalty = (zone.hoverTime - HOVER_PENALTY_START) * 0.08;
+                        increaseAnnoyance(penalty, "Stop hovering!");
+                    }
+                } else {
+                    zone.element.classList.remove('hovering');
+                    zone.hoverTime = Math.max(0, zone.hoverTime - 2);
+                }
+            });
+
+            // Check obstacles collision
+            obstacles.forEach(obstacle => {
+                const rect = obstacle.getBoundingClientRect();
+                const padding = 30;
+                if (mouseX >= rect.left - padding && mouseX <= rect.right + padding &&
+                    mouseY >= rect.top - padding && mouseY <= rect.bottom + padding) {
+                    const dx = mouseX - (rect.left + rect.width / 2);
+                    const dy = mouseY - (rect.top + rect.height / 2);
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 120) {
+                        const pushFactor = (120 - dist) / 120;
+                        obstacle.style.transform = `translate(${dx * pushFactor * 0.5}px, ${dy * pushFactor * 0.5}px) rotate(${dx * 0.3}deg)`;
+                    } else {
+                        obstacle.style.transform = 'translate(0, 0) rotate(0deg)';
+                    }
+                } else {
+                    obstacle.style.transform = 'translate(0, 0) rotate(0deg)';
+                }
+            });
+
+            // Check goal - only win if annoyance is below threshold
+            const goalRect = goal.getBoundingClientRect();
+            if (mouseX >= goalRect.left && mouseX <= goalRect.right &&
+                mouseY >= goalRect.top && mouseY <= goalRect.bottom) {
+                if (annoyance < ANNOYANCE_THRESHOLD) {
+                    win();
+                } else {
+                    // Can't win if too annoying!
+                    if (!gameOver) {
+                        showWarning("Too annoyed to accept victory!");
+                        goal.style.animation = 'none';
+                        goal.style.background = 'radial-gradient(circle, #ef4444, #dc2626)';
+                        setTimeout(() => {
+                            goal.style.animation = 'goal-pulse 2s infinite';
+                            goal.style.background = 'radial-gradient(circle, #4ade80, #22c55e)';
+                        }, 1000);
+                    }
+                }
+            }
+
+            // Passive annoyance decrease when moving calmly
+            if (speed > 1 && speed < 10 && !inAnyStickyZone) {
+                annoyance = Math.max(0, annoyance - 0.08);
+            }
+
+            // Lose condition
+            if (annoyance >= 100) {
+                lose();
+            }
+
+            updateUI();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function increaseAnnoyance(amount, message) {
+            annoyance = Math.min(100, annoyance + amount);
+            
+            if (message && annoyance > 60) {
+                showWarning(message);
+            }
+        }
+
+        function showWarning(message) {
+            warningText.textContent = message;
+            warningText.style.opacity = '1';
+            setTimeout(() => {
+                warningText.style.opacity = '0';
+            }, 1000);
+        }
+
+        function updateUI() {
+            const roundedAnnoyance = Math.round(annoyance);
+            annoyanceFill.style.width = annoyance + '%';
+            annoyanceText.textContent = roundedAnnoyance + '%';
+            annoyanceValue.textContent = roundedAnnoyance + '%';
+            
+            if (annoyance < 25) {
+                moodText.textContent = '😊 Calm';
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            } else if (annoyance < 50) {
+                moodText.textContent = '😐 Uneasy';
+                document.body.style.background = 'linear-gradient(135deg, #a78bfa 0%, #ec4899 100%)';
+            } else if (annoyance < 75) {
+                moodText.textContent = '😠 Irritated';
+                document.body.style.background = 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)';
+            } else if (annoyance < 90) {
+                moodText.textContent = '🤬 Angry';
+                document.body.style.background = 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)';
+            } else {
+                moodText.textContent = '💢 FURIOUS';
+                document.body.style.background = 'linear-gradient(135deg, #991b1b 0%, #450a0a 100%)';
+            }
+        }
+
+        function win() {
+            gameOver = true;
+            document.getElementById('final-annoyance-win').textContent = Math.round(annoyance) + '%';
+            winMessage.style.display = 'block';
+        }
+
+        function lose() {
+            gameOver = true;
+            document.getElementById('final-annoyance-lose').textContent = Math.round(annoyance) + '%';
+            loseMessage.style.display = 'block';
+        }
+
+        // Start game
+        init();
+        gameLoop();
+    </script>
+</body>
+</html>

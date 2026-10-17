@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liquid Glass Filter</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: #0a0a0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, serif;
+    overflow: hidden;
+  }
+  .scene {
+    position: relative;
+    width: 600px;
+    height: 600px;
+  }
+  .bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, #ff6b6b55 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, #4ecdc455 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, #45b7d155 0%, transparent 60%),
+      linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg,  transparent, transparent 18px, rgba(255,255,255,0.06) 18px, rgba(255,255,255,0.06) 20px),
+      repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(255,255,255,0.04) 18px, rgba(255,255,255,0.04) 20px);
+  }
+  .bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255,255,255,0.12);
+    font-size: 110px;
+    font-weight: 900;
+    letter-spacing: -4px;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .glass-pill {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px; height: 90px;
+    border-radius: 999px;
+  }
+  .glass-orb {
+    position: absolute;
+    top: 120px; left: 80px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+  }
+  .glass-rect {
+    position: absolute;
+    bottom: 80px; right: 70px;
+    width: 150px; height: 80px;
+    border-radius: 18px;
+  }
+  #svg-host {
+    position: absolute;
+    width: 0; height: 0;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="bg"><div class="bg-text">GLASS</div></div>
+  <div class="glass-pill"  data-glass></div>
+  <div class="glass-orb"   data-glass></div>
+  <div class="glass-rect"  data-glass></div>
+</div>
+<div id="svg-host">
+  <svg xmlns="http://www.w3.org/2000/svg"><defs id="svg-defs"></defs></svg>
+</div>
+<script>
+// Rounded-rect signed distance field (exact, pixels)
+function rrSDF(px, py, halfW, halfH, r) {
+  var cr = Math.min(r, halfW, halfH);
+  var qx = Math.abs(px) - halfW + cr;
+  var qy = Math.abs(py) - halfH + cr;
+  return Math.min(Math.max(qx, qy), 0) +
+         Math.sqrt(Math.max(qx, 0) * Math.max(qx, 0) + Math.max(qy, 0) * Math.max(qy, 0)) - cr;
+}
+
+function parseRadius(cssRadius, w, h) {
+  if (!cssRadius || cssRadius === '0px') return 0;
+  if (cssRadius.endsWith('%')) {
+    return Math.min(w, h) * parseFloat(cssRadius) / 100;
+  }
+  return Math.min(parseFloat(cssRadius) || 0, w / 2, h / 2);
+}
+
+/*
+ * Displacement map: models the refraction at the glass edge.
+ *
+ * 1. Compute rounded-rect SDF for every pixel.
+ * 2. Build a "thickness" profile: 1 at the edge, 0 in the flat centre
+ *    and outside, using a smoothstep ramp over `edgeWidth` pixels.
+ * 3. Take the central-difference gradient of that thickness field.
+ *    The gradient points away from the glass rim, which is exactly the
+ *    direction light bends when entering the curved edge.
+ * 4. Encode as R = 0.5 + gx*0.5, G = 0.5 + gy*0.5
+ *    (128 = neutral in feDisplacementMap's convention).
+ */
+function buildDisplacementMap(w, h, radiusPx) {
+  var canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  var ctx = canvas.getContext('2d');
+  var img = ctx.createImageData(w, h);
+  var data = img.data;
+
+  var halfW = w / 2, halfH = h / 2;
+  var edgeWidth = Math.min(halfW, halfH) * 0.30;
+  var thickness = new Float32Array(w * h);
+
+  // Pass 1: thickness field
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      var sdf = rrSDF(x - halfW, y - halfH, halfW, halfH, radiusPx);
+      if (sdf > 0) {
+        thickness[y * w + x] = 0;
+      } else {
+        var depth = -sdf;
+        var t = Math.max(0, 1 - depth / edgeWidth);
+        thickness[y * w + x] = t * t * (3 - 2 * t); // smoothstep
+      }
+    }
+  }
+
+  // Pass 2: gradient -> displacement encoding
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      var xm = thickness[y * w + Math.max(x - 1, 0)];
+      var xp = thickness[y * w + Math.min(x + 1, w - 1)];
+      var ym = thickness[Math.max(y - 1, 0) * w + x];
+      var yp = thickness[Math.min(y + 1, h - 1) * w + x];
+      var gx = (xp - xm) * 0.5;
+      var gy = (yp - ym) * 0.5;
+      var i = (y * w + x) * 4;
+      data[i]     = Math.round(Math.max(0, Math.min(255, (gx * 0.5 + 0.5) * 255)));
+      data[i + 1] = Math.round(Math.max(0, Math.min(255, (gy * 0.5 + 0.5) * 255)));
+      data[i + 2] = 128;
+      data[i + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(img, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
+// Specular highlight map: Phong hemisphere + Fresnel rim
+function buildSpecularMap(w, h, radiusPx) {
+  var canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  var ctx = canvas.getContext('2d');
+  var img = ctx.createImageData(w, h);
+  var data = img.data;
+
+  var halfW = w / 2, halfH = h / 2;
+  var lx = -0.5774, ly = -0.5774, lz = 0.5774;
+
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      var i = (y * w + x) * 4;
+      data[i] = data[i+1] = data[i+2] = 255;
+      var sdf = rrSDF(x - halfW, y - halfH, halfW, halfH, radiusPx);
+      if (sdf > 0) { data[i+3] = 0; continue; }
+
+      var depth = Math.max(0, -sdf);
+      var edgeW = Math.min(halfW, halfH) * 0.3;
+      var t = Math.max(0, 1 - depth / edgeW);
+
+      var nx = (x - halfW) / halfW * t * 0.8;
+      var ny = (y - halfH) / halfH * t * 0.8;
+      var nlen = Math.sqrt(nx*nx + ny*ny + 1);
+      var nnx = nx/nlen, nny = ny/nlen, nnz = 1/nlen;
+
+      var dot = nnx*lx + nny*ly + nnz*lz;
+      var diffuse = Math.max(0, dot);
+      var specular = Math.pow(Math.max(0, 2*dot*nnz - lz), 24);
+      var fresnel = Math.pow(1 - nnz, 4) * 0.5;
+      var total = diffuse*0.12 + specular*0.85 + fresnel*0.45;
+      data[i+3] = Math.round(Math.min(255, total * 255));
+    }
+  }
+
+  ctx.putImageData(img, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
+function applyGlass(el, index) {
+  var rect = el.getBoundingClientRect();
+  var style = getComputedStyle(el);
+  var w = Math.round(rect.width);
+  var h = Math.round(rect.height);
+  var radiusPx = parseRadius(style.borderTopLeftRadius, w, h);
+
+  var filterId = 'lg-filter-' + index;
+  var dispUrl = buildDisplacementMap(w, h, radiusPx);
+  var specUrl = buildSpecularMap(w, h, radiusPx);
+
+  var defs = document.getElementById('svg-defs');
+  var ns = 'http://www.w3.org/2000/svg';
+  var filter = document.createElementNS(ns, 'filter');
+  filter.id = filterId;
+  filter.setAttribute('x', '-10%');
+  filter.setAttribute('y', '-10%');
+  filter.setAttribute('width', '120%');
+  filter.setAttribute('height', '120%');
+  filter.setAttribute('color-interpolation-filters', 'sRGB');
+
+  // feImage + single displacement pass (no ghost copies)
+  var feDisp = document.createElementNS(ns, 'feImage');
+  feDisp.setAttribute('href', dispUrl);
+  feDisp.setAttribute('x', '0'); feDisp.setAttribute('y', '0');
+  feDisp.setAttribute('width', '1'); feDisp.setAttribute('height', '1');
+  feDisp.setAttribute('preserveAspectRatio', 'none');
+  feDisp.setAttribute('result', 'disp_map');
+
+  var feDisplace = document.createElementNS(ns, 'feDisplacementMap');
+  feDisplace.setAttribute('in', 'SourceGraphic');
+  feDisplace.setAttribute('in2', 'disp_map');
+  feDisplace.setAttribute('scale', '40');
+  feDisplace.setAttribute('xChannelSelector', 'R');
+  feDisplace.setAttribute('yChannelSelector', 'G');
+  feDisplace.setAttribute('result', 'displaced');
+
+  var feSat = document.createElementNS(ns, 'feColorMatrix');
+  feSat.setAttribute('in', 'displaced');
+  feSat.setAttribute('type', 'saturate');
+  feSat.setAttribute('values', '1.8');
+  feSat.setAttribute('result', 'saturated');
+
+  var feSpec = document.createElementNS(ns, 'feImage');
+  feSpec.setAttribute('href', specUrl);
+  feSpec.setAttribute('x', '0'); feSpec.setAttribute('y', '0');
+  feSpec.setAttribute('width', '1'); feSpec.setAttribute('height', '1');
+  feSpec.setAttribute('preserveAspectRatio', 'none');
+  feSpec.setAttribute('result', 'spec_map');
+
+  var feComp = document.createElementNS(ns, 'feComposite');
+  feComp.setAttribute('in', 'spec_map');
+  feComp.setAttribute('in2', 'SourceGraphic');
+  feComp.setAttribute('operator', 'in');
+  feComp.setAttribute('result', 'spec_clipped');
+
+  var feBlend = document.createElementNS(ns, 'feBlend');
+  feBlend.setAttribute('in', 'spec_clipped');
+  feBlend.setAttribute('in2', 'saturated');
+  feBlend.setAttribute('mode', 'screen');
+  feBlend.setAttribute('result', 'with_spec');
+
+  var feBlur = document.createElementNS(ns, 'feGaussianBlur');
+  feBlur.setAttribute('in', 'with_spec');
+  feBlur.setAttribute('stdDeviation', '0.8');
+
+  [feDisp, feDisplace, feSat, feSpec, feComp, feBlend, feBlur].forEach(function(n){ filter.appendChild(n); });
+  defs.appendChild(filter);
+  el.style.filter = 'url(#' + filterId + ')';
+}
+
+document.querySelectorAll('[data-glass]').forEach(applyGlass);
+</script>
+</body>
+</html>

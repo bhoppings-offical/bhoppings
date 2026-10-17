@@ -1,0 +1,463 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slingshot Lab</title>
+  <style>
+    :root {
+      --bg-1: #0a0b15;
+      --bg-2: #1b2033;
+      --ink: #f5f1e8;
+      --accent: #f4b942;
+      --accent-2: #41d3bd;
+      --danger: #ff5f6d;
+      --panel: rgba(18, 24, 40, 0.7);
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Futura", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top, #2c3353, var(--bg-1) 55%),
+        linear-gradient(135deg, #0b0e1a 0%, #1a2035 60%, #2d2433 100%);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+      margin: 0;
+      letter-spacing: 0.08em;
+    }
+    header p {
+      margin: 0;
+      opacity: 0.7;
+      font-size: 0.95rem;
+    }
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel);
+      padding: 10px 14px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .hud span {
+      font-weight: 600;
+    }
+    .hud button {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #f77f00);
+      color: #1a1306;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(244, 185, 66, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .hud button:hover {
+      transform: translateY(-1px) scale(1.02);
+    }
+    .arena-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+    canvas {
+      width: min(95vw, 1200px);
+      height: min(70vh, 680px);
+      border-radius: 20px;
+      background: radial-gradient(circle at 30% 20%, #202849, #101321 60%);
+      box-shadow: 0 30px 60px var(--shadow);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(10, 13, 24, 0.7);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(8px);
+      max-width: 240px;
+    }
+    .legend strong { color: var(--accent-2); }
+    .hint {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(255, 95, 109, 0.12);
+      color: #ffd1d6;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 720px) {
+      body { padding: 10px; }
+      .legend, .hint { position: static; margin-top: 10px; }
+      .arena-wrap { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SLINGSHOT LAB</h1>
+      <p>Launch goo-balls through low gravity, bouncy walls, and wobbly targets.</p>
+    </div>
+    <div class="hud">
+      <span id="score">Score: 0</span>
+      <span id="shots">Shots: 0</span>
+      <button id="reset">Reset Lab</button>
+    </div>
+  </header>
+
+  <section class="arena-wrap">
+    <canvas id="game" width="1200" height="700"></canvas>
+    <div class="legend">
+      <strong>Drag</strong> the sling to aim · Release to launch · Hit all targets to unlock a weird gravity burst.
+    </div>
+    <div class="hint" id="hint">Low gravity active</div>
+  </section>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const shotsEl = document.getElementById("shots");
+    const resetBtn = document.getElementById("reset");
+    const hintEl = document.getElementById("hint");
+
+    const world = {
+      gravity: 0.12,
+      superGravity: 0.04,
+      wind: 0.0,
+      bounds: { x: 60, y: 70, w: canvas.width - 120, h: canvas.height - 140 },
+      bounce: 0.9,
+    };
+
+    const sling = {
+      anchor: { x: 220, y: canvas.height - 180 },
+      ball: null,
+      maxPull: 140,
+      pulling: false,
+      pullPos: { x: 220, y: canvas.height - 180 },
+    };
+
+    const state = {
+      score: 0,
+      shots: 0,
+      targetsHit: 0,
+      targetsTotal: 5,
+      weirdBurst: false,
+      lastBurst: 0,
+    };
+
+    const balls = [];
+    const targets = [];
+    const particles = [];
+
+    const palette = ["#f4b942", "#ff8fa3", "#7bdff2", "#f6f740", "#9d7cff"];
+
+    function spawnTargets() {
+      targets.length = 0;
+      const padding = 120;
+      for (let i = 0; i < state.targetsTotal; i += 1) {
+        targets.push({
+          x: padding + i * 160 + (Math.random() * 80),
+          y: 160 + (Math.random() * 220),
+          r: 22 + Math.random() * 12,
+          wobble: Math.random() * 6,
+          alive: true,
+        });
+      }
+    }
+
+    function spawnBall(position) {
+      const ball = {
+        x: position.x,
+        y: position.y,
+        vx: 0,
+        vy: 0,
+        r: 16,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        alive: true,
+      };
+      balls.push(ball);
+      return ball;
+    }
+
+    function addParticles(x, y, color) {
+      for (let i = 0; i < 18; i += 1) {
+        particles.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.8) * 4,
+          life: 60 + Math.random() * 20,
+          color,
+        });
+      }
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function dist(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    function resetBall() {
+      sling.ball = spawnBall({ ...sling.anchor });
+    }
+
+    function resetGame() {
+      balls.length = 0;
+      particles.length = 0;
+      state.score = 0;
+      state.shots = 0;
+      state.targetsHit = 0;
+      state.weirdBurst = false;
+      state.lastBurst = 0;
+      spawnTargets();
+      resetBall();
+      updateHud();
+    }
+
+    function updateHud() {
+      scoreEl.textContent = `Score: ${state.score}`;
+      shotsEl.textContent = `Shots: ${state.shots}`;
+      hintEl.textContent = state.weirdBurst ? "Gravity burst active" : "Low gravity active";
+    }
+
+    function applyPhysics(ball) {
+      const gravity = state.weirdBurst ? world.superGravity : world.gravity;
+      ball.vy += gravity;
+      ball.vx += world.wind;
+
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      const { x, y, w, h } = world.bounds;
+      if (ball.x - ball.r < x) {
+        ball.x = x + ball.r;
+        ball.vx *= -world.bounce;
+      }
+      if (ball.x + ball.r > x + w) {
+        ball.x = x + w - ball.r;
+        ball.vx *= -world.bounce;
+      }
+      if (ball.y - ball.r < y) {
+        ball.y = y + ball.r;
+        ball.vy *= -world.bounce;
+      }
+      if (ball.y + ball.r > y + h) {
+        ball.y = y + h - ball.r;
+        ball.vy *= -world.bounce;
+        if (Math.abs(ball.vy) < 0.6) {
+          ball.vy *= 0.6;
+        }
+      }
+    }
+
+    function handleTargets(ball) {
+      for (const target of targets) {
+        if (!target.alive) continue;
+        const d = dist(ball, target);
+        if (d < ball.r + target.r) {
+          target.alive = false;
+          state.score += 200;
+          state.targetsHit += 1;
+          addParticles(target.x, target.y, ball.color);
+        }
+      }
+      if (state.targetsHit >= state.targetsTotal && !state.weirdBurst) {
+        state.weirdBurst = true;
+        state.lastBurst = performance.now();
+        world.wind = (Math.random() - 0.5) * 0.04;
+      }
+      if (state.weirdBurst && performance.now() - state.lastBurst > 6000) {
+        state.weirdBurst = false;
+        state.targetsHit = 0;
+        spawnTargets();
+      }
+    }
+
+    function updateParticles() {
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05;
+        p.life -= 1;
+      }
+      for (let i = particles.length - 1; i >= 0; i -= 1) {
+        if (particles[i].life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function drawArena() {
+      const { x, y, w, h } = world.bounds;
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.lineWidth = 8;
+      ctx.strokeRect(x, y, w, h);
+      ctx.restore();
+    }
+
+    function drawTargets() {
+      for (const target of targets) {
+        if (!target.alive) continue;
+        const wobble = Math.sin(Date.now() * 0.002 + target.wobble) * 8;
+        ctx.save();
+        ctx.translate(target.x + wobble, target.y - wobble);
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(65, 211, 189, 0.25)";
+        ctx.strokeStyle = "#41d3bd";
+        ctx.lineWidth = 3;
+        ctx.arc(0, 0, target.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawBalls() {
+      for (const ball of balls) {
+        ctx.beginPath();
+        ctx.fillStyle = ball.color;
+        ctx.shadowColor = ball.color;
+        ctx.shadowBlur = 12;
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    function drawParticles() {
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(p.life / 80, 0);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+        ctx.restore();
+      }
+    }
+
+    function drawSling() {
+      const pull = sling.pullPos;
+      ctx.save();
+      ctx.strokeStyle = "rgba(244, 185, 66, 0.6)";
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(sling.anchor.x, sling.anchor.y);
+      ctx.lineTo(pull.x, pull.y);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      ctx.arc(sling.anchor.x, sling.anchor.y, 26, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawArena();
+      drawTargets();
+      drawParticles();
+
+      for (const ball of balls) {
+        applyPhysics(ball);
+        handleTargets(ball);
+      }
+
+      drawBalls();
+      drawSling();
+      updateParticles();
+      updateHud();
+
+      requestAnimationFrame(update);
+    }
+
+    function startPull(x, y) {
+      sling.pulling = true;
+      sling.pullPos.x = x;
+      sling.pullPos.y = y;
+    }
+
+    function movePull(x, y) {
+      if (!sling.pulling) return;
+      const dx = x - sling.anchor.x;
+      const dy = y - sling.anchor.y;
+      const len = Math.hypot(dx, dy);
+      const clamped = Math.min(len, sling.maxPull);
+      const angle = Math.atan2(dy, dx);
+      sling.pullPos.x = sling.anchor.x + Math.cos(angle) * clamped;
+      sling.pullPos.y = sling.anchor.y + Math.sin(angle) * clamped;
+    }
+
+    function releasePull() {
+      if (!sling.pulling) return;
+      sling.pulling = false;
+      const dx = sling.anchor.x - sling.pullPos.x;
+      const dy = sling.anchor.y - sling.pullPos.y;
+      const force = 0.22;
+      sling.ball.vx = dx * force;
+      sling.ball.vy = dy * force;
+      state.shots += 1;
+      sling.pullPos = { ...sling.anchor };
+      setTimeout(resetBall, 400);
+    }
+
+    function toCanvasCoords(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * canvas.width,
+        y: ((event.clientY - rect.top) / rect.height) * canvas.height,
+      };
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      const pos = toCanvasCoords(event);
+      if (dist(pos, sling.anchor) < 60) {
+        startPull(pos.x, pos.y);
+      }
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      const pos = toCanvasCoords(event);
+      movePull(pos.x, pos.y);
+    });
+
+    canvas.addEventListener("pointerup", () => {
+      releasePull();
+    });
+
+    canvas.addEventListener("pointerleave", () => {
+      releasePull();
+    });
+
+    resetBtn.addEventListener("click", resetGame);
+
+    resetGame();
+    update();
+  </script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Circuit Craze</title>
+  <style>
+    :root {
+      --bg: #0a0c1a;
+      --bg-2: #141b2e;
+      --ink: #f4f0e8;
+      --accent: #ffd166;
+      --accent-2: #63f7ff;
+      --panel: rgba(12, 18, 34, 0.78);
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Gill Sans", "Trebuchet MS", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 10%, #2a3253, var(--bg) 55%),
+        linear-gradient(135deg, #090b16 0%, #141a2f 60%, #241b2e 100%);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: clamp(1.4rem, 2.6vw, 2.3rem);
+      margin: 0;
+      letter-spacing: 0.08em;
+    }
+    header p {
+      margin: 0;
+      opacity: 0.7;
+      font-size: 0.95rem;
+    }
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel);
+      padding: 10px 14px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .hud span { font-weight: 600; }
+    .hud button {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #f77f00);
+      color: #1a1306;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(244, 185, 66, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .hud button:hover { transform: translateY(-1px) scale(1.02); }
+    .board {
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(64px, 90px));
+      gap: 12px;
+      background: rgba(11, 15, 28, 0.6);
+      padding: 18px;
+      border-radius: 20px;
+      box-shadow: 0 30px 60px var(--shadow);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    .tile {
+      width: 90px;
+      height: 90px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1a2240, #111626);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+    .tile:hover { transform: translateY(-2px); }
+    .tile .connector {
+      position: absolute;
+      width: 12px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+    }
+    .tile .connector.on {
+      background: linear-gradient(180deg, #ffe066, #ff9f1c);
+      box-shadow: 0 0 18px rgba(255, 224, 102, 0.7);
+    }
+    .tile .core {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .tile.source .core {
+      background: #63f7ff;
+      box-shadow: 0 0 20px rgba(99, 247, 255, 0.8);
+    }
+    .tile.light .core {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .tile.light.lit .core {
+      background: #ffe066;
+      box-shadow: 0 0 24px rgba(255, 224, 102, 0.9);
+    }
+    .legend {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(10, 13, 24, 0.7);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      backdrop-filter: blur(8px);
+      max-width: 240px;
+    }
+    .legend strong { color: var(--accent-2); }
+    .status {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(99, 247, 255, 0.12);
+      color: #c8fbff;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 720px) {
+      body { padding: 10px; }
+      #grid { grid-template-columns: repeat(4, minmax(56px, 74px)); }
+      .tile { width: 72px; height: 72px; }
+      .legend, .status { position: static; margin-top: 10px; }
+      .board { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>CIRCUIT CRAZE</h1>
+      <p>Rotate tiles to send power from the source to every light.</p>
+    </div>
+    <div class="hud">
+      <span id="moves">Moves: 0</span>
+      <span id="lights">Lights: 0/0</span>
+      <button id="reset">New Circuit</button>
+    </div>
+  </header>
+
+  <section class="board">
+    <div id="grid"></div>
+    <div class="legend">
+      <strong>Click</strong> tiles to rotate. Connect the cyan source to the glowing lights.
+    </div>
+    <div class="status" id="status">Power: Offline</div>
+  </section>
+
+  <script>
+    const gridEl = document.getElementById("grid");
+    const movesEl = document.getElementById("moves");
+    const lightsEl = document.getElementById("lights");
+    const statusEl = document.getElementById("status");
+    const resetBtn = document.getElementById("reset");
+
+    const size = 6;
+    const tiles = [];
+    const directions = [
+      { x: 0, y: -1, key: "n" },
+      { x: 1, y: 0, key: "e" },
+      { x: 0, y: 1, key: "s" },
+      { x: -1, y: 0, key: "w" },
+    ];
+
+    const state = {
+      moves: 0,
+      lights: 0,
+      lit: 0,
+    };
+
+    function tileAt(x, y) {
+      return tiles.find((tile) => tile.x === x && tile.y === y);
+    }
+
+    function makeTile(x, y, type = "path") {
+      const tile = {
+        x,
+        y,
+        type,
+        rotation: Math.floor(Math.random() * 4),
+        connections: [],
+        powered: false,
+        element: document.createElement("button"),
+      };
+      tile.element.className = "tile";
+      tile.element.setAttribute("type", "button");
+      tile.element.addEventListener("click", () => rotateTile(tile));
+      gridEl.appendChild(tile.element);
+      tiles.push(tile);
+      return tile;
+    }
+
+    function rotateConnections(conns, rot) {
+      return conns.map((dir) => directions[(directions.findIndex((d) => d.key === dir) + rot) % 4].key);
+    }
+
+    function addTileUI(tile) {
+      tile.element.innerHTML = "";
+      const core = document.createElement("div");
+      core.className = "core";
+      tile.element.appendChild(core);
+
+      const active = rotateConnections(tile.connections, tile.rotation);
+      active.forEach((dir) => {
+        const idx = directions.findIndex((d) => d.key === dir);
+        const connector = document.createElement("span");
+        connector.className = "connector";
+        if (tile.powered) connector.classList.add("on");
+        if (idx === 0) {
+          connector.style.top = "-8px";
+        }
+        if (idx === 1) {
+          connector.style.right = "-8px";
+          connector.style.width = "32px";
+          connector.style.height = "12px";
+        }
+        if (idx === 2) {
+          connector.style.bottom = "-8px";
+        }
+        if (idx === 3) {
+          connector.style.left = "-8px";
+          connector.style.width = "32px";
+          connector.style.height = "12px";
+        }
+        tile.element.appendChild(connector);
+      });
+
+      tile.element.classList.toggle("source", tile.type === "source");
+      tile.element.classList.toggle("light", tile.type === "light");
+      tile.element.classList.toggle("lit", tile.type === "light" && tile.powered);
+    }
+
+    function generateCircuit() {
+      tiles.length = 0;
+      gridEl.innerHTML = "";
+      state.moves = 0;
+
+      const pathPoints = [];
+      let x = 0;
+      let y = Math.floor(size / 2);
+      pathPoints.push({ x, y });
+      for (let step = 0; step < size * 2; step += 1) {
+        const dir = directions[Math.floor(Math.random() * directions.length)];
+        const nx = Math.max(0, Math.min(size - 1, x + dir.x));
+        const ny = Math.max(0, Math.min(size - 1, y + dir.y));
+        if (nx === x && ny === y) continue;
+        x = nx;
+        y = ny;
+        pathPoints.push({ x, y });
+        if (x === size - 1 && y === Math.floor(size / 2)) break;
+      }
+
+      const sourcePoint = pathPoints[0];
+      const goalPoint = pathPoints[pathPoints.length - 1];
+
+      for (let row = 0; row < size; row += 1) {
+        for (let col = 0; col < size; col += 1) {
+          const type = row === sourcePoint.y && col === sourcePoint.x ? "source" : "path";
+          makeTile(col, row, type);
+        }
+      }
+
+      for (let i = 0; i < pathPoints.length - 1; i += 1) {
+        const a = pathPoints[i];
+        const b = pathPoints[i + 1];
+        const tileA = tileAt(a.x, a.y);
+        const tileB = tileAt(b.x, b.y);
+        const dir = directions.find((d) => d.x === b.x - a.x && d.y === b.y - a.y);
+        if (!dir) continue;
+        tileA.connections.push(dir.key);
+        const opposite = directions[(directions.indexOf(dir) + 2) % 4].key;
+        tileB.connections.push(opposite);
+      }
+
+      const lightCount = 4;
+      state.lights = lightCount;
+      state.lit = 0;
+      const lights = [];
+      while (lights.length < lightCount) {
+        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+        if (randomTile.type === "path") {
+          randomTile.type = "light";
+          lights.push(randomTile);
+        }
+      }
+
+      tiles.forEach((tile) => {
+        if (tile.connections.length === 0) {
+          tile.connections = ["n", "s"]; 
+        }
+        tile.rotation = Math.floor(Math.random() * 4);
+        addTileUI(tile);
+      });
+
+      updatePower();
+      updateHud();
+    }
+
+    function rotateTile(tile) {
+      tile.rotation = (tile.rotation + 1) % 4;
+      state.moves += 1;
+      updatePower();
+      updateHud();
+    }
+
+    function updatePower() {
+      tiles.forEach((tile) => { tile.powered = false; });
+      const source = tiles.find((tile) => tile.type === "source");
+      if (!source) return;
+
+      const queue = [source];
+      source.powered = true;
+
+      while (queue.length) {
+        const current = queue.shift();
+        const active = rotateConnections(current.connections, current.rotation);
+        active.forEach((dirKey) => {
+          const dir = directions.find((d) => d.key === dirKey);
+          const neighbor = tileAt(current.x + dir.x, current.y + dir.y);
+          if (!neighbor) return;
+          const neighborActive = rotateConnections(neighbor.connections, neighbor.rotation);
+          const opposite = directions[(directions.indexOf(dir) + 2) % 4].key;
+          if (!neighborActive.includes(opposite)) return;
+          if (!neighbor.powered) {
+            neighbor.powered = true;
+            queue.push(neighbor);
+          }
+        });
+      }
+
+      tiles.forEach(addTileUI);
+
+      state.lit = tiles.filter((tile) => tile.type === "light" && tile.powered).length;
+      statusEl.textContent = state.lit === state.lights ? "Power: Stable" : "Power: Offline";
+    }
+
+    function updateHud() {
+      movesEl.textContent = `Moves: ${state.moves}`;
+      lightsEl.textContent = `Lights: ${state.lit}/${state.lights}`;
+    }
+
+    resetBtn.addEventListener("click", generateCircuit);
+
+    generateCircuit();
+  </script>
+</body>
+</html>

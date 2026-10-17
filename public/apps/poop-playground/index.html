@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poop Playground Physics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="controls" style="display: none"></div>
+    <div id="info-ui">
+        <div class="icon-counter">
+            <img src="images/jem.svg" />
+            <span id="level-counter">0</span>
+        </div>
+        <div class="icon-counter">
+            <img src="images/coin.svg" />
+            <span id="coin-counter">0</span>
+        </div>
+    </div>
+  
+  <div id="hotbar-right"></div>
+  <div id="hotbar-left" style="display: none"></div>
+  <canvas id="canvas"></canvas>
+  <div id="settings-btn" title="Settings" style="position: absolute; top: 20px; right: 20px; z-index: 1000; cursor: pointer; background: #222; color: #fff; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 2px 8px #0008; border: 2px solid #444;">
+    <span>⚙️</span>
+  </div>
+  <div id="settings-menu" style="display: none;"></div>
+  <script src="matter.min.js"></script>
+  <script src="poop-playground.js"></script>
+  <script>
+    // Hotbar item system
+    const hotbarRight = document.getElementById('hotbar-right');
+    const hotbarLeft = document.getElementById('hotbar-left');
+    const controlsBar = document.getElementById('controls');
+    // Erase All button (appears only in Eraser mode)
+    const eraseAllBtn = document.createElement('button');
+    eraseAllBtn.id = 'erase-all-btn';
+    eraseAllBtn.className = 'btn';
+    eraseAllBtn.textContent = 'Erase All';
+    eraseAllBtn.title = 'Erase all drawn walls';
+    eraseAllBtn.onclick = () => {
+      try {
+        // Remove all existing drawn wall bodies
+        if (typeof drawnWalls !== 'undefined' && Array.isArray(drawnWalls)) {
+          for (const path of drawnWalls) {
+            for (const wallBody of path) {
+              try { Matter.World.remove(world, wallBody); } catch (e) {}
+            }
+          }
+          drawnWalls.length = 0;
+        }
+        // Also remove any in-progress pencil path
+        if (typeof currentPencilPath !== 'undefined' && Array.isArray(currentPencilPath) && currentPencilPath.length) {
+          for (const wallBody of currentPencilPath) {
+            try { Matter.World.remove(world, wallBody); } catch (e) {}
+          }
+        }
+        if (typeof currentPencilPath !== 'undefined') {
+          currentPencilPath = null;
+        }
+      } catch (err) {
+        console.warn('Erase All failed:', err);
+      }
+    };
+    controlsBar.appendChild(eraseAllBtn);
+
+    function updateToolUI() {
+      const isEraser = window.selectedHotbarItem === 'Eraser';
+      controlsBar.style.display = isEraser ? '' : 'none';
+      eraseAllBtn.style.display = isEraser ? '' : 'none';
+    }
+    window.hotbarItems = [];
+    window.selectedHotbarItem = null;
+    // Calculate max items for right hotbar based on 60% of screen height
+    function getMaxHotbarItemsPerSide() {
+      // Estimate button height (48px) + margin (4px)
+      const btnHeight = 48 + 8; // 48px + 8px margin
+      return Math.floor((window.innerHeight - 360) / btnHeight);
+    }
+    let rightHotbarCount = 0;
+    window.addHotbarItem = function({icon, name, onSelect, selected}) {
+      const btn = document.createElement('button');
+      btn.className = 'hotbar-item hotbar-btn' + (name === 'Pencil' ? ' pencil' : '');
+      btn.title = name;
+      btn.innerHTML = icon;
+      // Set initial border for pencil button
+      if (name === 'Pencil') {
+        btn.style.border = '2px solid ' + window.pencilColor;
+      }
+      btn.onclick = () => {
+        window.selectedHotbarItem = name;
+        if (typeof onSelect === 'function') onSelect();
+        // Highlight selected
+        for (const b of hotbarRight.children) {
+          b.classList.remove('selected');
+          if (b.classList.contains('pencil')) {
+            b.style.background = '';
+            b.style.border = '2px solid ' + window.pencilColor;
+          }
+        }
+        for (const b of hotbarLeft.children) {
+          b.classList.remove('selected');
+          if (b.classList.contains('pencil')) {
+            b.style.background = '';
+            b.style.border = '2px solid ' + window.pencilColor;
+          }
+        }
+        btn.classList.add('selected');
+        if (btn.classList.contains('pencil')) {
+          btn.style.background = window.pencilColor;
+          btn.style.border = '2px solid ' + window.pencilColor;
+        }
+        // Update tool-specific UI
+        updateToolUI();
+      };
+      // Decide which hotbar to put this button in
+      const maxRight = getMaxHotbarItemsPerSide();
+      if (rightHotbarCount < maxRight) {
+        hotbarRight.appendChild(btn);
+        rightHotbarCount++;
+      } else {
+        hotbarLeft.appendChild(btn);
+      }
+      window.hotbarItems.push({name, btn, onSelect});
+      if (selected) {
+        btn.classList.add('selected');
+        window.selectedHotbarItem = name;
+        if (btn.classList.contains('pencil')) {
+          btn.style.background = window.pencilColor;
+          btn.style.border = '2px solid ' + window.pencilColor;
+        }
+        updateToolUI();
+      }
+    };
+    // Recalculate on resize
+    window.addEventListener('resize', () => {
+      // Move all buttons back to hotbarItems, then refill right/left
+      rightHotbarCount = 0;
+      hotbarRight.innerHTML = '';
+      hotbarLeft.innerHTML = '';
+      const maxRight = getMaxHotbarItemsPerSide();
+      window.hotbarItems.forEach(({btn}, i) => {
+        if (i < maxRight) {
+          hotbarRight.appendChild(btn);
+          rightHotbarCount++;
+        } else {
+          hotbarLeft.appendChild(btn);
+        }
+      });
+      // Hide left hotbar if empty
+      hotbarLeft.style.display = hotbarLeft.children.length === 0 ? 'none' : '';
+    });
+    // Also observe left hotbar for changes and hide if empty
+    const leftHotbarObserver = new MutationObserver(() => {
+      hotbarLeft.style.display = hotbarLeft.children.length === 0 ? 'none' : '';
+    });
+    leftHotbarObserver.observe(hotbarLeft, { childList: true });
+    // Add Poop item (default selected)
+    addHotbarItem({
+      icon: '<img id="poop-hotbar-icon" class="hotbar-icon" src="images/skins/0.svg" />',
+      name: 'Poop',
+      selected: true,
+      onSelect: null // no-op
+    });
+    // Add Diarrhea item
+    addHotbarItem({
+      icon: '<img src="images/icons/diarrhea.svg" class="hotbar-icon" />',
+      name: 'Diarrhea',
+      onSelect: null // logic handled in JS
+    });
+    // Add Magnet item
+    addHotbarItem({
+      icon: '<img src="images/icons/magnet.svg" class="hotbar-icon" />',
+      name: 'Magnet',
+      onSelect: null // logic handled in JS
+    });
+    // Add Syringe item
+    addHotbarItem({
+      icon: '<img src="images/icons/syringe.svg" class="hotbar-icon" />',
+      name: 'Syringe',
+      onSelect: null // logic handled in JS
+    });
+    // Add Medicine item
+    addHotbarItem({
+      icon: '<img src="images/icons/medkit.svg" class="hotbar-icon" />',
+      name: 'Medkit',
+      onSelect: null // logic handled in JS
+    });
+    // Add Saw item
+    addHotbarItem({
+      icon: '<img src="images/icons/saw.svg" class="hotbar-icon" />',
+      name: 'Saw',
+      onSelect: null // logic handled in JS
+    });
+    
+    // Add Pencil tool
+    addHotbarItem({
+      icon: '<img src="images/icons/pencil.svg" class="hotbar-icon" />',
+      name: 'Pencil',
+      onSelect: null // logic handled in JS
+    });
+    // Add Pencil color swatch popout
+    const pencilBtn = [...hotbarRight.children].find(b => b.title === 'Pencil');
+    const colorPopout = document.createElement('div');
+    colorPopout.style.position = 'absolute';
+    colorPopout.style.display = 'none';
+    colorPopout.style.zIndex = '100';
+    colorPopout.style.background = '#222';
+    colorPopout.style.border = '2px solid #444';
+    colorPopout.style.borderRadius = '10px';
+    colorPopout.style.padding = '8px 8px 8px 8px';
+    colorPopout.style.boxShadow = '0 2px 8px #0008';
+    colorPopout.style.userSelect = 'none';
+    colorPopout.style.transition = 'opacity 0.15s';
+    colorPopout.style.pointerEvents = 'auto';
+    colorPopout.className = 'pencil-color-popout';
+    colorPopout.style.display = 'none';
+    colorPopout.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    colorPopout.style.gridTemplateRows = 'repeat(3, 1fr)';
+    colorPopout.style.gap = '6px';
+    colorPopout.style.width = 'max-content';
+    colorPopout.style.height = 'max-content';
+    colorPopout.style.display = 'none';
+    colorPopout.style.position = 'absolute';
+    // Will set left/top below
+    colorPopout.style.display = 'none';
+
+    // Color swatches
+    const COLORS = [
+      {name:'Red',color:'#e53935'},
+      {name:'Orange',color:'#fb8c00'},
+      {name:'Yellow',color:'#fdd835'},
+      {name:'Green',color:'#43a047'},
+      {name:'Blue',color:'#1e88e5'},
+      {name:'Purple',color:'#8e24aa'},
+      {name:'Pink',color:'#ec407a'},
+      {name:'Magenta',color:'#d500f9'},
+      {name:'Brown',color:'#8d5524'},
+      {name:'Black',color:'#222'},
+      {name:'White',color:'#fff'}
+    ];
+    // Add a 12th color for grid symmetry (gray)
+    COLORS.push({name:'Gray',color:'#888'});
+
+    let pencilColor = localStorage.getItem('pencilColor') || '#888';
+    window.pencilColor = pencilColor;
+    COLORS.forEach(({name, color}) => {
+      const swatch = document.createElement('button');
+      swatch.title = name;
+      swatch.style.background = color;
+      swatch.style.width = '28px';
+      swatch.style.height = '28px';
+      swatch.style.margin = '2px';
+      swatch.style.border = '2px solid #444';
+      swatch.style.borderRadius = '6px';
+      swatch.style.cursor = 'pointer';
+      swatch.style.outline = 'none';
+      swatch.style.display = 'inline-block';
+      swatch.style.transition = 'border 0.15s';
+      swatch.onmouseenter = () => swatch.style.border = '2px solid #ffb300';
+      swatch.onmouseleave = () => swatch.style.border = (window.pencilColor === color ? '2px solid #ffb300' : '2px solid #444');
+      swatch.onclick = (e) => {
+        window.pencilColor = color;
+        localStorage.setItem('pencilColor', color);
+        updatePencilBtnColor();
+        // Highlight selected
+        for (const btn of colorPopout.children) btn.style.border = '2px solid #444';
+        swatch.style.border = '2px solid #ffb300';
+        e.stopPropagation();
+      };
+      if (color === window.pencilColor) swatch.style.border = '2px solid #ffb300';
+      colorPopout.appendChild(swatch);
+    });
+    hotbarRight.appendChild(colorPopout);
+
+    // Show/hide logic
+    let popoutVisible = false;
+    function showPencilColorPopout(show) {
+      colorPopout.style.display = show ? 'grid' : 'none';
+      popoutVisible = show;
+      if (show) {
+        // Position popout to the left of the pencil button, vertically centered
+        const btnRect = pencilBtn.getBoundingClientRect();
+        const hotbarRect = hotbarRight.getBoundingClientRect();
+        colorPopout.style.left = (pencilBtn.offsetLeft - colorPopout.offsetWidth - 8) + 'px';
+        colorPopout.style.top = (pencilBtn.offsetTop + pencilBtn.offsetHeight/2 - colorPopout.offsetHeight/2) + 'px';
+      }
+    }
+    // When pencil color changes, update the pencil button background if selected
+    function updatePencilBtnColor() {
+      // Update all pencil buttons (in case of left/right hotbar)
+      const pencilBtns = document.querySelectorAll('.hotbar-btn.pencil');
+      pencilBtns.forEach(pencilBtn => {
+        if (pencilBtn.classList.contains('selected')) {
+          pencilBtn.style.background = window.pencilColor;
+        } else {
+          pencilBtn.style.background = '';
+        }
+        pencilBtn.style.border = '2px solid ' + window.pencilColor;
+      });
+    }
+    updatePencilBtnColor();
+    // Toggle popout on right-click
+    function addPencilContextMenu(btn) {
+      btn.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showPencilColorPopout(!popoutVisible);
+      });
+    }
+    addPencilContextMenu(pencilBtn);
+    // Add context menu to any pencil buttons that get moved to left hotbar
+    const leftHotbarPencilObserver = new MutationObserver(() => {
+      hotbarLeft.style.display = hotbarLeft.children.length === 0 ? 'none' : '';
+      // Re-add context menu to any pencil buttons in left hotbar
+      const leftPencilBtns = hotbarLeft.querySelectorAll('.hotbar-btn.pencil');
+      leftPencilBtns.forEach(btn => {
+        // Remove existing listeners to avoid duplicates
+        btn.removeEventListener('contextmenu', btn._pencilContextHandler);
+        // Add new listener
+        btn._pencilContextHandler = (e) => {
+          e.preventDefault();
+          showPencilColorPopout(!popoutVisible);
+        };
+        btn.addEventListener('contextmenu', btn._pencilContextHandler);
+      });
+    });
+    leftHotbarPencilObserver.observe(hotbarLeft, { childList: true });
+    // Hide popout if clicking elsewhere
+    document.addEventListener('mousedown', (e) => {
+      if (!colorPopout.contains(e.target) && e.target !== pencilBtn) {
+        showPencilColorPopout(false);
+      }
+    });
+    // Hide popout if another tool is selected
+    for (const btn of hotbarRight.children) {
+      if (btn !== pencilBtn) btn.addEventListener('click', () => showPencilColorPopout(false));
+    }
+    // Add Eraser tool
+    addHotbarItem({
+      icon: '<img src="images/icons/eraser.svg" class="hotbar-icon" />',
+      name: 'Eraser',
+      onSelect: () => updateToolUI() // show erase-all when selected
+    });
+    
+    // Add Toilet tool
+    addHotbarItem({
+      icon: '<img src="images/icons/toilet.svg" class="hotbar-icon" />',
+      name: 'Toilet',
+      onSelect: null // logic handled in JS
+    });
+    // Add Toilet Paper tool
+    addHotbarItem({
+      icon: '<img src="images/icons/toilet-paper.svg" class="hotbar-icon" />',
+      name: 'Toilet Paper',
+      onSelect: null // logic handled in JS
+    });
+    // Add Chain tool
+    addHotbarItem({
+      icon: '<img src="images/icons/chain.svg" class="hotbar-icon" />',
+      name: 'Chain',
+      onSelect: null // logic handled in JS
+    });
+    // Add JSFB tool
+    addHotbarItem({
+      icon: '<img src="images/icons/jsfb.svg" class="hotbar-icon" />',
+      name: 'JSFB',
+      onSelect: null // logic handled in JS
+    });
+    // Add Disco Ball tool
+    addHotbarItem({
+      icon: '<img src="images/icons/disco-ball.svg" class="hotbar-icon" />',
+      name: 'Disco Ball',
+      onSelect: null // logic handled in JS
+    });
+    // Add Wind tool
+    addHotbarItem({
+      icon: '<img src="images/icons/wind.svg" class="hotbar-icon" />',
+      name: 'Wind',
+      onSelect: null // logic handled in JS
+    });
+    // Add Sandal tool
+    addHotbarItem({
+      icon: '<img src="images/icons/sandal.svg" class="hotbar-icon" />',
+      name: 'Sandal',
+      onSelect: null // logic handled in JS
+    });
+    // Add Volcano tool
+    addHotbarItem({
+      icon: '<img src="images/icons/volcano.svg" class="hotbar-icon" />',
+      name: 'Volcano',
+      onSelect: null // logic handled in JS
+    });
+    // Initial UI state
+    updateToolUI();
+  </script>
+  <script>
+    // After hotbar setup, add JS to update poop-hotbar-icon src based on current skin
+    const updatePoopHotbarIcon = () => {
+      let skin = localStorage.getItem('poop-skin') || '0';
+      if (skin === 'random') {
+        document.getElementById('poop-hotbar-icon').src = 'images/skins/random.svg';
+      } else {
+        document.getElementById('poop-hotbar-icon').src = `images/skins/${skin}.svg`;
+      }
+    };
+    updatePoopHotbarIcon();
+    window.addEventListener('storage', updatePoopHotbarIcon);
+    window.addEventListener('focus', updatePoopHotbarIcon);
+    // Also update on skin input change
+  </script>
+</body>
+</html>

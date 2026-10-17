@@ -1,0 +1,6 @@
+.liquid-glass {
+    position: absolute !important;
+    width: 400px;
+    height: 300px;
+    border-radius: 48px;
+}

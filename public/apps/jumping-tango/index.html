@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumping Tango - Endless Platformer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 70%, #90EE90 100%);
+            border: 4px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            z-index: 10;
+        }
+
+        #powerupDisplay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 16px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            z-index: 10;
+            text-align: right;
+        }
+
+        .powerup-icon {
+            background: rgba(255,255,255,0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+
+        #gameOver h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        #gameOver button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        #gameOver button:hover {
+            background: #45a049;
+            transform: scale(1.1);
+        }
+
+        #startScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            max-height: 90vh;
+            overflow-y: auto;
+            max-width: 500px;
+        }
+
+        #startScreen h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+        }
+
+        #startScreen p {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        #startScreen button {
+            background: #FF6347;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        #startScreen button:hover {
+            background: #FF4500;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div>Score: <span id="score">0</span></div>
+            <div>High Score: <span id="highScore">0</span></div>
+        </div>
+
+        <div id="powerupDisplay"></div>
+
+        <div id="startScreen">
+            <h1>🐱 Jumping Tango 🐱</h1>
+            <p>Control Tango the Siamese cat!</p>
+            <p><strong>Controls:</strong></p>
+            <p>← → Arrow keys to move</p>
+            <p>SPACE or ↑ to jump</p>
+            <p><strong>Collect power-ups:</strong></p>
+            <p>💨 Fart Fly - Press F to fly!</p>
+            <p>⚡ Dash - Press D to dash!</p>
+            <p>🌟 Double Jump - Extra jump in air!</p>
+            <p>🛡️ Shield - Protects from falls!</p>
+            <p><strong>Watch out for 💩 Poop Guys!</strong></p>
+            <p>Jump on their heads to defeat them!</p>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="gameOver">
+            <h1>Game Over!</h1>
+            <p id="finalScore"></p>
+            <button onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // Camera system
+        const camera = {
+            x: 0,
+            y: 0,
+            targetX: 0,
+            targetY: 0,
+            smoothing: 0.1
+        };
+
+        // Game state
+        let gameRunning = false;
+        let score = 0;
+        let highScore = localStorage.getItem('tangoHighScore') || 0;
+        document.getElementById('highScore').textContent = highScore;
+
+        // Player (Tango the cat)
+        const player = {
+            x: 100,
+            y: 300,
+            width: 40,
+            height: 40,
+            velocityX: 0,
+            velocityY: 0,
+            speed: 5,
+            jumpPower: 15,
+            gravity: 0.6,
+            onGround: false,
+            color: '#F5DEB3',
+            hasDoubleJump: false,
+            doubleJumpUsed: false,
+            hasDash: false,
+            dashCooldown: 0,
+            hasFartFly: false,
+            fartFlyFuel: 0,
+            hasShield: false,
+            shieldActive: false,
+            isSticky: false,
+            stickyTimer: 0
+        };
+
+        // Platforms
+        let platforms = [];
+        let platformSpeed = 2;
+        let platformSpawnTimer = 0;
+        let lastPlatformX = 0;
+
+        // Enemies
+        let enemies = [];
+        let enemySpawnTimer = 0;
+        const enemySpawnInterval = 300; // Spawn every 5 seconds
+
+        // Power-ups
+        let powerups = [];
+        const powerupTypes = [
+            { type: 'fartfly', color: '#FFB6C1', symbol: '💨', name: 'Fart Fly' },
+            { type: 'dash', color: '#FFD700', symbol: '⚡', name: 'Dash' },
+            { type: 'doublejump', color: '#87CEEB', symbol: '🌟', name: 'Double Jump' },
+            { type: 'shield', color: '#9370DB', symbol: '🛡️', name: 'Shield' }
+        ];
+
+        // Particles for effects
+        let particles = [];
+
+        // Input handling
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            keys[e.code] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+            keys[e.code] = false;
+        });
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameRunning = true;
+            initGame();
+            gameLoop();
+        }
+
+        function initGame() {
+            score = 0;
+            platformSpeed = 2;
+            player.x = 100;
+            player.y = 300;
+            player.velocityX = 0;
+            player.velocityY = 0;
+            player.hasDoubleJump = false;
+            player.doubleJumpUsed = false;
+            player.hasDash = false;
+            player.dashCooldown = 0;
+            player.hasFartFly = false;
+            player.fartFlyFuel = 0;
+            player.hasShield = false;
+            player.shieldActive = false;
+            player.isSticky = false;
+            player.stickyTimer = 0;
+            
+            // Reset camera
+            camera.x = 0;
+            camera.y = 0;
+            camera.targetX = 0;
+            camera.targetY = 0;
+            
+            platforms = [];
+            powerups = [];
+            particles = [];
+            enemies = [];
+            enemySpawnTimer = 0;
+            lastPlatformX = 0;
+
+            // Create starting platform right under player
+            platforms.push({
+                x: 0,
+                y: 400,
+                width: 250,
+                height: 15,
+                type: 'normal',
+                bounceHeight: 0,
+                movingDirection: 0,
+                movingSpeed: 2,
+                conveyorDirection: 0,
+                conveyorSpeed: 3,
+                originalY: 400,
+                crumbleTimer: 0,
+                crumbling: false,
+                animationOffset: 0,
+                phasingCycle: 180,
+                phasingTimer: 0,
+                isSolid: true
+            });
+
+            // Create initial chain of platforms sequentially
+            for (let i = 0; i < 8; i++) {
+                createPlatform(true);
+            }
+        }
+
+        function createPlatform(fromPrevious = true) {
+            const gridSize = 48;
+            let x, y;
+            const width = Math.random() * 80 + 100;
+            
+            if (fromPrevious && platforms.length > 0) {
+                // Get the last platform
+                const lastPlatform = platforms[platforms.length - 1];
+                
+                // Start from top-left corner of previous platform
+                const startX = lastPlatform.x;
+                const startY = lastPlatform.y;
+                
+                // Add horizontal offset (how far right the next platform is)
+                const horizontalOffset = Math.random() * 120 + 80; // 80-200 pixels right
+                
+                // Add vertical offset (can go up or down, but must be jumpable)
+                const maxVerticalChange = 120;
+                const verticalOffset = (Math.random() * maxVerticalChange * 2) - maxVerticalChange; // -120 to +120
+                
+                x = Math.floor((startX + horizontalOffset) / gridSize) * gridSize;
+                y = Math.floor((startY + verticalOffset) / gridSize) * gridSize;
+                
+                // Keep platforms within bounds
+                if (y < 100) y = 100;
+                if (y > canvas.height - 100) y = canvas.height - 100;
+            } else {
+                // Initial platform positioning
+                x = canvas.width;
+                y = Math.random() * (canvas.height - 250) + 150;
+            }
+            
+            // Random platform types with new interactive elements
+            const rand = Math.random();
+            let type = 'normal';
+            if (rand > 0.88) type = 'springboard';      // Super bounce
+            else if (rand > 0.76) type = 'bouncy';      // Regular bounce
+            else if (rand > 0.64) type = 'sticky';      // Slows movement
+            else if (rand > 0.52) type = 'ice';         // Slippery
+            else if (rand > 0.40) type = 'conveyor';    // Moves player
+            else if (rand > 0.28) type = 'moving';      // Platform moves
+            else if (rand > 0.16) type = 'crumbling';   // Breaks after landing
+            else if (rand > 0.08) type = 'phasing';     // Appears and disappears
+            
+            platforms.push({
+                x: x,
+                y: y,
+                width: width,
+                height: 15,
+                type: type,
+                bounceHeight: type === 'bouncy' ? 20 : (type === 'springboard' ? 35 : 0),
+                movingDirection: type === 'moving' ? (Math.random() > 0.5 ? 1 : -1) : 0,
+                movingSpeed: 2,
+                conveyorDirection: type === 'conveyor' ? (Math.random() > 0.5 ? 1 : -1) : 0,
+                conveyorSpeed: 3,
+                originalY: y,
+                crumbleTimer: type === 'crumbling' ? 60 : 0,
+                crumbling: false,
+                animationOffset: Math.random() * Math.PI * 2,
+                // Phasing platform properties
+                phasingCycle: 180, // 3 seconds per cycle (at 60fps)
+                phasingTimer: Math.floor(Math.random() * 180), // Random starting point
+                isSolid: true
+            });
+
+            lastPlatformX = x;
+
+            // Spawn power-up on some platforms
+            if (Math.random() < 0.25) {
+                const powerupType = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
+                powerups.push({
+                    x: x + width / 2 - 12.5,
+                    y: y - 30,
+                    width: 25,
+                    height: 25,
+                    type: powerupType.type,
+                    color: powerupType.color,
+                    symbol: powerupType.symbol,
+                    name: powerupType.name
+                });
+            }
+        }
+
+        function createEnemy() {
+            // Find a platform to spawn on
+            const validPlatforms = platforms.filter(p => 
+                p.x > player.x + canvas.width / 2 && 
+                p.x < player.x + canvas.width * 1.5 &&
+                p.type !== 'crumbling'
+            );
+            
+            if (validPlatforms.length === 0) return;
+            
+            const platform = validPlatforms[Math.floor(Math.random() * validPlatforms.length)];
+            
+            enemies.push({
+                x: platform.x + platform.width / 2,
+                y: platform.y - 35,
+                width: 30,
+                height: 35,
+                velocityX: 0,
+                velocityY: 0,
+                speed: 2,
+                gravity: 0.6,
+                onGround: false,
+                chaseDistance: 400,
+                isDead: false,
+                deathTimer: 0
+            });
+        }
+
+        function updatePlayer() {
+            // Handle sticky slime slowdown
+            const moveSpeed = player.isSticky ? player.speed * 0.4 : player.speed;
+            if (player.stickyTimer > 0) {
+                player.stickyTimer--;
+                if (player.stickyTimer === 0) {
+                    player.isSticky = false;
+                }
+            }
+
+            // Horizontal movement
+            if (keys['ArrowLeft'] || keys['a']) {
+                player.velocityX = -moveSpeed;
+            } else if (keys['ArrowRight'] || keys['d']) {
+                player.velocityX = moveSpeed;
+            } else {
+                player.velocityX *= 0.8;
+            }
+
+            // Jumping
+            if ((keys[' '] || keys['ArrowUp'] || keys['w']) && player.onGround) {
+                player.velocityY = -player.jumpPower;
+                player.onGround = false;
+                player.doubleJumpUsed = false;
+                createParticles(player.x + player.width / 2, player.y + player.height, '#ffffff', 5);
+            }
+
+            // Double jump
+            if ((keys[' '] || keys['ArrowUp'] || keys['w']) && !player.onGround && player.hasDoubleJump && !player.doubleJumpUsed) {
+                if (!keys.jumpWasPressed) {
+                    player.velocityY = -player.jumpPower * 0.8;
+                    player.doubleJumpUsed = true;
+                    createParticles(player.x + player.width / 2, player.y + player.height / 2, '#87CEEB', 8);
+                    keys.jumpWasPressed = true;
+                }
+            } else if (!keys[' '] && !keys['ArrowUp'] && !keys['w']) {
+                keys.jumpWasPressed = false;
+            }
+
+            // Dash ability
+            if ((keys['d'] || keys['D']) && player.hasDash && player.dashCooldown === 0) {
+                player.velocityX = player.speed * 5;
+                player.dashCooldown = 60;
+                createParticles(player.x, player.y + player.height / 2, '#FFD700', 15);
+            }
+            if (player.dashCooldown > 0) player.dashCooldown--;
+
+            // Fart fly ability
+            if ((keys['f'] || keys['F']) && player.hasFartFly && player.fartFlyFuel > 0) {
+                player.velocityY = -8;
+                player.fartFlyFuel--;
+                if (player.fartFlyFuel % 3 === 0) {
+                    createParticles(player.x + player.width / 2, player.y + player.height, '#FFB6C1', 3);
+                }
+                if (player.fartFlyFuel === 0) {
+                    player.hasFartFly = false;
+                }
+            }
+
+            // Apply gravity
+            player.velocityY += player.gravity;
+
+            // Update position
+            player.x += player.velocityX;
+            player.y += player.velocityY;
+
+            // Update camera to follow player
+            camera.targetX = player.x - canvas.width / 3;
+            camera.targetY = player.y - canvas.height / 2;
+            
+            // Smooth camera movement
+            camera.x += (camera.targetX - camera.x) * camera.smoothing;
+            camera.y += (camera.targetY - camera.y) * camera.smoothing;
+
+            // Check if fallen too far below visible area
+            if (player.y > camera.y + canvas.height + 100) {
+                if (player.hasShield && !player.shieldActive) {
+                    player.shieldActive = true;
+                    player.y = camera.y - 50;
+                    player.velocityY = 0;
+                    createParticles(player.x + player.width / 2, player.y, '#9370DB', 20);
+                    player.hasShield = false;
+                } else {
+                    gameOver();
+                }
+            }
+
+            player.onGround = false;
+        }
+
+        function updatePlatforms() {
+            for (let i = platforms.length - 1; i >= 0; i--) {
+                const platform = platforms[i];
+
+                // Moving platforms
+                if (platform.type === 'moving') {
+                    platform.y += platform.movingDirection * platform.movingSpeed;
+                    if (platform.y < platform.originalY - 50 || platform.y > platform.originalY + 50) {
+                        platform.movingDirection *= -1;
+                    }
+                }
+
+                // Phasing platforms
+                if (platform.type === 'phasing') {
+                    platform.phasingTimer++;
+                    if (platform.phasingTimer >= platform.phasingCycle) {
+                        platform.phasingTimer = 0;
+                    }
+                    
+                    // Solid for 2/3 of cycle, invisible for 1/3
+                    const cyclePosition = platform.phasingTimer / platform.phasingCycle;
+                    platform.isSolid = cyclePosition < 0.66;
+                }
+
+                // Crumbling platforms
+                if (platform.crumbling && platform.crumbleTimer > 0) {
+                    platform.crumbleTimer--;
+                    if (platform.crumbleTimer === 0) {
+                        platforms.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                // Remove platforms that are far behind camera
+                if (platform.x + platform.width < camera.x - 200) {
+                    platforms.splice(i, 1);
+                    score += 10;
+                    continue;
+                }
+
+                // Collision detection (only for solid platforms)
+                const canCollide = platform.type !== 'phasing' || platform.isSolid;
+                
+                if (canCollide && player.velocityY > 0 &&
+                    player.x + player.width > platform.x &&
+                    player.x < platform.x + platform.width &&
+                    player.y + player.height > platform.y &&
+                    player.y + player.height < platform.y + platform.height + 10) {
+                    
+                    player.y = platform.y - player.height;
+                    player.velocityY = 0;
+                    player.onGround = true;
+
+                    // Handle different platform types
+                    if (platform.type === 'bouncy' || platform.type === 'springboard') {
+                        player.velocityY = -(player.jumpPower + platform.bounceHeight);
+                        const color = platform.type === 'springboard' ? '#FF1493' : '#FFD700';
+                        createParticles(player.x + player.width / 2, player.y + player.height, color, 10);
+                    }
+
+                    if (platform.type === 'sticky') {
+                        player.isSticky = true;
+                        player.stickyTimer = 120;
+                        createParticles(player.x + player.width / 2, player.y + player.height, '#32CD32', 5);
+                    }
+
+                    if (platform.type === 'ice') {
+                        // Ice makes you slide - reduce friction
+                        player.velocityX *= 1.2;
+                    }
+
+                    if (platform.type === 'conveyor') {
+                        // Conveyor adds velocity to player
+                        player.velocityX += platform.conveyorDirection * platform.conveyorSpeed;
+                    }
+
+                    if (platform.type === 'crumbling' && !platform.crumbling) {
+                        platform.crumbling = true;
+                        platform.crumbleTimer = 30;
+                    }
+                }
+            }
+
+            // Spawn new platforms when player progresses
+            platformSpawnTimer++;
+            if (platformSpawnTimer > 40 && (platforms.length === 0 || lastPlatformX < player.x + canvas.width)) {
+                createPlatform(true);
+                platformSpawnTimer = 0;
+            }
+
+            // Update score based on distance traveled
+            const distanceScore = Math.floor(player.x / 10);
+            if (distanceScore > score) {
+                score = distanceScore;
+            }
+            document.getElementById('score').textContent = Math.floor(score);
+        }
+
+        function updatePowerups() {
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                const powerup = powerups[i];
+
+                // Bobbing animation
+                powerup.y += Math.sin(Date.now() / 200 + i) * 0.5;
+
+                // Remove powerups behind camera
+                if (powerup.x + powerup.width < camera.x - 200) {
+                    powerups.splice(i, 1);
+                    continue;
+                }
+
+                // Collision with player
+                if (player.x + player.width > powerup.x &&
+                    player.x < powerup.x + powerup.width &&
+                    player.y + player.height > powerup.y &&
+                    player.y < powerup.y + powerup.height) {
+                    
+                    collectPowerup(powerup);
+                    powerups.splice(i, 1);
+                }
+            }
+        }
+
+        function updateEnemies() {
+            // Spawn enemies occasionally
+            enemySpawnTimer++;
+            if (enemySpawnTimer > enemySpawnInterval && enemies.length < 3) {
+                createEnemy();
+                enemySpawnTimer = 0;
+            }
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+
+                if (enemy.isDead) {
+                    enemy.deathTimer--;
+                    enemy.y += 5; // Fall down when dead
+                    if (enemy.deathTimer <= 0 || enemy.y > camera.y + canvas.height + 100) {
+                        enemies.splice(i, 1);
+                    }
+                    continue;
+                }
+
+                // Chase player AI
+                const distanceToPlayer = Math.abs(player.x - enemy.x);
+                if (distanceToPlayer < enemy.chaseDistance) {
+                    if (player.x < enemy.x) {
+                        enemy.velocityX = -enemy.speed;
+                    } else if (player.x > enemy.x) {
+                        enemy.velocityX = enemy.speed;
+                    }
+                } else {
+                    enemy.velocityX *= 0.8; // Slow down when not chasing
+                }
+
+                // Apply gravity
+                enemy.velocityY += enemy.gravity;
+                enemy.onGround = false;
+
+                // Update position
+                enemy.x += enemy.velocityX;
+                enemy.y += enemy.velocityY;
+
+                // Platform collision for enemies
+                platforms.forEach(platform => {
+                    if (enemy.velocityY > 0 &&
+                        enemy.x + enemy.width > platform.x &&
+                        enemy.x < platform.x + platform.width &&
+                        enemy.y + enemy.height > platform.y &&
+                        enemy.y + enemy.height < platform.y + platform.height + 10) {
+                        
+                        enemy.y = platform.y - enemy.height;
+                        enemy.velocityY = 0;
+                        enemy.onGround = true;
+
+                        // Jump if player is above
+                        if (player.y < enemy.y - 50 && distanceToPlayer < enemy.chaseDistance) {
+                            enemy.velocityY = -12;
+                        }
+                    }
+                });
+
+                // Check collision with player
+                if (!enemy.isDead &&
+                    player.x + player.width > enemy.x &&
+                    player.x < enemy.x + enemy.width &&
+                    player.y + player.height > enemy.y &&
+                    player.y < enemy.y + enemy.height) {
+                    
+                    // Check if player is jumping on enemy's head
+                    if (player.velocityY > 0 && player.y + player.height < enemy.y + enemy.height / 2) {
+                        // Kill enemy
+                        enemy.isDead = true;
+                        enemy.deathTimer = 30;
+                        player.velocityY = -10; // Bounce player up
+                        createParticles(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, '#8B4513', 15);
+                        score += 50;
+                    } else {
+                        // Player hits enemy from side - game over
+                        gameOver();
+                    }
+                }
+
+                // Remove enemies far behind camera
+                if (enemy.x + enemy.width < camera.x - 400) {
+                    enemies.splice(i, 1);
+                }
+            }
+        }
+
+        function collectPowerup(powerup) {
+            createParticles(powerup.x + powerup.width / 2, powerup.y + powerup.height / 2, powerup.color, 15);
+            
+            switch(powerup.type) {
+                case 'fartfly':
+                    player.hasFartFly = true;
+                    player.fartFlyFuel = 180;
+                    break;
+                case 'dash':
+                    player.hasDash = true;
+                    setTimeout(() => player.hasDash = false, 10000);
+                    break;
+                case 'doublejump':
+                    player.hasDoubleJump = true;
+                    setTimeout(() => player.hasDoubleJump = false, 15000);
+                    break;
+                case 'shield':
+                    player.hasShield = true;
+                    player.shieldActive = false;
+                    break;
+            }
+
+            updatePowerupDisplay();
+        }
+
+        function updatePowerupDisplay() {
+            const display = document.getElementById('powerupDisplay');
+            display.innerHTML = '';
+
+            if (player.hasFartFly) {
+                display.innerHTML += `<div class="powerup-icon">💨 Fart Fly: ${Math.floor(player.fartFlyFuel / 60)}s</div>`;
+            }
+            if (player.hasDash) {
+                display.innerHTML += `<div class="powerup-icon">⚡ Dash (D) ${player.dashCooldown > 0 ? '⏳' : '✓'}</div>`;
+            }
+            if (player.hasDoubleJump) {
+                display.innerHTML += `<div class="powerup-icon">🌟 Double Jump</div>`;
+            }
+            if (player.hasShield) {
+                display.innerHTML += `<div class="powerup-icon">🛡️ Shield Active</div>`;
+            }
+        }
+
+        function createParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 30,
+                    color: color,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.3;
+                p.life--;
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            // Clear canvas with solid background
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Save context and apply camera transform
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y);
+
+            // Draw clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            const cloudOffset = (Date.now() / 50) % 600;
+            for (let i = 0; i < 8; i++) {
+                const cloudX = (i * 300 - cloudOffset + camera.x * 0.5) % (canvas.width + camera.x);
+                const cloudY = 100 + (i % 3) * 50 + camera.y * 0.3;
+                ctx.beginPath();
+                ctx.arc(cloudX, cloudY, 30, 0, Math.PI * 2);
+                ctx.arc(cloudX + 25, cloudY, 35, 0, Math.PI * 2);
+                ctx.arc(cloudX + 50, cloudY, 30, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw platforms
+            platforms.forEach(platform => {
+                let alpha = platform.crumbling ? platform.crumbleTimer / 30 : 1;
+                
+                // Special handling for phasing platforms
+                if (platform.type === 'phasing') {
+                    const cyclePosition = platform.phasingTimer / platform.phasingCycle;
+                    
+                    if (platform.isSolid) {
+                        // Blinking effect when solid - gets faster near the end
+                        const blinkSpeed = cyclePosition > 0.5 ? 0.1 : 0.3;
+                        const blinkValue = Math.sin(platform.phasingTimer * blinkSpeed) * 0.5 + 0.5;
+                        alpha = 0.4 + (blinkValue * 0.6); // Blinks between 0.4 and 1.0
+                        
+                        // Draw solid platform with purple color
+                        ctx.fillStyle = `rgba(138, 43, 226, ${alpha})`;
+                        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                        
+                        // Add warning glow if about to disappear
+                        if (cyclePosition > 0.5) {
+                            ctx.strokeStyle = `rgba(255, 255, 0, ${(cyclePosition - 0.5) * 2})`;
+                            ctx.lineWidth = 3;
+                            ctx.strokeRect(platform.x - 2, platform.y - 2, platform.width + 4, platform.height + 4);
+                        }
+                    } else {
+                        // Draw dashed outline when invisible
+                        ctx.strokeStyle = 'rgba(138, 43, 226, 0.4)';
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([8, 8]);
+                        ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+                        ctx.setLineDash([]); // Reset to solid lines
+                    }
+                    return; // Skip normal rendering
+                }
+                
+                // Base color based on type
+                switch(platform.type) {
+                    case 'springboard':
+                        ctx.fillStyle = `rgba(255, 20, 147, ${alpha})`;
+                        break;
+                    case 'bouncy':
+                        ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+                        break;
+                    case 'sticky':
+                        ctx.fillStyle = `rgba(50, 205, 50, ${alpha})`;
+                        break;
+                    case 'ice':
+                        ctx.fillStyle = `rgba(173, 216, 230, ${alpha})`;
+                        break;
+                    case 'conveyor':
+                        ctx.fillStyle = `rgba(139, 69, 19, ${alpha})`;
+                        break;
+                    case 'moving':
+                        ctx.fillStyle = `rgba(135, 206, 250, ${alpha})`;
+                        break;
+                    case 'crumbling':
+                        ctx.fillStyle = `rgba(160, 82, 45, ${alpha})`;
+                        break;
+                    default:
+                        ctx.fillStyle = `rgba(34, 139, 34, ${alpha})`;
+                }
+                
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                
+                // Platform decorations
+                if (platform.type === 'springboard') {
+                    // Draw springs
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.6 * alpha})`;
+                    for (let i = 0; i < 3; i++) {
+                        const x = platform.x + (platform.width / 4) * (i + 1);
+                        ctx.fillRect(x - 5, platform.y - 10, 10, 10);
+                    }
+                } else if (platform.type === 'sticky') {
+                    // Draw slime drips
+                    ctx.fillStyle = `rgba(144, 238, 144, ${0.7 * alpha})`;
+                    for (let i = 0; i < platform.width; i += 20) {
+                        ctx.beginPath();
+                        ctx.arc(platform.x + i, platform.y + platform.height, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (platform.type === 'ice') {
+                    // Draw ice crystals
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.8 * alpha})`;
+                    ctx.lineWidth = 2;
+                    for (let i = 0; i < platform.width; i += 30) {
+                        ctx.beginPath();
+                        ctx.moveTo(platform.x + i, platform.y + 5);
+                        ctx.lineTo(platform.x + i + 5, platform.y + 8);
+                        ctx.moveTo(platform.x + i, platform.y + 5);
+                        ctx.lineTo(platform.x + i - 5, platform.y + 8);
+                        ctx.stroke();
+                    }
+                } else if (platform.type === 'conveyor') {
+                    // Draw conveyor belt arrows
+                    const offset = (Date.now() / 50 * platform.conveyorDirection) % 30;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.6 * alpha})`;
+                    for (let i = -30; i < platform.width + 30; i += 30) {
+                        const x = platform.x + i + offset;
+                        ctx.beginPath();
+                        ctx.moveTo(x, platform.y + 5);
+                        ctx.lineTo(x + 8 * platform.conveyorDirection, platform.y + 7.5);
+                        ctx.lineTo(x, platform.y + 10);
+                        ctx.fill();
+                    }
+                } else {
+                    // Regular highlight
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * alpha})`;
+                    ctx.fillRect(platform.x, platform.y, platform.width, 3);
+                }
+            });
+
+            // Draw powerups
+            powerups.forEach(powerup => {
+                ctx.fillStyle = powerup.color;
+                ctx.beginPath();
+                ctx.arc(powerup.x + powerup.width / 2, powerup.y + powerup.height / 2, powerup.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#000';
+                ctx.font = '20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(powerup.symbol, powerup.x + powerup.width / 2, powerup.y + powerup.height / 2 + 7);
+            });
+
+            // Draw particles
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+
+            // Draw player (Tango the cat)
+            drawCat(player.x, player.y, player.width, player.height);
+
+            // Draw enemies (poop guys)
+            enemies.forEach(enemy => {
+                if (enemy.isDead) {
+                    ctx.globalAlpha = enemy.deathTimer / 30;
+                }
+                drawPoopGuy(enemy.x, enemy.y, enemy.width, enemy.height);
+                ctx.globalAlpha = 1;
+            });
+
+            // Draw sticky effect
+            if (player.isSticky) {
+                ctx.fillStyle = 'rgba(50, 205, 50, 0.3)';
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+            }
+
+            // Draw shield effect
+            if (player.hasShield && !player.shieldActive) {
+                ctx.strokeStyle = '#9370DB';
+                ctx.lineWidth = 3;
+                ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 100) * 0.3;
+                ctx.beginPath();
+                ctx.arc(player.x + player.width / 2, player.y + player.height / 2, player.width, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+
+            // Restore context
+            ctx.restore();
+        }
+
+        function drawCat(x, y, w, h) {
+            // Body
+            ctx.fillStyle = '#F5DEB3';
+            ctx.fillRect(x + w * 0.2, y + h * 0.3, w * 0.6, h * 0.6);
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(x + w / 2, y + h * 0.3, w * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ears
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.2, y + h * 0.2);
+            ctx.lineTo(x + w * 0.3, y);
+            ctx.lineTo(x + w * 0.4, y + h * 0.2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.6, y + h * 0.2);
+            ctx.lineTo(x + w * 0.7, y);
+            ctx.lineTo(x + w * 0.8, y + h * 0.2);
+            ctx.fill();
+            
+            // Darker patches (Siamese markings)
+            ctx.fillStyle = '#8B7355';
+            ctx.beginPath();
+            ctx.arc(x + w / 2, y + h * 0.3, w * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#1E90FF';
+            ctx.beginPath();
+            ctx.arc(x + w * 0.4, y + h * 0.25, w * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + w * 0.6, y + h * 0.25, w * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pupils
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(x + w * 0.4, y + h * 0.25, w * 0.04, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + w * 0.6, y + h * 0.25, w * 0.04, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Nose
+            ctx.fillStyle = '#FFB6C1';
+            ctx.beginPath();
+            ctx.arc(x + w / 2, y + h * 0.35, w * 0.05, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Whiskers
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.5, y + h * 0.35);
+            ctx.lineTo(x + w * 0.2, y + h * 0.3);
+            ctx.moveTo(x + w * 0.5, y + h * 0.35);
+            ctx.lineTo(x + w * 0.8, y + h * 0.3);
+            ctx.stroke();
+            
+            // Tail
+            ctx.strokeStyle = '#8B7355';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.8, y + h * 0.6);
+            ctx.quadraticCurveTo(x + w * 1.2, y + h * 0.4, x + w * 1.1, y + h * 0.1);
+            ctx.stroke();
+            
+            // Legs
+            ctx.fillStyle = '#8B7355';
+            ctx.fillRect(x + w * 0.25, y + h * 0.7, w * 0.15, h * 0.25);
+            ctx.fillRect(x + w * 0.6, y + h * 0.7, w * 0.15, h * 0.25);
+        }
+
+        function drawPoopGuy(x, y, w, h) {
+            // Poop body - brown swirl shape
+            ctx.fillStyle = '#8B4513';
+            
+            // Bottom layer
+            ctx.beginPath();
+            ctx.ellipse(x + w/2, y + h * 0.8, w * 0.45, h * 0.25, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Middle layer
+            ctx.beginPath();
+            ctx.ellipse(x + w/2, y + h * 0.55, w * 0.4, h * 0.25, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Top layer
+            ctx.beginPath();
+            ctx.ellipse(x + w/2, y + h * 0.3, w * 0.35, h * 0.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Top swirl
+            ctx.beginPath();
+            ctx.arc(x + w/2, y + h * 0.15, w * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyes
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath();
+            ctx.arc(x + w * 0.35, y + h * 0.4, w * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + w * 0.65, y + h * 0.4, w * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pupils (looking at player direction)
+            ctx.fillStyle = '#000';
+            const pupilOffsetX = (player.x > x) ? w * 0.03 : -w * 0.03;
+            ctx.beginPath();
+            ctx.arc(x + w * 0.35 + pupilOffsetX, y + h * 0.4, w * 0.06, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + w * 0.65 + pupilOffsetX, y + h * 0.4, w * 0.06, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Angry mouth
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x + w/2, y + h * 0.55, w * 0.15, 0.2, Math.PI - 0.2);
+            ctx.stroke();
+
+            // Steam/stink lines above
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            const wobble = Math.sin(Date.now() / 200) * 2;
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.3, y);
+            ctx.quadraticCurveTo(x + w * 0.25 + wobble, y - h * 0.15, x + w * 0.3, y - h * 0.3);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + w * 0.7, y);
+            ctx.quadraticCurveTo(x + w * 0.75 - wobble, y - h * 0.15, x + w * 0.7, y - h * 0.3);
+            ctx.stroke();
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            updatePlayer();
+            updatePlatforms();
+            updatePowerups();
+            updateEnemies();
+            updateParticles();
+            updatePowerupDisplay();
+            draw();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('finalScore').textContent = `Final Score: ${Math.floor(score)}`;
+            
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('tangoHighScore', Math.floor(highScore));
+                document.getElementById('highScore').textContent = Math.floor(highScore);
+                document.getElementById('finalScore').textContent += ' 🎉 NEW HIGH SCORE!';
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            gameRunning = true;
+            initGame();
+            gameLoop();
+        }
+
+        // Initial high score display
+        document.getElementById('highScore').textContent = highScore;
+    </script>
+</body>
+</html>
