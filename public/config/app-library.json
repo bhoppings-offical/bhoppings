@@ -77,6 +77,11 @@
         "url": "/poopshooter3d",
         "image": "poopshooter3d.png"
     },
+    {
+        "name": "Sewer Survivor",
+        "url": "/sewer-survivor",
+        "image": "sewer-survivor.svg"
+    },
     { "name": "Damyan Run", "url": "/damyan-run", "image": "damyan-run.png" },
     { "name": "Drug Tycoon", "url": "/drugtycoon", "image": "drugtycoon.png" },
     {
@@ -757,5 +762,3 @@
         "image": "wtdjl.png"
     }
 ]
-
-

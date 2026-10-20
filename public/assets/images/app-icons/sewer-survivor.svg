@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1">
+      <stop stop-color="#17221b"/>
+      <stop offset="1" stop-color="#080c0a"/>
+    </linearGradient>
+    <linearGradient id="water" x2="0" y2="1">
+      <stop stop-color="#758e42"/>
+      <stop offset="1" stop-color="#1b3322"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#b6e477" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#b6e477" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+  <path d="M0 102Q320-4 640 102V0H0Z" fill="#303a31"/>
+  <path d="M86 0v147M554 0v147" stroke="#78816d" stroke-width="18"/>
+  <path d="M0 235q150-25 320 0t320 0v185H0Z" fill="url(#water)"/>
+  <ellipse cx="320" cy="246" rx="224" ry="96" fill="url(#glow)"/>
+  <path d="M225 221h190l-22 69H247Z" fill="#796447" stroke="#c1a477" stroke-width="5"/>
+  <path d="M245 222v67m45-67v67m45-67v67m45-67v67" stroke="#342f24" stroke-width="5"/>
+  <path d="M320 220v-68m0 20 45-48" fill="none" stroke="#a5b995" stroke-width="8"/>
+  <path d="M366 104h48v25h-48z" fill="#b6e477"/>
+  <path d="M90 182v-36h65v36m330 0v-36h65v36" fill="none" stroke="#65705f" stroke-width="8"/>
+  <path d="M154 162h18m296 0h18" stroke="#b6e477" stroke-width="9"/>
+  <path d="M320 43c-17 20 17 20 0 41s17 20 0 41" fill="none" stroke="#c5d87b" stroke-linecap="round" stroke-width="6" opacity=".72"/>
+  <text x="320" y="367" fill="#edf2e8" font-family="monospace" font-size="27" font-weight="700" letter-spacing="5" text-anchor="middle">SEWER SURVIVOR</text>
+</svg>
