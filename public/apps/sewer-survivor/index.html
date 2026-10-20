@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080b0a">
+  <title>Sewer Survivor: The Haunted Maze</title>
+  <style>
+    :root{color-scheme:dark;--ink:#e7eee8;--muted:#98a69c;--acid:#b6e477;--line:#ffffff1c;--panel:#0b100fe8;--red:#ff7770}
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#080b0a;color:var(--ink);font:14px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace}
+    button{font:inherit;color:inherit}
+    #game{position:fixed;inset:0}
+    #game canvas{display:block;width:100%;height:100%;outline:0}
+    .vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 52%,transparent 24%,#02040335 72%,#020403cc 130%)}
+    .topbar{position:fixed;top:18px;left:18px;display:flex;gap:8px;align-items:stretch;pointer-events:none}
+    .stat,.panel{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(12px);box-shadow:0 12px 42px #0005}
+    .stat{min-width:102px;padding:9px 12px}
+    .stat span,.eyebrow{display:block;color:var(--muted);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+    .stat strong{display:block;margin-top:3px;font-size:13px;font-weight:600}
+    .health{width:112px;height:5px;margin-top:7px;background:#313a34}
+    .health i{display:block;width:100%;height:100%;background:var(--acid);transition:width .2s}
+    #rightbar{position:fixed;right:18px;top:18px;width:218px;padding:14px}
+    #rightbar h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin:5px 0 8px}
+    #objective{color:#dce6dc;font-size:12px}
+    #depth{color:var(--acid);font-size:11px;margin-top:9px}
+    #prompt{position:fixed;bottom:106px;left:50%;transform:translateX(-50%);padding:10px 14px;background:#080d0be8;border:1px solid #c9ec8d66;color:#eff6e8;letter-spacing:.04em;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none}
+    #prompt.visible{opacity:1}
+    #toast{position:fixed;top:104px;left:50%;transform:translate(-50%,-8px);background:#101713ed;border:1px solid var(--line);padding:10px 16px;opacity:0;transition:.2s;pointer-events:none;text-align:center}
+    #toast.visible{opacity:1;transform:translate(-50%,0)}
+    .bottom{position:fixed;left:18px;right:18px;bottom:16px;display:flex;align-items:flex-end;justify-content:space-between;pointer-events:none}
+    .hint{max-width:480px;padding:10px 12px;background:#080d0bc9;border:1px solid var(--line);color:#b5c0b8;font-size:11px}
+    .hint b{color:var(--ink);font-weight:600}
+    .quick{display:flex;gap:7px;pointer-events:auto}
+    .quick button,.action{border:1px solid var(--line);background:#0b100fe8;padding:9px 12px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+    button:hover{border-color:#c6ed8a99!important;color:var(--acid)}
+    .modal{position:fixed;inset:0;display:none;place-items:center;background:#020403b8;backdrop-filter:blur(7px);padding:20px}
+    .modal.open{display:grid}
+    .sheet{width:min(560px,100%);max-height:min(84vh,720px);overflow:auto;padding:22px;background:#0b100ff5;border:1px solid #ffffff2b;box-shadow:0 30px 100px #000a}
+    .sheet.wide{width:min(780px,100%)}
+    .sheet-head{display:flex;justify-content:space-between;align-items:start;gap:20px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+    .sheet h1{font-size:20px;letter-spacing:.06em;margin:0 0 3px}
+    .sheet p{color:var(--muted);font-size:12px;margin:5px 0}
+    .close{background:transparent;border:1px solid var(--line);padding:6px 9px;cursor:pointer}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:9px}
+    .card{display:flex;flex-direction:column;align-items:flex-start;min-height:130px;padding:13px;border:1px solid var(--line);background:#ffffff06;text-align:left;cursor:pointer}
+    .card strong{font-size:13px}
+    .card p{flex:1}
+    .card small{color:var(--acid);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
+    .inventory{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .inventory div{padding:12px;border:1px solid var(--line);background:#ffffff06;color:var(--muted)}
+    .inventory b{float:right;color:var(--ink)}
+    #mapcanvas{width:100%;height:auto;aspect-ratio:1/1;background:#070a09;border:1px solid var(--line);image-rendering:pixelated}
+    .map-layout{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:18px;align-items:start}
+    .map-legend{font-size:11px;color:var(--muted)}
+    .map-legend div{margin:8px 0}
+    .dot{display:inline-block;width:8px;height:8px;margin-right:8px;background:var(--acid);border-radius:50%}
+    #intro{z-index:5}
+    #intro .sheet{width:min(680px,100%);padding:clamp(22px,5vw,46px)}
+    .title{font-size:clamp(32px,7vw,66px)!important;line-height:.98;letter-spacing:-.06em!important;margin:10px 0 18px!important}
+    .title em{font-style:normal;color:var(--acid)}
+    .intro-copy{max-width:500px;font-size:13px!important;line-height:1.7}
+    .start{margin-top:18px;padding:12px 18px;background:var(--acid);color:#10170e;border:0;cursor:pointer;font-weight:bold;letter-spacing:.08em}
+    .control-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px 18px;margin:18px 0;color:var(--muted);font-size:11px}
+    .control-grid b{display:inline-block;min-width:58px;color:var(--ink)}
+    #damage{position:fixed;inset:0;pointer-events:none;border:0 solid #f44;transition:border-width .08s}
+    #damage.hit{border-width:12px}
+    @media(max-width:700px){.topbar{top:8px;left:8px;gap:4px}.stat{min-width:72px;padding:7px 8px}.stat span{font-size:8px}.stat strong{font-size:11px}#rightbar{top:auto;bottom:76px;right:8px;width:165px;padding:10px}.bottom{left:8px;right:8px;bottom:8px}.hint{max-width:58%;font-size:9px}.quick{gap:4px}.quick button{padding:8px 7px;font-size:9px}.map-layout{grid-template-columns:1fr}.map-legend{display:grid;grid-template-columns:repeat(2,1fr)}}
+  </style>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <div id="game" aria-label="3D sewer game"></div>
+  <div class="vignette"></div><div id="damage"></div>
+  <div class="topbar">
+    <div class="stat"><span>Hull integrity</span><strong id="healthText">100 / 100</strong><div class="health"><i id="healthBar"></i></div></div>
+    <div class="stat"><span>Salvage</span><strong id="resourceText">0 scrap</strong></div>
+    <div class="stat"><span>Cannon</span><strong id="ammoText">18 rounds</strong></div>
+    <div class="stat"><span>Depth</span><strong id="depthText">01 · OLD DRAINS</strong></div>
+  </div>
+  <aside id="rightbar" class="panel"><span class="eyebrow">Current signal</span><h2 id="roomName">The intake</h2><div id="objective">Find a supply cache and follow the faint lights.</div><div id="depth">UNKNOWN · SIGNAL WEAK</div></aside>
+  <div id="prompt" role="status"></div><div id="toast" role="status"></div>
+  <div class="bottom">
+    <div class="hint"><b>WASD</b> steer · <b>Mouse</b> aim · <b>Click</b> fire · <b>E</b> interact · <b>Space</b> boost</div>
+    <div class="quick"><button data-panel="build">B · Build</button><button data-panel="map">M · Map</button><button data-panel="journal">J · Log</button><button data-panel="pause">Esc · Pause</button></div>
+  </div>
+  <div id="intro" class="modal open">
+    <section class="sheet">
+      <span class="eyebrow">A survival expedition · run saved locally</span>
+      <h1 class="title">SEWER<br><em>SURVIVOR</em></h1>
+      <p class="intro-copy">Your raft is the only thing between you and the dark. Navigate the drains, salvage what the last crew left behind, and build something that can survive what lives below.</p>
+      <div class="control-grid"><div><b>W / S</b> throttle / reverse</div><div><b>A / D</b> steer</div><div><b>MOUSE</b> aim & look</div><div><b>CLICK</b> fire cannon</div><div><b>E</b> interact nearby</div><div><b>B</b> raft modules</div><div><b>M</b> discovered map</div><div><b>F</b> headlight · <b>Space</b> boost</div></div>
+      <button id="start" class="start">ENTER THE DRAIN →</button>
+      <p id="save-note">A new maze will be generated for this run.</p>
+    </section>
+  </div>
+  <div id="build" class="modal"><section class="sheet"><div class="sheet-head"><div><span class="eyebrow">Raft workshop</span><h1>Build a module</h1><p>Modules are physical, persistent, and work while you explore.</p></div><button class="close">×</button></div><div id="buildCards" class="cards"></div></section></div>
+  <div id="map" class="modal"><section class="sheet wide"><div class="sheet-head"><div><span class="eyebrow">Cartographer's scrap</span><h1>The drains, so far</h1><p>Unexplored branches stay dark until you travel them.</p></div><button class="close">×</button></div><div class="map-layout"><canvas id="mapcanvas" width="480" height="480"></canvas><div class="map-legend"><div><i class="dot"></i>You are here</div><div>■ explored passage</div><div>◆ supply cache</div><div>! hostile signal</div><div>⌘ control room</div><p id="mapStats"></p></div></div></section></div>
+  <div id="journal" class="modal"><section class="sheet"><div class="sheet-head"><div><span class="eyebrow">Recovered field notes</span><h1>Expedition log</h1><p id="journalSummary"></p></div><button class="close">×</button></div><div id="journalEntries" class="cards"></div></section></div>
+  <div id="pause" class="modal"><section class="sheet"><div class="sheet-head"><div><span class="eyebrow">The water keeps moving</span><h1>Expedition paused</h1><p>Your progress saves automatically on this device.</p></div><button class="close">×</button></div><div class="cards"><button id="resume" class="card"><strong>Return to the raft</strong><p>Pick up where you left off.</p><small>Resume</small></button><button id="newRun" class="card"><strong>Abandon this run</strong><p>Start a new maze and reset expedition progress.</p><small>New expedition</small></button></div></section></div>
+  <script type="module">
+    import * as THREE from "three";
+
+    const SIZE = 17, CELL = 14, HALF = (SIZE - 1) / 2, SAVE_KEY = "sewer-survivor-save-v1";
+    const DIRS = [{x:0,z:-1,key:"n"},{x:1,z:0,key:"e"},{x:0,z:1,key:"s"},{x:-1,z:0,key:"w"}];
+    const TYPES = {
+      brute: {name:"Pipe brute", color:0x796a47, hp:5, speed:1.2, damage:13, range:2.5},
+      spitter: {name:"Sludge spitter", color:0x81ad54, hp:3, speed:.65, damage:8, range:15},
+      rat: {name:"Drain rat", color:0x958276, hp:2, speed:2, damage:6, range:2}
+    };
+    const MODULES = [
+      {id:"lamp",name:"Floodlight mast",desc:"A brighter raft lamp opens up the darkness around your bow.",cost:{scrap:4},kind:"lamp"},
+      {id:"cannon",name:"Auto-scrap cannon",desc:"Tracks and fires at hostile creatures without using your ammo.",cost:{scrap:7,parts:1},kind:"cannon"},
+      {id:"harpoon",name:"Salvage harpoon",desc:"Pulls nearby floating caches to the raft automatically.",cost:{scrap:5,wood:2},kind:"harpoon"},
+      {id:"recycler",name:"Sludge recycler",desc:"Turns spare scrap into fuel every few seconds.",cost:{scrap:6,parts:2},kind:"recycler"},
+      {id:"armor",name:"Reinforced hull",desc:"Adds 35 maximum hull integrity and repairs the raft.",cost:{scrap:8,wood:3},kind:"armor"}
+    ];
+    const $ = id => document.getElementById(id);
+    const rngFor = seed => { let n = seed >>> 0; return () => ((n = (n * 1664525 + 1013904223) >>> 0) / 4294967296); };
+    const hashString = value => { let h=2166136261; for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)} return h>>>0 };
+    const cellKey = (x,z) => `${x},${z}`;
+    const fromKey = key => key.split(",").map(Number);
+    let loaded = null;
+    try { loaded = JSON.parse(localStorage.getItem(SAVE_KEY) || "null"); } catch (error) { console.warn("Could not read the expedition save.", error); }
+    const seed = loaded?.seed || Math.floor(Math.random()*0xffffffff);
+    let random = rngFor(seed);
+    const nodes = new Map(), explored = new Set(loaded?.explored || []), looted = new Set(loaded?.looted || []), journal = new Set(loaded?.journal || []), activatedSwitches = new Set(loaded?.activatedSwitches || []), defeatedEnemies = new Set(loaded?.defeatedEnemies || []);
+    const inventory = Object.assign({scrap:0,wood:0,fuel:0,parts:0,coins:0,ammo:18}, loaded?.inventory || {});
+    const modules = Object.assign({}, loaded?.modules || {});
+    let health = loaded?.health ?? 100, maxHealth = loaded?.maxHealth ?? 100;
+    let active=false, paused=false, headlight=true, yaw=loaded?.yaw ?? 0, speed=0, boost=0, saveTimer=0, moduleTimer=0, toastTimer=0, promptTarget=null;
+    const position = new THREE.Vector3(loaded?.x ?? 0,0,loaded?.z ?? 0);
+    const keys = new Set(), enemies=[], projectiles=[], lootMeshes=[], switches=[], ambientBits=[], flickerLights=[], waterMeshes=[];
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x07100d);
+    scene.fog = new THREE.FogExp2(0x07100d,.009);
+    const camera = new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,600);
+    const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:"high-performance"});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.7)); renderer.setSize(innerWidth,innerHeight);
+    renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.25;
+    $("game").appendChild(renderer.domElement);
+    scene.add(new THREE.HemisphereLight(0x60766b,0x100f0b,.6));
+    const fill=new THREE.DirectionalLight(0x93aa94,.48); fill.position.set(-35,50,10); scene.add(fill);
+    const mats={
+      water:new THREE.MeshStandardMaterial({color:0x172b22,roughness:.33,metalness:.12}),
+      floor:new THREE.MeshStandardMaterial({color:0x252a24,roughness:.94}),
+      wall:new THREE.MeshStandardMaterial({color:0x343832,roughness:.94}),
+      trim:new THREE.MeshStandardMaterial({color:0x565547,roughness:.8}),
+      rust:new THREE.MeshStandardMaterial({color:0x654432,roughness:.88}),
+      raft:new THREE.MeshStandardMaterial({color:0x786447,roughness:.9}),
+      darkWood:new THREE.MeshStandardMaterial({color:0x3c362b,roughness:.95}),
+      acid:new THREE.MeshStandardMaterial({color:0x8fba5d,emissive:0x385a18,emissiveIntensity:.6}),
+      gold:new THREE.MeshStandardMaterial({color:0xd9b66c,emissive:0x4b3211,emissiveIntensity:.65}),
+      tech:new THREE.MeshStandardMaterial({color:0x83b8c5,emissive:0x245c6a,emissiveIntensity:.8}),
+      enemy:new THREE.MeshStandardMaterial({color:0x638548,roughness:.62}),
+      crate:new THREE.MeshStandardMaterial({color:0xa58650,roughness:.8}),
+      emissiveRed:new THREE.MeshStandardMaterial({color:0xe56e50,emissive:0x9b2113,emissiveIntensity:1.6})
+    };
+    const boxGeo=new THREE.BoxGeometry(1,1,1), sphereGeo=new THREE.IcosahedronGeometry(1,1);
+    const cylGeo=new THREE.CylinderGeometry(.5,.5,1,10);
+    const makeBox=(parent,mat,x,y,z,sx,sy,sz)=>{const m=new THREE.Mesh(boxGeo,mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);parent.add(m);return m};
+    const nodesList=[];
+    function generateMaze(){
+      const grid=Array.from({length:SIZE},()=>Array(SIZE).fill(false));
+      const start={x:HALF,z:HALF}, stack=[start]; grid[start.z][start.x]=true;
+      while(stack.length){const current=stack[stack.length-1];const options=DIRS.filter(d=>{const x=current.x+d.x*2,z=current.z+d.z*2;return x>0&&x<SIZE-1&&z>0&&z<SIZE-1&&!grid[z][x]});if(!options.length){stack.pop();continue}
+        const d=options[Math.floor(random()*options.length)],x=current.x+d.x*2,z=current.z+d.z*2;grid[current.z+d.z][current.x+d.x]=true;grid[z][x]=true;stack.push({x,z});
+      }
+      for(let z=1;z<SIZE-1;z++)for(let x=1;x<SIZE-1;x++)if(!grid[z][x]&&random()<.075){const n=DIRS.filter(d=>grid[z+d.z]?.[x+d.x]);if(n.length>=2)grid[z][x]=true}
+      for(let z=0;z<SIZE;z++)for(let x=0;x<SIZE;x++)if(grid[z][x]){
+        const node={x,z,key:cellKey(x,z),edges:[],feature:"passage",loot:null,enemy:null};
+        for(const d of DIRS)if(grid[z+d.z]?.[x+d.x])node.edges.push(d.key);
+        nodes.set(node.key,node);nodesList.push(node);
+      }
+      const startNode=nodes.get(cellKey(HALF,HALF));
+      const distance=new Map([[startNode.key,0]]),queue=[startNode];
+      while(queue.length){const n=queue.shift();for(const d of DIRS)if(n.edges.includes(d.key)){const next=nodes.get(cellKey(n.x+d.x,n.z+d.z));if(!distance.has(next.key)){distance.set(next.key,distance.get(n.key)+1);queue.push(next)}}}
+      const far=nodesList.filter(n=>(distance.get(n.key)||0)>4);
+      random=rngFor(seed^0x3a7e91);
+      far.forEach((n,i)=>{const roll=random();if(roll<.12){n.feature="chamber";n.loot="rare"}else if(roll<.23){n.feature="cache";n.loot="common"}else if(roll<.29){n.feature="nest";n.enemy="brute"}else if(roll<.37){n.feature="passage";n.enemy=["rat","spitter","brute"][i%3]}});
+      const room=far.find(n=>n.feature==="chamber")||far[Math.floor(far.length*.48)];
+      if(room){room.feature="control";room.loot="blueprint"}
+      const special=far.find(n=>n!==room&&n.feature==="passage"&&!n.enemy);if(special){special.feature="valve";special.loot="rare"}
+      const known=new Set(loaded?.explored||[]); known.add(startNode.key);
+      for(const node of nodesList)node.discovered=known.has(node.key);
+      return startNode;
+    }
+    const startNode=generateMaze();
+    function worldOf(node){return new THREE.Vector3((node.x-HALF)*CELL,0,(node.z-HALF)*CELL)}
+    function buildWorld(){
+      const floorGeo=new THREE.PlaneGeometry(CELL,CELL), waterGeo=new THREE.PlaneGeometry(CELL-1,CELL-1);
+      floorGeo.rotateX(-Math.PI/2);waterGeo.rotateX(-Math.PI/2);
+      const waterMat=mats.water.clone();waterMat.transparent=true;waterMat.opacity=.88;
+      for(const node of nodesList){
+        const p=worldOf(node), isRoom=node.feature==="chamber"||node.feature==="control";
+        const floor=new THREE.Mesh(floorGeo,mats.floor);floor.position.set(p.x,-.15,p.z);scene.add(floor);
+        const water=new THREE.Mesh(waterGeo,waterMat);water.position.set(p.x,.02,p.z);scene.add(water);waterMeshes.push(water);
+        const wallMat=node.feature==="control"?mats.trim:mats.wall;
+        for(const d of DIRS)if(!node.edges.includes(d.key)){
+          const x=p.x+d.x*(CELL/2),z=p.z+d.z*(CELL/2),along=d.x===0;
+          makeBox(scene,wallMat,x,2.45,z,along?(isRoom?CELL:1.4):1.4,5.2,along?1.4:(isRoom?CELL:1.4));
+          makeBox(scene,mats.rust,x,4.82,z,along?(isRoom?CELL:1.8):1.8,.22,along?1.8:(isRoom?CELL:1.8));
+        }
+        const pipe=new THREE.Mesh(cylGeo,mats.rust);pipe.position.set(p.x+(node.x%2?4.8:-4.8),4.35,p.z);pipe.rotation.z=Math.PI/2;pipe.scale.set(.26,CELL-.7,.26);scene.add(pipe);
+        if((node.x+node.z)%5===0){
+          const lightMat=(node.feature==="control"?mats.tech:mats.acid);
+          makeBox(scene,mats.rust,p.x,4.72,p.z,1.5,.18,.55);
+          const lamp=makeBox(scene,lightMat,p.x,4.58,p.z,.9,.1,.24);
+          if(flickerLights.length<14){const light=new THREE.PointLight(node.feature==="control"?0x77c7d5:0xa4c86b,node.feature==="control"?2.1:1.4,13,2);light.position.set(p.x,3.8,p.z);scene.add(light);flickerLights.push({light,base:light.intensity,phase:random()*8})}
+          if(random()<.35)addStink(p.x,1,p.z,random()>.5?0x8fb554:0xc3aa51);
+          if(lamp)lamp.userData.lamp=true;
+        }
+        if(node.feature==="chamber"||node.feature==="control"){
+          const pad=new THREE.Mesh(new THREE.RingGeometry(4.6,5,32),new THREE.MeshBasicMaterial({color:node.feature==="control"?0x658e9a:0x6c7148,side:THREE.DoubleSide,transparent:true,opacity:.36}));pad.rotation.x=-Math.PI/2;pad.position.set(p.x,.12,p.z);scene.add(pad);
+          for(let i=0;i<3;i++){const pipe=new THREE.Mesh(cylGeo,mats.trim);pipe.position.set(p.x+(i-1)*3,2.5,p.z+3.8);pipe.scale.set(.22,7,.22);scene.add(pipe)}
+        }
+      }
+      // Decorative sludge vents and hanging growths are kept sparse for performance.
+      for(let i=0;i<Math.min(42,nodesList.length);i++){
+        const node=nodesList[Math.floor(random()*nodesList.length)],p=worldOf(node);
+        if(random()<.5){const blob=new THREE.Mesh(sphereGeo,mats.acid);blob.position.set(p.x+(random()-.5)*8,.15,p.z+(random()-.5)*8);blob.scale.set(.5+random(),.12,.55+random());scene.add(blob)}
+        if(random()<.42){const drip=new THREE.Mesh(cylGeo,mats.enemy);drip.position.set(p.x+(random()-.5)*8,4.8,p.z+(random()-.5)*8);drip.scale.set(.06,.8+random(),.06);scene.add(drip)}
+      }
+      const flyNodes=nodesList.filter((_,i)=>i%9===0||nodesList[i].feature==="nest").slice(0,18);
+      for(const node of flyNodes)addFlies(worldOf(node));
+    }
+    function addStink(x,y,z,color){
+      const group=new THREE.Group();group.position.set(x,y,z);
+      for(let i=0;i<3;i++){const curve=new THREE.CatmullRomCurve3([new THREE.Vector3((i-1)*.45,0,0),new THREE.Vector3((i-1)*.45-.3,.55,0),new THREE.Vector3((i-1)*.45+.32,1.05,0),new THREE.Vector3((i-1)*.45,1.55,0)]);const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,12,.035,4,false),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.58}));group.add(mesh)}
+      scene.add(group);ambientBits.push({group,phase:random()*5,stink:true});
+    }
+    function addFlies(position){
+      const group=new THREE.Group();group.position.set(position.x,1.25,position.z);
+      const flyMat=new THREE.MeshBasicMaterial({color:0x161b13});
+      for(let i=0;i<7;i++){const fly=new THREE.Mesh(sphereGeo,flyMat);fly.scale.set(.045,.035,.07);fly.position.set(Math.cos(i)*(.35+random()*.8),(random()-.5)*.5,Math.sin(i)*(.35+random()*.8));group.add(fly)}
+      scene.add(group);ambientBits.push({group,phase:random()*7,flies:true});
+    }
+    buildWorld();
+    const raft=new THREE.Group();scene.add(raft);
+    const hull=makeBox(raft,mats.raft,0,.5,0,3.4,.55,4.6);hull.rotation.y=0;
+    makeBox(raft,mats.darkWood,0,.84,-.4,2.9,.16,3.6);
+    for(let i=-1;i<=1;i++){makeBox(raft,mats.rust,i*1.42,.39,0,.18,.72,4.5)}
+    const bow=makeBox(raft,mats.trim,0,.78,-2.45,2.5,.16,.32);
+    const lamp=new THREE.SpotLight(0xc8e89a,headlight?48:0,38,.48,.62,1.4);lamp.position.set(0,2.1,-1.2);lamp.target.position.set(0,0,-16);raft.add(lamp,lamp.target);
+    const raftGlow=new THREE.PointLight(0xb5d97d,1.15,9);raftGlow.position.set(0,1.1,.5);raft.add(raftGlow);
+    const player=makeBox(raft,new THREE.MeshStandardMaterial({color:0xabb39e,roughness:.9}),0,1.22,.72,.48,.92,.38);
+    const head=new THREE.Mesh(sphereGeo,mats.trim);head.position.set(0,1.85,.55);head.scale.set(.25,.25,.25);raft.add(head);
+    const moduleObjects=new Map();
+    function addModuleVisual(def,index){
+      const g=new THREE.Group();g.position.set((index%3-1)*.9,1.05,1.35+Math.floor(index/3)*-.9);raft.add(g);moduleObjects.set(def.id,g);
+      if(def.kind==="lamp"){makeBox(g,mats.rust,0,.65,0,.15,1.3,.15);const glow=makeBox(g,mats.gold,0,1.25,0,.65,.28,.35);glow.material=mats.tech;return}
+      if(def.kind==="cannon"){const base=new THREE.Mesh(cylGeo,mats.rust);base.position.y=.3;base.scale.set(.85,.45,.85);g.add(base);const barrel=new THREE.Mesh(cylGeo,mats.trim);barrel.rotation.x=Math.PI/2;barrel.position.set(0,.62,-.35);barrel.scale.set(.25,1.35,.25);g.add(barrel)}
+      if(def.kind==="harpoon"){makeBox(g,mats.trim,0,.45,0,.5,.65,.8);const line=makeBox(g,mats.gold,0,.6,-.6,.08,.08,1.2);line.rotation.x=.2}
+      if(def.kind==="recycler"){const tank=new THREE.Mesh(cylGeo,mats.acid);tank.position.y=.65;tank.scale.set(.5,1.3,.5);g.add(tank);makeBox(g,mats.trim,0,.1,0,1.1,.18,1)}
+      if(def.kind==="armor"){for(let i=-1;i<=1;i++)makeBox(g,mats.trim,i*.38,.28,0,.28,.55,1.2)}
+    }
+    MODULES.forEach((m,i)=>{if(modules[m.id])addModuleVisual(m,i)});
+    function makeCrate(node){
+      const p=worldOf(node),group=new THREE.Group();group.position.set(p.x,.35,p.z);scene.add(group);
+      makeBox(group,node.loot==="rare"?mats.gold:mats.crate,0,.45,0,1.35,.9,1.1);
+      makeBox(group,mats.rust,0,.93,0,1.38,.14,1.15);
+      const light=new THREE.PointLight(node.loot==="rare"?0xe5bc63:0x75b9c1,node.loot==="rare"?1.2:.55,7);light.position.y=1.3;group.add(light);
+      group.userData={node,type:"loot"};lootMeshes.push(group);
+    }
+    function makeSwitch(node,index){
+      const p=worldOf(node),g=new THREE.Group();g.position.set(p.x+(index-1)*2.15,0,p.z+2);scene.add(g);
+      makeBox(g,mats.trim,0,1,0,.8,2,.5);
+      const button=makeBox(g,mats.emissiveRed,0,1.45,-.3,.42,.34,.14);
+      const activated=activatedSwitches.has(`${node.key}:${index}`);
+      if(activated)button.material=mats.tech;
+      g.userData={node,index,button,activated,type:"switch"};switches.push(g);
+    }
+    for(const node of nodesList){
+      if(node.loot)makeCrate(node);
+      if(node.enemy&&!defeatedEnemies.has(node.key)){const p=worldOf(node),type=node.enemy;makeEnemy(type,p.x+(random()-.5)*2,p.z+(random()-.5)*2,node)}
+      if(node.feature==="control")for(let i=0;i<3;i++)makeSwitch(node,i);
+    }
+    function makeEnemy(type,x,z,node){
+      const spec=TYPES[type],g=new THREE.Group();g.position.set(x,.2,z);scene.add(g);
+      const body=new THREE.Mesh(sphereGeo,new THREE.MeshStandardMaterial({color:spec.color,roughness:.75}));body.position.y=.9;body.scale.set(type==="brute"?1.15:.72,type==="rat"?.48:.78,type==="rat"?1.05:.72);g.add(body);
+      const eyeMat=new THREE.MeshBasicMaterial({color:type==="spitter"?0xbaff75:0xff805d});
+      for(const side of [-1,1]){const eye=new THREE.Mesh(sphereGeo,eyeMat);eye.position.set(side*.23,1.08,-.49);eye.scale.set(.075,.075,.075);g.add(eye)}
+      if(type==="brute")for(const side of [-1,1]){const horn=new THREE.Mesh(cylGeo,mats.rust);horn.position.set(side*.65,1.45,-.08);horn.rotation.z=side*-.7;horn.scale.set(.18,.65,.18);g.add(horn)}
+      g.userData={type,node,hp:spec.hp,maxHp:spec.hp,attack:random()*1.5,pathTimer:0,dead:false};enemies.push(g);
+    }
+    function currentNodeAt(x,z){const gx=Math.round(x/CELL+HALF),gz=Math.round(z/CELL+HALF);return nodes.get(cellKey(gx,gz))||null}
+    function save(){
+      const state={seed,x:position.x,z:position.z,yaw,health,maxHealth,inventory,modules,explored:[...explored],looted:[...looted],journal:[...journal],activatedSwitches:[...activatedSwitches],defeatedEnemies:[...defeatedEnemies]};
+      try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(error){console.warn("Could not save the expedition.",error);toast("Save failed — browser storage may be full.")}
+    }
+    function toast(message){$("toast").textContent=message;$("toast").classList.add("visible");toastTimer=2.6}
+    function nodeLabel(node){if(!node)return "Unmapped drains";if(node.feature==="control")return "Flooded control room";if(node.feature==="chamber")return "The cistern";if(node.feature==="nest")return "Nest chamber";if(node.feature==="valve")return "Pressure station";return node.key===startNode.key?"The intake": "Brick drain";}
+    function updateHud(){
+      $("healthText").textContent=`${Math.ceil(health)} / ${maxHealth}`;$("healthBar").style.width=`${Math.max(0,health/maxHealth*100)}%`;
+      $("healthBar").style.background=health<35?"#ff7770":"#b6e477";
+      $("resourceText").textContent=`${inventory.scrap} scrap · ${inventory.parts} parts`;
+      $("ammoText").textContent=`${inventory.ammo} rounds`;
+      const node=currentNodeAt(position.x,position.z);$("roomName").textContent=nodeLabel(node);
+      $("objective").textContent=node?.feature==="control"&&!journal.has("control")?"A control panel flickers. Find three switches nearby.":node?.loot&&!looted.has(node.key)?"A cache is glowing in this chamber. Get close and press E.":modules.cannon?"Follow the mapped passages. Something is moving below.":"Find salvage and build a weapon module.";
+      const distance=node?Math.max(0,Math.round(Math.hypot(node.x-HALF,node.z-HALF)*CELL/10)):0;
+      $("depth").textContent=`${distance}M BELOW INTAKE · ${node?.feature==="nest"?"HOSTILE SIGNAL":"SIGNAL WEAK"}`;
+      $("depthText").textContent=`${String(Math.min(99,1+Math.floor(distance/12))).padStart(2,"0")} · ${node?.feature==="nest"?"NEST ZONE":"OLD DRAINS"}`;
+    }
+    function costText(cost){return Object.entries(cost).map(([item,n])=>`${n} ${item}`).join(" · ")}
+    function canAfford(cost){return Object.entries(cost).every(([item,n])=>(inventory[item]||0)>=n)}
+    function renderBuild(){
+      $("buildCards").replaceChildren();
+      for(const def of MODULES){const built=!!modules[def.id],card=document.createElement("button");card.className="card";card.disabled=built||!canAfford(def.cost);
+        card.innerHTML=`<strong>${def.name}${built?" · INSTALLED":""}</strong><p>${def.desc}</p><small>${built?"Operational":costText(def.cost)}</small>`;
+        card.addEventListener("click",()=>buildModule(def));$("buildCards").append(card)}
+    }
+    function buildModule(def){
+      if(modules[def.id]||!canAfford(def.cost))return;
+      for(const [item,n] of Object.entries(def.cost))inventory[item]-=n;
+      modules[def.id]=true;if(def.kind==="armor"){maxHealth+=35;health=maxHealth}
+      addModuleVisual(def,MODULES.indexOf(def));renderBuild();updateHud();save();toast(`${def.name} installed`);
+    }
+    function openPanel(id){
+      document.exitPointerLock?.();keys.clear();
+      if(id==="build")renderBuild();
+      if(id==="map")drawMap();
+      if(id==="journal")drawJournal();
+      paused=true;
+      $(id).classList.add("open");
+    }
+    function closePanels(){document.querySelectorAll(".modal.open").forEach(m=>{if(m.id!=="intro")m.classList.remove("open")});paused=false;keys.clear()}
+    function nearestTarget(){
+      let best=null,bestD=5;
+      const objects=[...lootMeshes,...switches];
+      for(const obj of objects){if(!obj.visible)continue;const d=obj.position.distanceTo(position);if(d<bestD){best=obj;bestD=d}}
+      return best;
+    }
+    function interact(){
+      const target=promptTarget||nearestTarget();
+      if(!target){toast("Nothing close enough to reach.");return}
+      if(target.userData.type==="loot"){
+        const node=target.userData.node;if(looted.has(node.key))return;
+        looted.add(node.key);target.visible=false;const rare=node.loot==="rare"||node.loot==="blueprint";
+        if(node.loot==="blueprint"){inventory.parts+=2;inventory.scrap+=5;journal.add("control");toast("Control room salvaged · rare parts +2 · scrap +5")}
+        else if(rare){inventory.parts+=1+Math.floor(random()*2);inventory.scrap+=3;inventory.coins+=8;inventory.ammo+=4;journal.add("artifact");toast("Rare salvage recovered · parts +1 · scrap +3")}
+        else {inventory.scrap+=2+Math.floor(random()*4);inventory.wood+=Math.random()<.65?2:0;inventory.fuel+=Math.random()<.28?1:0;inventory.ammo+=3;toast("Supply cache recovered")}
+        journal.add("cache");save();updateHud();return;
+      }
+      if(target.userData.type==="switch"){
+        if(target.userData.activated)return;
+        target.userData.activated=true;target.userData.button.material=mats.tech;activatedSwitches.add(`${target.userData.node.key}:${target.userData.index}`);
+        const roomSwitches=switches.filter(s=>s.userData.node.key===target.userData.node.key);
+        if(roomSwitches.every(s=>s.userData.activated)){journal.add("control");inventory.parts+=1;inventory.scrap+=3;toast("Gate pressure released · shortcut charted")}
+        else toast(`Relay activated · ${roomSwitches.filter(s=>!s.userData.activated).length} remaining`);
+        save();updateHud();
+      }
+    }
+    function fire(fromPlayer=true,targetOverride=null,shooter=null){
+      if(fromPlayer&&inventory.ammo<=0){toast("Cannon dry — recover a cache for ammunition.");return}
+      if(fromPlayer)inventory.ammo--;
+      const origin=shooter?shooter.position.clone().add(new THREE.Vector3(0,1.15,0)):raft.localToWorld(new THREE.Vector3(0,1.25,-2.2));
+      let target=targetOverride;
+      if(!target&&fromPlayer){let closest=55;for(const enemy of enemies)if(!enemy.userData.dead){const d=enemy.position.distanceTo(position);if(d<closest){closest=d;target=enemy}}}
+      const aimPoint=target?target.position.clone().add(new THREE.Vector3(0,.8,0)):null;
+      const dir=aimPoint?aimPoint.sub(origin).normalize():new THREE.Vector3(-Math.sin(yaw),.05,-Math.cos(yaw));
+      const mesh=new THREE.Mesh(new THREE.SphereGeometry(fromPlayer?.2:.16,8,8),new THREE.MeshBasicMaterial({color:fromPlayer?0xd6ed9c:0x72bb54}));
+      mesh.position.copy(origin);scene.add(mesh);projectiles.push({mesh,dir,speed:fromPlayer?35:16,life:2.6,fromPlayer,hostile:!!shooter,damage:fromPlayer?2:8});save();
+    }
+    function damagePlayer(amount){
+      health=Math.max(0,health-amount);$("damage").classList.add("hit");setTimeout(()=>$("damage").classList.remove("hit"),100);
+      if(health===0){health=maxHealth;position.copy(worldOf(startNode));speed=0;inventory.coins=Math.max(0,inventory.coins-10);toast("The current carried you back to the intake. 10 coins lost.");save()}
+      updateHud();
+    }
+    function moveEnemy(enemy,dt){
+      const data=enemy.userData,spec=TYPES[data.type],dist=enemy.position.distanceTo(position);
+      if(dist>50)return;
+      data.attack-=dt;
+      if(data.type==="spitter"&&dist<17&&dist>5&&data.attack<=0){fire(false,raft,enemy);data.attack=2.5}
+      if(dist<spec.range){if(data.attack<=0){damagePlayer(spec.damage);data.attack=1.1}return}
+      if(dist>3){
+        const dx=position.x-enemy.position.x,dz=position.z-enemy.position.z,len=Math.hypot(dx,dz)||1;
+        const step=spec.speed*dt;const nx=enemy.position.x+dx/len*step,nz=enemy.position.z+dz/len*step;
+        const from=currentNodeAt(enemy.position.x,enemy.position.z),to=currentNodeAt(nx,nz);
+        if(to&&from&&to===from||to&&from&&from.edges.some(k=>{const d=DIRS.find(v=>v.key===k);return from.x+d.x===to.x&&from.z+d.z===to.z})){enemy.position.x=nx;enemy.position.z=nz}
+        enemy.rotation.y=Math.atan2(-dx,-dz);enemy.position.y=.2+Math.sin(performance.now()*.005+enemy.id)*.1;
+      }
+    }
+    function markExplored(){
+      const node=currentNodeAt(position.x,position.z);if(!node)return;
+      if(!explored.has(node.key)){explored.add(node.key);node.discovered=true;
+        if(node.feature==="control")journal.add("control");if(node.feature==="nest")journal.add("nest");
+        if(node.loot&&!looted.has(node.key))toast(node.loot==="rare"?"A rare signal glows in the dark.":"Supply cache detected nearby.");
+        save();
+      }
+    }
+    function drawMap(){
+      const c=$("mapcanvas"),ctx=c.getContext("2d");ctx.fillStyle="#070a09";ctx.fillRect(0,0,c.width,c.height);
+      const margin=18,scale=(c.width-margin*2)/SIZE;ctx.lineWidth=Math.max(2,scale*.15);ctx.lineCap="square";
+      const playerNode=currentNodeAt(position.x,position.z);
+      for(const node of nodesList){if(!explored.has(node.key))continue;const x=margin+(node.x+.5)*scale,y=margin+(node.z+.5)*scale;ctx.strokeStyle=node.feature==="control"?"#7fb8c0":"#637263";ctx.fillStyle=node.feature==="control"?"#76959a":"#5d685b";
+        for(const d of DIRS)if(node.edges.includes(d.key)){const nx=node.x+d.x,nz=node.z+d.z;if(!explored.has(cellKey(nx,nz)))continue;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(margin+(nx+.5)*scale,margin+(nz+.5)*scale);ctx.stroke()}
+        ctx.fillRect(x-scale*.18,y-scale*.18,scale*.36,scale*.36);
+        if(node.loot&&!looted.has(node.key)){ctx.fillStyle=node.loot==="rare"?"#eccb7c":"#8bb7c1";ctx.fillRect(x-2,y-2,4,4)}
+        if(node.enemy){ctx.fillStyle="#db7664";ctx.fillText("!",x+3,y-3)}
+        if(playerNode===node){ctx.fillStyle="#c4ec86";ctx.beginPath();ctx.arc(x,y,scale*.27,0,Math.PI*2);ctx.fill()}
+      }
+      $("mapStats").textContent=`${explored.size} / ${nodes.size} passages charted`;
+    }
+    function drawJournal(){
+      const data=[
+        ["Cartographer","Passages charted",`${explored.size} / ${nodes.size}`],
+        ["The scavenger","Supply caches recovered",`${[...looted].length} recovered`],
+        ["Control room","Three relays power a hidden gate",journal.has("control")?"Gate opened":"Signal located"],
+        ["Below the surface","Hostile creatures encountered",journal.has("nest")?"Nest chamber found":"Threats remain unknown"],
+        ["Recovered artifact","Rare technology recovered",journal.has("artifact")?"Logged in your field notes":"No artifact recovered"],
+        ["Raft workshop","Modules installed",`${Object.keys(modules).length} / ${MODULES.length}`]
+      ];
+      $("journalSummary").textContent=`Run seed ${seed.toString(16).toUpperCase()} · progress saves locally`;
+      $("journalEntries").replaceChildren(...data.map(([title,desc,status])=>{const el=document.createElement("div");el.className="card";el.innerHTML=`<strong>${title}</strong><p>${desc}</p><small>${status}</small>`;return el}));
+    }
+    function updatePrompt(){
+      promptTarget=nearestTarget();const el=$("prompt");
+      if(promptTarget){const type=promptTarget.userData.type;el.textContent=type==="loot"?"E  ·  recover salvage":`E  ·  activate relay ${promptTarget.userData.index+1}`;el.classList.add("visible")}
+      else el.classList.remove("visible");
+    }
+    function updateModules(dt){
+      moduleTimer-=dt;if(moduleTimer>0)return;moduleTimer=2.4;
+      if(modules.cannon){let target=null,best=28;for(const e of enemies)if(!e.userData.dead){const d=e.position.distanceTo(position);if(d<best){best=d;target=e}}if(target)fire(false,target)}
+      if(modules.harpoon){for(const loot of lootMeshes){if(loot.visible&&loot.position.distanceTo(position)<9){const n=loot.userData.node;loot.position.set(position.x,position.y+.2,position.z);interactLootDirect(loot,n);break}}}
+      if(modules.recycler&&inventory.scrap>=4){inventory.scrap-=4;inventory.fuel++;toast("Recycler produced 1 fuel")}
+    }
+    function interactLootDirect(loot,node){
+      if(looted.has(node.key))return;looted.add(node.key);loot.visible=false;inventory.scrap+=2+Math.floor(random()*3);if(node.loot!=="common")inventory.parts++;journal.add("cache");save();updateHud();toast("Harpoon hauled in a salvage cache");
+    }
+    function update(dt,time){
+      if(active&&!paused){
+        const throttle=(keys.has("w")?1:0)-(keys.has("s")?1:0);
+        const turning=(keys.has("d")?1:0)-(keys.has("a")?1:0);
+        yaw+=turning*dt*1.8;
+        if(keys.has(" ")&&boost<=0&&inventory.fuel>0){boost=1.1;inventory.fuel--;toast("Booster burn")}
+        const boostFactor=boost>0?1.75:1;boost=Math.max(0,boost-dt);
+        const targetSpeed=throttle*(keys.has("shift")?9:5.7)*boostFactor;
+        speed=THREE.MathUtils.damp(speed,targetSpeed,throttle?2.7:2,dt);
+        const nx=position.x-Math.sin(yaw)*speed*dt,nz=position.z-Math.cos(yaw)*speed*dt;
+        const from=currentNodeAt(position.x,position.z),to=currentNodeAt(nx,nz);
+        let allowed=!!to;
+        if(allowed&&from&&from!==to){const dx=to.x-from.x,dz=to.z-from.z,dir=DIRS.find(d=>d.x===dx&&d.z===dz);allowed=!!dir&&from.edges.includes(dir.key)}
+        if(allowed){position.x=nx;position.z=nz}else speed*= -.12;
+        raft.position.set(position.x,.08+Math.sin(time*1.7)*.11,position.z);raft.rotation.set(Math.sin(time*1.8)*.015, yaw,Math.sin(time*1.7)*.035+turning*.07);
+        const camOffset=new THREE.Vector3(Math.sin(yaw)*11,8.2,Math.cos(yaw)*11);
+        const camTarget=position.clone().add(new THREE.Vector3(0,1.3,0));
+        camera.position.lerp(position.clone().add(camOffset),1-Math.exp(-dt*3.1));camera.lookAt(camTarget);
+        lamp.intensity=headlight?(modules.lamp?78:48):0;
+        for(const e of enemies)if(!e.userData.dead)moveEnemy(e,dt);
+        updateModules(dt);
+        for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i],old=p.mesh.position.clone(),next=old.clone().addScaledVector(p.dir,p.speed*dt);p.life-=dt;let remove=p.life<=0;
+          const from=currentNodeAt(old.x,old.z),to=currentNodeAt(next.x,next.z);
+          if(!to||from!==to&&!from?.edges.some(k=>{const d=DIRS.find(v=>v.key===k);return from.x+d.x===to.x&&from.z+d.z===to.z}))remove=true;
+          if(!remove)p.mesh.position.copy(next);
+          if(!p.hostile){for(const enemy of enemies)if(!enemy.userData.dead&&enemy.position.distanceTo(p.mesh.position)<1.4){enemy.userData.hp-=p.damage;remove=true;if(enemy.userData.hp<=0){enemy.userData.dead=true;defeatedEnemies.add(enemy.userData.node.key);scene.remove(enemy);inventory.coins+=2;inventory.scrap++;journal.add("nest");toast(`${TYPES[enemy.userData.type].name} down · +1 scrap`);save()}break}}
+          else if(p.mesh.position.distanceTo(position)<2){damagePlayer(p.damage);remove=true}
+          if(remove){scene.remove(p.mesh);projectiles.splice(i,1)}
+        }
+        for(const bit of ambientBits){if(bit.stink){bit.group.position.y=1+Math.sin(time*.8+bit.phase)*.18;bit.group.rotation.y=Math.sin(time*.4+bit.phase)*.2}else if(bit.flies){bit.group.rotation.y=time*.7+bit.phase;bit.group.position.y=1.1+Math.sin(time*2+bit.phase)*.15}}
+        for(let i=0;i<waterMeshes.length;i++)waterMeshes[i].position.y=.02+Math.sin(time*1.25+i*.17)*.025;
+        for(const item of lootMeshes)if(item.visible){item.rotation.y+=dt*.42;item.position.y=.35+Math.sin(time*1.4+item.position.x)*.12}
+        flickerLights.forEach(({light,base,phase})=>light.intensity=base*(.82+Math.sin(time*5+phase)*.12+(Math.sin(time*19+phase)> .96?.35:0)));
+        markExplored();updatePrompt();saveTimer+=dt;if(saveTimer>5){saveTimer=0;save()}
+        toastTimer-=dt;if(toastTimer<=0)$("toast").classList.remove("visible");
+        updateHud();
+      }else{
+        camera.position.lerp(new THREE.Vector3(0,24,23),.018);camera.lookAt(0,0,0);
+      }
+      renderer.render(scene,camera);
+    }
+    let last=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;update(dt,now/1000)}requestAnimationFrame(animate);
+    function startGame(){active=true;paused=false;$("intro").classList.remove("open");closePanels();if(!explored.size)markExplored();updateHud();save();renderer.domElement.focus()}
+    function togglePanel(id){const el=$(id);if(el.classList.contains("open")){el.classList.remove("open");if(id==="pause")paused=false;return}closePanels();openPanel(id)}
+    $("start").addEventListener("click",startGame);
+    $("resume").addEventListener("click",closePanels);
+    $("newRun").addEventListener("click",()=>{localStorage.removeItem(SAVE_KEY);location.reload()});
+    document.querySelectorAll(".close").forEach(b=>b.addEventListener("click",closePanels));
+    document.querySelectorAll("[data-panel]").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.panel)));
+    renderer.domElement.addEventListener("click",()=>{if(active&&!paused){fire();if(document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock?.()}});// Click fires once, then locks the mouse for aiming.
+    document.addEventListener("pointerlockchange",()=>{if(document.pointerLockElement!==renderer.domElement&&active&&paused===false){/* Mouse lock may be released without pausing. */}});
+    document.addEventListener("mousemove",event=>{if(document.pointerLockElement===renderer.domElement&&active&&!paused)yaw-=event.movementX*.0024});
+    document.addEventListener("keydown",event=>{
+      const key=event.key.toLowerCase();
+      if(["w","a","s","d"," ","shift"].includes(key))event.preventDefault();
+      if(key==="escape"){if($("intro").classList.contains("open"))return;togglePanel("pause");document.exitPointerLock?.();return}
+      if(["b","m","j"].includes(key)){if(event.repeat||!active)return;togglePanel(key==="b"?"build":key==="m"?"map":"journal");return}
+      if(key==="f"&&active&&!paused){headlight=!headlight;toast(`Raft headlight ${headlight?"on":"off"}`);return}
+      if(key==="e"&&!event.repeat&&active&&!paused){interact();return}
+      keys.add(key);
+    });
+    document.addEventListener("keyup",event=>keys.delete(event.key.toLowerCase()));
+    window.addEventListener("blur",()=>{keys.clear()});
+    window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.7))});
+    window.addEventListener("beforeunload",save);
+    if(loaded){$("save-note").textContent=`Saved expedition found · ${explored.size} passages charted · continue your run.`;$("start").textContent="CONTINUE EXPEDITION →"}
+    if(loaded?.looted)for(const item of lootMeshes){if(looted.has(item.userData.node.key))item.visible=false}
+    if(loaded){position.copy(new THREE.Vector3(loaded.x||0,0,loaded.z||0));raft.position.set(position.x,.08,position.z);camera.position.set(position.x,8,position.z+11)}
+    updateHud();
+  </script>
+</body>
+</html>
