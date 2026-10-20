@@ -1,6 +1,7 @@
 "use strict";
 const navbarItems = [
   { text: "bio", href: "/" },
+  { text: "emoji hats", href: "/apps/emoji-hats" },
   {
     text: "software",
     items: [
