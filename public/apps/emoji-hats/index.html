@@ -11,6 +11,7 @@
 <meta name="theme-color" content="#ffd23f">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap">
 <style>
+
 :root{--ink:#1d1b3a;--e:cubic-bezier(.34,1.56,.64,1);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
@@ -67,7 +68,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #stamp{position:absolute;left:50%;top:42%;z-index:5;font-size:min(20vw,110px);padding:0 22px;border:9px solid;border-radius:22px;background:#fffd;margin-left:0;white-space:nowrap;pointer-events:none;display:none}
 .panel{background:#fff;border:4px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0;width:min(100%,780px);height:46dvh;min-height:280px;display:flex;flex-direction:column;padding:10px 10px 12px;gap:8px;box-shadow:0 -7px 0 rgba(29,27,58,.15)}
 .tabs{display:flex;gap:6px;justify-content:safe center;overflow-x:auto;flex-shrink:0;padding:8px 2px 6px 8px}
-.tb{flex-shrink:0;font-size:24px;width:48px;height:42px;border:3px solid var(--ink);border-radius:14px;background:#fff;transition:transform .2s var(--e)}
+.tb{flex-shrink:0;font-size:24px;width:48px;height:42px;border:3px solid var(--ink);border-radius:14px;background:#fff;transition:all 0.4s var(--e);}
 .tb.on{background:var(--ink);transform:scale(1.12)}
 #grid{padding-top:32px;flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:2px;align-content:start}
 #grid button{font-size:30px;line-height:1.25;border-radius:12px;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;transition:transform .15s var(--e)}
@@ -213,6 +214,7 @@ html,body,#app{height:100vh;height:100dvh}
 .opwc .inp{width:100%}
 #opwn{font-size:30px;line-height:1.3}
 #onh{font-size:15px;max-width:90vw}
+
 
 </style></head><body>
 <button id="mute" aria-label="Sound">🔊</button>
