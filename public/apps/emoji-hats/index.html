@@ -127,9 +127,8 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.3) rotate(15deg
 .jc .cw{position:relative;width:var(--w)}
 .jc .cw img{width:100%;display:block}
 .jh{position:absolute;left:50%;top:11%;font-size:calc(var(--w)*.55);line-height:1;width:max-content}
-html{height:100vh;height:100dvh}
-body,#app{height:100%}
-/*.panel{padding-bottom:14px}*/
+html,body,#app{height:100vh;height:100dvh}
+.panel{padding-bottom:max(14px,env(safe-area-inset-bottom,0px))}
 #grid button.used{opacity:.22;filter:grayscale(1);position:relative}
 #grid button.used:hover{transform:none;background:none}
 #grid button.used::after{content:'✕';position:absolute;right:3px;top:1px;font-size:14px;color:#e11d48;font-family:system-ui,sans-serif}
