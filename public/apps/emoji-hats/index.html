@@ -443,7 +443,8 @@ function finish(){
 }
 $('#again').onclick=()=>{if(OL.on)return OL.again();bg('#ffd23f');go('setup')};$('#home').onclick=()=>{if(OL.on)return OL.leave();bg('#ffd23f');go('menu')};
 
-const TH=['Food','Space','Spooky','Animals','Summer','Fancy','Ocean','Sports','Gross','Weather','Music','Transport','Nature','Office','Party','Tech','Medieval','Winter','Farm','Royalty','Kitchen','Beach','Circus','Science'];
+const TH=['Food','Space','Spooky','Animals','Summer','Fancy','Ocean','Sports','Gross','Weather','Music','Transport','Nature','Office','Party','Tech','Medieval','Winter','Farm','Royalty','Kitchen','Beach','Circus','Science',
+'Camping','Pirates','Breakfast','Dessert','Hospital','School','Wedding','Jungle','Desert','City','Garden','Bedroom','Bathroom','Airport','Gym','Movie Night','Superheroes','Wild West','Fairy Tale','Robots','Dinosaurs','Road Trip','Birthday','Holiday','Love','Money','Fire','Cold','Night','Morning','Magic','Mystery','Art','Fashion','Pizza Party','Picnic','Farmers Market','Haunted House','Time','Luck','Danger','Chaos','Cozy','Lazy Day','Mood','Gaming'];
 /* AI judge + AI themes go through a serverless proxy that holds the Groq key in the Vercel env variable "emojihats" (see api/groq.js).
    Deployed on Vercel this just works. Opened as a local file it can't reach the proxy, so the game falls back to its built-in judge;
    to use the AI from a local file, set this to your full deployment URL, e.g. 'https://your-app.vercel.app/api/groq'. */
