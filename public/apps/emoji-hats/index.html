@@ -475,8 +475,13 @@ $('#modes').onclick=async e=>{const b=e.target.closest('.mcard');if(!b||W.busy)r
  else{const m=$('#ham');m.style.display='block';await an(m,[{transform:'translate(30px,-110px) rotate(-70deg)',opacity:0},{transform:'translate(20px,-70px) rotate(-60deg)',opacity:1,offset:.45},{transform:'translate(-40px,30px) rotate(25deg)',opacity:1}],{duration:480,easing:'ease-in',fill:'forwards'});snd(70,.4,'sawtooth',-20,.3);shk();an(b,[{transform:'none'},{transform:'scale(.86,.78)'},{transform:'none'}],{duration:420});boom(true)}
  await sleep(950);const m=$('#ham');m.getAnimations().forEach(a=>a.cancel());m.style.display='none';$('#bb').style.display='none';W.busy=0;
  $('#sph').textContent=S.mode=='j'?'PLAYERS? (+1 JUDGE)':'HOW MANY PLAYERS?';go('setup')};
-
-async function aiTheme(){try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),12000);const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai/gpt-oss-120b',messages:[{role:'system',content:'You pick ONE random theme for an emoji hat party game. It must be broad and generic (1-2 words) so hundreds of emojis could fit it, like Food, Space, Spooky, Ocean, Fancy, Sports. Reply with ONLY the theme, no punctuation, no quotes.'},{role:'user',content:`Random seed ${Math.random()}. Do not use: ${S.used.join(', ')||'none'}`}],temperature:1,max_completion_tokens:512,reasoning_effort:'low'}),signal:ac.signal});clearTimeout(tm);const t=(await r.json()).choices[0].message.content.trim().split('\n')[0];if(!t||t.length>30)throw 0;return t}catch(e){return rnd(TH.filter(x=>!S.used.includes(x)))}}
+async function aiTheme(){
+  const last=S.used[S.used.length-1];
+  let pool=TH.filter(x=>!S.used.includes(x));      // themes not yet used this game
+  if(!pool.length)pool=TH.filter(x=>x!==last);     // everything used: reset the pool, but never repeat the previous one
+  return rnd(pool);
+}
+//async function aiTheme(){try{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),12000);const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai/gpt-oss-120b',messages:[{role:'system',content:'You pick ONE random theme for an emoji hat party game. It must be broad and generic (1-2 words) so hundreds of emojis could fit it, like Food, Space, Spooky, Ocean, Fancy, Sports. Reply with ONLY the theme, no punctuation, no quotes.'},{role:'user',content:`Random seed ${Math.random()}. Do not use: ${S.used.join(', ')||'none'}`}],temperature:1,max_completion_tokens:512,reasoning_effort:'low'}),signal:ac.signal});clearTimeout(tm);const t=(await r.json()).choices[0].message.content.trim().split('\n')[0];if(!t||t.length>30)throw 0;return t}catch(e){return rnd(TH.filter(x=>!S.used.includes(x)))}}
 $('#thdice').onclick=()=>{$('#thi').value=rnd(TH);snd(600,.1,'square',300);an($('#thi'),[{transform:'scale(1.12) rotate(-2deg)'},{transform:'none'}],{duration:350})};
 $('#thlock').onclick=()=>{if(W.th){const r=W.th;W.th=0;r($('#thi').value)}};
 $('#thgo').onclick=()=>{if(W.thn){const r=W.thn;W.thn=0;r()}};
