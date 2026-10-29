@@ -452,8 +452,29 @@ const TH=['Food','Space','Spooky','Animals','Summer','Fancy','Ocean','Sports','G
 'Medieval','Winter','Farm','Royalty','Kitchen','Beach','Circus','Science','Camping','Pirates','Breakfast','Dessert','Hospital','School','Wedding',
 'Jungle','Desert','City','Garden','Bedroom','Bathroom','Airport','Gym','Movie Night','Superheroes','Wild West','Fairy Tale','Robots','Dinosaurs',
 'Road Trip','Birthday','Holiday','Love','Money','Fire','Cold','Night','Morning','Magic','Mystery','Art','Fashion','Pizza Party','Picnic','Farmers Market',
-'Haunted House','Time','Luck','Danger','Chaos','Cozy','Lazy Day','Mood','Gaming'];
-/* AI judge + AI themes go through a serverless proxy that holds the Groq key in the Vercel env variable "emojihats" (see api/groq.js).
+'Haunted House','Time','Luck','Danger','Chaos','Cozy','Lazy Day','Mood','Gaming',
+
+// Everyday life
+'Laundry Day','Grocery Store','Garage Sale','Thrift Store','Dentist','Barbecue','Sleepover','Yard Work','Moving Day','Rainy Day','Sick Day','Monday Morning','Friday Night','Cleaning','Shopping Mall','Gas Station','Laundromat','Waiting Room','Elevator','Traffic Jam',
+
+// Food & drink
+'Fast Food','Street Food','Snack Time','Midnight Snack','Coffee Shop','Bakery','Ice Cream Shop','Buffet','Thanksgiving','Taco Tuesday','Brunch','Lunchbox','Cheese','Spicy','Sweet Tooth','Diner','Campfire Cooking','Movie Theater Snacks',
+
+// Funny / emotional
+'Embarrassing','Awkward','Drama','Panic','Procrastination','Overthinking','Bad Idea','Good Idea','Regret','Victory','Revenge','Jealousy','Bragging','Gossip','Secrets','Excuses','Fake Smile','Hangry','Tiredness','Cringe',
+
+// Places & scenes
+'Playground','Zoo','Aquarium','Theme Park','County Fair','Carnival','Swimming Pool','Ski Lodge','Treehouse','Basement','Attic','Backyard','Rooftop','Cabin','Castle','Lighthouse','Island','Cave','Library','Museum','Restaurant','Hotel','Cruise Ship','Train Station','Bus Stop','Parking Lot',
+
+// Occasions
+'Halloween','Christmas','New Year','Valentine\'s Day','Graduation','First Date','Job Interview','Road Rage','Family Reunion','Baby Shower','Garage Band','Talent Show','Camping Disaster','Surprise Party','Prom','Funeral Snacks','Vacation','Staycation','Snow Day','Power Outage',
+
+// Characters & vibes
+'Grandma\'s House','Dad Stuff','Mom Bag','Teenager','Toddler','Roommate','Neighbor','Cat Person','Dog Person','Night Owl','Early Bird','Overachiever','Slacker','Rich Person','Broke Person','Influencer','Tourist','Chef','Detective','Cowboy','Ninja','Wizard','Vampire','Zombie','Ghost','Alien','Mermaid','Bigfoot',
+
+// Weird & whimsical
+'Disguise','Escape Plan','Heist','Prank','Treasure Hunt','Mascot','Parade','Fireworks','Bubble Bath','Fort Building','Spa Day','Gift Wrapping','Birthday Cake','Lost and Found','Junk Drawer','Pocket Contents','Purse Chaos','Backpack','Survival','Apocalypse','Emergency','Rescue','Escape','Showoff','Lucky Charm','Bad Luck','Fame','Mess','Noise','Silence','Smell','Squishy','Shiny','Sticky','Crunchy','Tiny','Giant','Fuzzy','Slippery'
+];/* AI judge + AI themes go through a serverless proxy that holds the Groq key in the Vercel env variable "emojihats" (see api/groq.js).
    Deployed on Vercel this just works. Opened as a local file it can't reach the proxy, so the game falls back to its built-in judge;
    to use the AI from a local file, set this to your full deployment URL, e.g. 'https://your-app.vercel.app/api/groq'. */
 const API='/api/groq';
